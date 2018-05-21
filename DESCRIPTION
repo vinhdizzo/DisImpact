@@ -1,0 +1,14 @@
+Package: DisImpact
+Title: Calculates Disproportionate Impact When Binary Success Data are Disaggregated by Subgroups
+Version: 0.0.1
+Authors@R: person("Vinh", "Nguyen", email = "nguyenvq714@gmail.com", role = c("aut", "cre"))
+Description: Implements the Percentage Point Gap Method and other methods for Disproportionate Impact
+Depends: R (>= 3.4.2)
+Imports: magrittr, dplyr, rlang
+License: GPL3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr

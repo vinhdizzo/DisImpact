@@ -1,0 +1,140 @@
+---
+title: "DisImpact Tutorial"
+author: "Vinh Nguyen"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DisImpact Tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+The `DisImpact` R package contains functions that help in determining Disproportionate Impact (DI) based on the following methodologies:
+
+1. [Percentage Point Gap](http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf) (PPG) method,
+2. [Proportionality Index](http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES%20FOR%20MEASURING%20DISPROPORTIONATE%20IMPACT%20IN%20EQUITY%20PLANS.pdf) method (method #1 in reference), and
+3. [80% Index](http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES%20FOR%20MEASURING%20DISPROPORTIONATE%20IMPACT%20IN%20EQUITY%20PLANS.pdf) method (method #2 in reference).
+
+## Install Package
+```{r}
+# From CRAN
+## install.packages('DisImpact')
+
+# From github (Development)
+## devtools::install_github('vinhdizzo/DisImpact')
+```
+
+## Load Packages
+```{r}
+library(DisImpact)
+```
+
+## Generate Toy Data Set
+To illustrate the functionality of the package, let's generate a toy data set using random numbers:
+```{r}
+# Data parameters
+true.p <- c(0.4, 0.5, 0.3, 0.2, 0.7, 0.6)
+nPerGroup <- c(100, 500, 1000, 2000, 3000, 3400)
+nGroups <- length(nPerGroup); nGroups
+nEachCohort <- sum(nPerGroup); nEachCohort
+nCohorts <- 2
+
+# Generate toy data
+set.seed(1)
+library(dplyr)
+df <- data_frame(Cohort=rep(2017:2018, each=nEachCohort)
+                 , Ethnicity=rep(rep(c('Native American', 'Multi-Ethnicity', 'Black', 'Hispanic', 'Asian', 'White'), times=nPerGroup), 2)
+                 , Transfer=c(lapply(1:nGroups, function(i) sample(0:1, size=nPerGroup[i], replace=TRUE, prob=c(1-true.p[i], true.p[i]))) %>% unlist
+                              , lapply(1:nGroups, function(i) sample(0:1, size=nPerGroup[i], replace=TRUE, prob=c(1-true.p[i]*1.05, true.p[i]*1.05))) %>% unlist
+                              )
+                 )
+```
+
+The toy data set can be summarized as follows:
+```{r}
+# Summarize toy data
+dim(df)
+df %>%
+  group_by(Cohort, Ethnicity) %>%
+  summarize(n=n(), Transfer_Rate=mean(Transfer))
+```
+
+## Percentage Point Gap (PPG) method
+`ppg` is the main work function, and it can take on vectors or column names the tidy way:
+```{r}
+# Without cohort
+## Vector
+di_ppg(success=df$Transfer, group=df$Ethnicity) %>% as.data.frame
+## Tidy and column reference
+df %>%
+  di_ppg(success=Transfer, group=Ethnicity, data=.) %>%
+  as.data.frame
+
+# With cohort
+## Vector
+di_ppg(success=df$Transfer, group=df$Ethnicity, cohort=df$Cohort) %>% as.data.frame
+## Tidy and column reference
+df %>%
+  di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, data=.) %>%
+  as.data.frame
+
+# With custom reference (single)
+## Vector
+di_ppg(success=df$Transfer, group=df$Ethnicity, reference=0.54) %>%
+  as.data.frame
+## Tidy and column reference
+df %>%
+  di_ppg(success=Transfer, group=Ethnicity, reference=0.54, data=.) %>%
+  as.data.frame
+
+# With custom reference (multiple), but
+## Vector
+di_ppg(success=df$Transfer, group=df$Ethnicity, cohort=df$Cohort, reference=c(0.5, 0.55)) %>%
+  as.data.frame
+## Tidy and column reference
+df %>%
+  di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, reference=c(0.5, 0.55), data=.) %>%
+  as.data.frame
+```
+
+## Proportionality Index
+`di_prop_index` is the main work function for this method, and it can take on vectors or column names the tidy way:
+
+```{r}
+# Without cohort
+## Vector
+di_prop_index(success=df$Transfer, group=df$Ethnicity) %>% as.data.frame
+## Tidy and column reference
+df %>%
+  di_prop_index(success=Transfer, group=Ethnicity, data=.) %>%
+  as.data.frame
+
+# With cohort
+## Vector
+di_prop_index(success=df$Transfer, group=df$Ethnicity, cohort=df$Cohort) %>% as.data.frame
+## Tidy and column reference
+df %>%
+  di_prop_index(success=Transfer, group=Ethnicity, cohort=Cohort, data=.) %>%
+  as.data.frame
+```
+
+## 80% Index
+`di_80_index` is the main work function for this method, and it can take on vectors or column names the tidy way:
+
+```{r}
+# Without cohort
+## Vector
+di_80_index(success=df$Transfer, group=df$Ethnicity) %>% as.data.frame
+## Tidy and column reference
+df %>%
+  di_80_index(success=Transfer, group=Ethnicity, data=.) %>%
+  as.data.frame
+
+# With cohort
+## Vector
+di_80_index(success=df$Transfer, group=df$Ethnicity, cohort=df$Cohort) %>% as.data.frame
+## Tidy and column reference
+df %>%
+  di_80_index(success=Transfer, group=Ethnicity, cohort=Cohort, data=.) %>%
+  as.data.frame
+```
