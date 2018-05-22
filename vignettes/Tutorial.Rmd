@@ -17,7 +17,7 @@ The `DisImpact` R package contains functions that help in determining Disproport
 
 ## Install Package
 ```{r}
-# From CRAN
+# From CRAN (Official)
 ## install.packages('DisImpact')
 
 # From github (Development)
@@ -25,8 +25,9 @@ The `DisImpact` R package contains functions that help in determining Disproport
 ```
 
 ## Load Packages
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library(DisImpact)
+library(dplyr) # Ease in manipulations with data frames
 ```
 
 ## Generate Toy Data Set
@@ -41,7 +42,6 @@ nCohorts <- 2
 
 # Generate toy data
 set.seed(1)
-library(dplyr)
 df <- data_frame(Cohort=rep(2017:2018, each=nEachCohort)
                  , Ethnicity=rep(rep(c('Native American', 'Multi-Ethnicity', 'Black', 'Hispanic', 'Asian', 'White'), times=nPerGroup), 2)
                  , Transfer=c(lapply(1:nGroups, function(i) sample(0:1, size=nPerGroup[i], replace=TRUE, prob=c(1-true.p[i], true.p[i]))) %>% unlist
@@ -54,9 +54,10 @@ The toy data set can be summarized as follows:
 ```{r}
 # Summarize toy data
 dim(df)
-df %>%
+dSumm <- df %>%
   group_by(Cohort, Ethnicity) %>%
   summarize(n=n(), Transfer_Rate=mean(Transfer))
+dSumm
 ```
 
 ## Percentage Point Gap (PPG) method
@@ -66,16 +67,14 @@ df %>%
 ## Vector
 di_ppg(success=df$Transfer, group=df$Ethnicity) %>% as.data.frame
 ## Tidy and column reference
-df %>%
-  di_ppg(success=Transfer, group=Ethnicity, data=.) %>%
+di_ppg(success=Transfer, group=Ethnicity, data=df) %>%
   as.data.frame
 
 # With cohort
 ## Vector
 di_ppg(success=df$Transfer, group=df$Ethnicity, cohort=df$Cohort) %>% as.data.frame
 ## Tidy and column reference
-df %>%
-  di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, data=.) %>%
+di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, data=df) %>%
   as.data.frame
 
 # With custom reference (single)
@@ -83,8 +82,7 @@ df %>%
 di_ppg(success=df$Transfer, group=df$Ethnicity, reference=0.54) %>%
   as.data.frame
 ## Tidy and column reference
-df %>%
-  di_ppg(success=Transfer, group=Ethnicity, reference=0.54, data=.) %>%
+di_ppg(success=Transfer, group=Ethnicity, reference=0.54, data=df) %>%
   as.data.frame
 
 # With custom reference (multiple), but
@@ -92,8 +90,7 @@ df %>%
 di_ppg(success=df$Transfer, group=df$Ethnicity, cohort=df$Cohort, reference=c(0.5, 0.55)) %>%
   as.data.frame
 ## Tidy and column reference
-df %>%
-  di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, reference=c(0.5, 0.55), data=.) %>%
+di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, reference=c(0.5, 0.55), data=df) %>%
   as.data.frame
 ```
 
@@ -105,16 +102,14 @@ df %>%
 ## Vector
 di_prop_index(success=df$Transfer, group=df$Ethnicity) %>% as.data.frame
 ## Tidy and column reference
-df %>%
-  di_prop_index(success=Transfer, group=Ethnicity, data=.) %>%
+di_prop_index(success=Transfer, group=Ethnicity, data=df) %>%
   as.data.frame
 
 # With cohort
 ## Vector
 di_prop_index(success=df$Transfer, group=df$Ethnicity, cohort=df$Cohort) %>% as.data.frame
 ## Tidy and column reference
-df %>%
-  di_prop_index(success=Transfer, group=Ethnicity, cohort=Cohort, data=.) %>%
+di_prop_index(success=Transfer, group=Ethnicity, cohort=Cohort, data=df) %>%
   as.data.frame
 ```
 
@@ -126,15 +121,33 @@ df %>%
 ## Vector
 di_80_index(success=df$Transfer, group=df$Ethnicity) %>% as.data.frame
 ## Tidy and column reference
-df %>%
-  di_80_index(success=Transfer, group=Ethnicity, data=.) %>%
+di_80_index(success=Transfer, group=Ethnicity, data=df) %>%
   as.data.frame
 
 # With cohort
 ## Vector
 di_80_index(success=df$Transfer, group=df$Ethnicity, cohort=df$Cohort) %>% as.data.frame
 ## Tidy and column reference
-df %>%
-  di_80_index(success=Transfer, group=Ethnicity, cohort=Cohort, data=.) %>%
+di_80_index(success=Transfer, group=Ethnicity, cohort=Cohort, data=df) %>%
   as.data.frame
+```
+
+## When we have a non-success variable like drop-out
+Suppose we have a variable that indicates something nevative.  We could calculate DI on the converse of it:
+```{r}
+di_ppg(success=!Transfer, group=Ethnicity, data=df) %>%
+  as.data.frame
+```
+
+## Transformations on the fly
+We can compute the success, group, and cohort variables on the fly:
+```{r}
+# Transform success
+a <- sample(0:1, size=sum(nPerGroup)*nCohorts, replace=TRUE, prob=c(0.95, 0.05))
+mean(a)
+di_ppg(success=pmax(Transfer, a), group=Ethnicity, data=df) %>%
+  as.data.frame
+
+# Collapse Black and Hispanic
+di_ppg(success=Transfer, group=ifelse(Ethnicity %in% c('Black', 'Hispanic'), 'Black/Hispanic', Ethnicity), data=df) %>% as.data.frame
 ```

@@ -33,13 +33,15 @@ di_prop_index <- function(success, group, cohort, data) {
 
   # Calculate
   df <- data_frame(cohort, group, success)
+  pct_success <- pct_group <- NULL # to resolve CRAN NOTE: no visible binding for global variable
   dResults <- df %>%
     group_by(cohort, group) %>%
     summarize(n=n(), success=sum(success)) %>%
     ungroup %>%
     group_by(cohort) %>% 
     mutate(pct_success=success/sum(success), pct_group=n/sum(n), di_prop_index=pct_success/pct_group) %>% 
-    ungroup
+    ungroup %>%
+    arrange(cohort, group)
 
   if (remove_cohort) {
     dResults$cohort <- NULL

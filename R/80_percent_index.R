@@ -33,13 +33,15 @@ di_80_index <- function(success, group, cohort, data) {
 
   # Calculate
   df <- data_frame(cohort, group, success)
+  pct <- reference <- NULL # to resolve CRAN NOTE: no visible binding for global variable
   dResults <- df %>%
     group_by(cohort, group) %>%
     summarize(n=n(), success=sum(success), pct=success/n) %>%
     ungroup %>%
     group_by(cohort) %>% 
-    mutate(reference=max(pct), di_80_index=pct/reference, di_indicator=ifelse(di_80_index<0.80, 1, 0)) %>% 
-    ungroup
+    mutate(reference=max(pct), di_80_index=pct/reference, di_indicator=ifelse(di_80_index < 0.80, 1, 0)) %>% 
+    ungroup %>%
+    arrange(cohort, group)
 
   if (remove_cohort) {
     dResults$cohort <- NULL

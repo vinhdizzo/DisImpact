@@ -5,7 +5,7 @@
 \title{Calculate Disproportionate Impact per the Percentage Point Gap (PPG) method.}
 \usage{
 di_ppg(success, group, cohort, reference = c("overall", "hpg"), data,
-  min.moe = 0.03)
+  min.moe = 0.03, use.prop.in.moe = FALSE)
 }
 \arguments{
 \item{success}{A vector of success indicators (\code{1}/\code{0} or \code{TRUE}/\code{FALSE}) or an unquoted reference (name) to a column in \code{data} if it is specified.}
@@ -23,6 +23,8 @@ di_ppg(success, group, cohort, reference = c("overall", "hpg"), data,
 \item{data}{(Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.}
 
 \item{min.moe}{The minimum margin of error (MOE) to be used in the calculation of Disproportionate Impact and is passed to \link{ppg_moe}.  Defaults to \code{0.03}.}
+
+\item{use.prop.in.moe}{A logical value indicating whether or not the MOE formula should use the observed success rates (\code{TRUE}).  Defaults to \code{FALSE}, which uses 0.50 as the proportion in the MOE formula.  If \code{TRUE}, the success rates are passed to the \code{proportion} argument of \link{ppg_moe}.}
 }
 \value{
 A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference (reference used in DI calculation), moe (margin of error), pct.lo (lower 95\% confidence interval for pct), pct.hi (upper 95\% confidence interval for pct), and di.indicator (1 if there is Disproportionate Impact).

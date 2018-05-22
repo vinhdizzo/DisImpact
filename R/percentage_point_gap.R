@@ -1,5 +1,8 @@
+## library(devtools)
+## library(roxygen2)
 ## setwd('DisImpact')
 ## document()
+## devtools::build()
 ## setwd('..')
 ## install('DisImpact')
 
@@ -11,12 +14,12 @@
 ##' @param min.moe The minimum MOE returned even if the sample size is large.  Defaults to 0.03.
 ##' @return The margin of error for the PPG given the specified sample size.
 ##' @export
-di_ppg_moe <- function(n, proportion, min.moe=0.03) {
+ppg_moe <- function(n, proportion, min.moe=0.03) {
   if (missing(proportion)) {
-    return(max(1.96 * sqrt(0.25/n), min.moe))
+    return(pmax(1.96 * sqrt(0.25/n), min.moe))
   }
   else {
-    return(max(1.96 * sqrt(proportion * (1-proportion)/n), min.moe))
+    return(pmax(1.96 * sqrt(proportion * (1-proportion)/n), min.moe))
   }
 }
 ##' Calculate Disproportionate Impact per the Percentage Point Gap (PPG) method.
@@ -33,21 +36,21 @@ di_ppg_moe <- function(n, proportion, min.moe=0.03) {
 ##'   4. the specified vector of proportions will refer to the reference point for each cohort in alphabetical order (so the number of proportions should equal to the number of unique cohorts).\cr
 ##' @param data (Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.
 ##' @param min.moe The minimum margin of error (MOE) to be used in the calculation of Disproportionate Impact and is passed to \link{ppg_moe}.  Defaults to \code{0.03}.
+##' @param use.prop.in.moe A logical value indicating whether or not the MOE formula should use the observed success rates (\code{TRUE}).  Defaults to \code{FALSE}, which uses 0.50 as the proportion in the MOE formula.  If \code{TRUE}, the success rates are passed to the \code{proportion} argument of \link{ppg_moe}.
 ##' @return A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference (reference used in DI calculation), moe (margin of error), pct.lo (lower 95\% confidence interval for pct), pct.hi (upper 95\% confidence interval for pct), and di.indicator (1 if there is Disproportionate Impact).
 ##' @export
 ##' @import dplyr rlang
-di_ppg <- function(success, group, cohort, reference=c('overall', 'hpg'), data, min.moe=0.03) {
+di_ppg <- function(success, group, cohort, reference=c('overall', 'hpg'), data, min.moe=0.03, use.prop.in.moe=FALSE) {
   ## require(magrittr)
   ## require(dplyr)
   ## require(rlang)
 
   if (!missing(data)) {
     eq_success <- enquo(success)
-    success <- data %>% select(!!eq_success) %>% unlist
+    success <- data %>% mutate(success=!!eq_success) %>% select(success) %>% unlist
     eq_group <- enquo(group)
-    group <- data %>% select(!!eq_group) %>% unlist
+    group <- data %>% mutate(group=!!eq_group) %>% select(group) %>% unlist
   }
-  
   # Check if success is binary or logical and that there are no NA's
   stopifnot(success %in% c(1, 0))
 
@@ -59,7 +62,7 @@ di_ppg <- function(success, group, cohort, reference=c('overall', 'hpg'), data, 
     remove_cohort <- FALSE
     if (!missing(data)) {
       eq_cohort <- enquo(cohort)
-      cohort <- data %>% select(!!eq_cohort) %>% unlist
+      cohort <- data %>% mutate(cohort=!!eq_cohort) %>% select(cohort) %>% unlist
     }
   }
 
@@ -100,12 +103,16 @@ di_ppg <- function(success, group, cohort, reference=c('overall', 'hpg'), data, 
     dResults <- dResults %>%
       left_join(dReference)
   }
+  pct <- moe <- pct.hi <- NULL # to resolve CRAN NOTE: no visible binding for global variable
   dResults <- dResults %>% 
-    mutate(moe=di_ppg_moe(n, min.moe)
+    mutate(moe=case_when(use.prop.in.moe ~ ppg_moe(n=n, proportion=pct, min.moe=min.moe)
+                         , !use.prop.in.moe ~ ppg_moe(n=n, min.moe=min.moe)
+                         )
          , pct.lo=pct - moe
          , pct.hi=pct + moe
          , di.indicator=ifelse(pct.hi < reference, 1, 0)
-           )
+           ) %>%
+    arrange(cohort, group)
   
   if (remove_cohort) {
     dResults$cohort <- NULL
