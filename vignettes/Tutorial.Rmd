@@ -61,36 +61,45 @@ dSumm
 ```
 
 ## Percentage Point Gap (PPG) method
-`ppg` is the main work function, and it can take on vectors or column names the tidy way:
+`di_ppg` is the main work function, and it can take on vectors or column names the tidy way:
 ```{r}
-# Without cohort
-## Vector
+# Vector
 di_ppg(success=df$Transfer, group=df$Ethnicity) %>% as.data.frame
-## Tidy and column reference
+# Tidy and column reference
 di_ppg(success=Transfer, group=Ethnicity, data=df) %>%
   as.data.frame
+```
 
-# With cohort
-## Vector
-di_ppg(success=df$Transfer, group=df$Ethnicity, cohort=df$Cohort) %>% as.data.frame
-## Tidy and column reference
+Sometimes, one might want to break out the DI calculation by cohort:
+```{r}
+# Tidy and column reference
 di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, data=df) %>%
   as.data.frame
+```
 
+The user could also pass in custom reference points for comparison (eg, a state-wide rate).  `di_ppg` accepts either a single reference point to be used or a vector of reference points, one for each cohort.  For the latter, the vector of reference points will be taken to correspond to the `cohort` variable, alphabetically ordered.
+```{r}
 # With custom reference (single)
-## Vector
-di_ppg(success=df$Transfer, group=df$Ethnicity, reference=0.54) %>%
-  as.data.frame
-## Tidy and column reference
 di_ppg(success=Transfer, group=Ethnicity, reference=0.54, data=df) %>%
   as.data.frame
 
-# With custom reference (multiple), but
-## Vector
-di_ppg(success=df$Transfer, group=df$Ethnicity, cohort=df$Cohort, reference=c(0.5, 0.55)) %>%
-  as.data.frame
+# With custom reference (multiple)
 ## Tidy and column reference
 di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, reference=c(0.5, 0.55), data=df) %>%
+  as.data.frame
+```
+
+The margin of error (MOE) in `di_ppg` has 2 underlying assumptions (defaults):
+
+1. the minimum MOE returned is 0.03, and
+2. using 0.50 as the proportion in the margin of error formula, $1.96 \times \sqrt{\hat{p} (1-\hat{p}) / n}$.
+
+To override 1, the user could specify `min_moe` in `di_ppg`.  To override 2, the user could specify `use_prop_in_moe=TRUE` in `di_ppg`.
+```{r}
+di_ppg(success=Transfer, group=Ethnicity, data=df, min_moe=0.02) %>%
+  as.data.frame
+
+di_ppg(success=Transfer, group=Ethnicity, data=df, min_moe=0.02, use_prop_in_moe=TRUE) %>%
   as.data.frame
 ```
 
