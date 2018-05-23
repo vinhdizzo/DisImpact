@@ -14,5 +14,5 @@ The `DisImpact` R package contains functions that help in determining Disproport
 ## devtools::install_github('vinhdizzo/DisImpact')
 ```
 
-# Tutorial
+## Tutorial
 A vignette on how to use the package can be found here.
