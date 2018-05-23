@@ -11,20 +11,20 @@
 ##' @title Margin of Error for the PPG
 ##' @param n Sample size for the group of interest.
 ##' @param proportion The proportion of successes for the group of interest.  If specified, then the proportion is used in the MOE formula.  Otherwise, a default proportion of 0.50 is used (conservative and yields the maximum MOE).
-##' @param min.moe The minimum MOE returned even if the sample size is large.  Defaults to 0.03.
+##' @param min_moe The minimum MOE returned even if the sample size is large.  Defaults to 0.03.
 ##' @return The margin of error for the PPG given the specified sample size.
 ##' @export
-ppg_moe <- function(n, proportion, min.moe=0.03) {
+ppg_moe <- function(n, proportion, min_moe=0.03) {
   if (missing(proportion)) {
-    return(pmax(1.96 * sqrt(0.25/n), min.moe))
+    return(pmax(1.96 * sqrt(0.25/n), min_moe))
   }
   else {
-    return(pmax(1.96 * sqrt(proportion * (1-proportion)/n), min.moe))
+    return(pmax(1.96 * sqrt(proportion * (1-proportion)/n), min_moe))
   }
 }
 ##' Calculate Disproportionate Impact per the Percentage Point Gap (PPG) method.
 ##'
-##' This function determines Disproportionate Impact based on the Percentage Point Gap (PPG) method, as described in \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.  Note that the margin of error (MOE) is calculated using using 1.96*sqrt(0.25^2/n), with a \code{min.moe} used as the minimum by default.
+##' This function determines Disproportionate Impact based on the Percentage Point Gap (PPG) method, as described in \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.  Note that the margin of error (MOE) is calculated using using 1.96*sqrt(0.25^2/n), with a \code{min_moe} used as the minimum by default.
 ##' @title Calculate Disproportionate Impact per the Percentage Point Gap (PPG) method.
 ##' @param success A vector of success indicators (\code{1}/\code{0} or \code{TRUE}/\code{FALSE}) or an unquoted reference (name) to a column in \code{data} if it is specified.
 ##' @param group A vector of group names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.
@@ -35,12 +35,12 @@ ppg_moe <- function(n, proportion, min.moe=0.03) {
 ##'   3. the specified proportion will be used for all cohorts;\cr
 ##'   4. the specified vector of proportions will refer to the reference point for each cohort in alphabetical order (so the number of proportions should equal to the number of unique cohorts).\cr
 ##' @param data (Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.
-##' @param min.moe The minimum margin of error (MOE) to be used in the calculation of Disproportionate Impact and is passed to \link{ppg_moe}.  Defaults to \code{0.03}.
-##' @param use.prop.in.moe A logical value indicating whether or not the MOE formula should use the observed success rates (\code{TRUE}).  Defaults to \code{FALSE}, which uses 0.50 as the proportion in the MOE formula.  If \code{TRUE}, the success rates are passed to the \code{proportion} argument of \link{ppg_moe}.
+##' @param min_moe The minimum margin of error (MOE) to be used in the calculation of Disproportionate Impact and is passed to \link{ppg_moe}.  Defaults to \code{0.03}.
+##' @param use_prop_in_moe A logical value indicating whether or not the MOE formula should use the observed success rates (\code{TRUE}).  Defaults to \code{FALSE}, which uses 0.50 as the proportion in the MOE formula.  If \code{TRUE}, the success rates are passed to the \code{proportion} argument of \link{ppg_moe}.
 ##' @return A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference (reference used in DI calculation), moe (margin of error), pct.lo (lower 95\% confidence interval for pct), pct.hi (upper 95\% confidence interval for pct), and di.indicator (1 if there is Disproportionate Impact).
 ##' @export
 ##' @import dplyr rlang
-di_ppg <- function(success, group, cohort, reference=c('overall', 'hpg'), data, min.moe=0.03, use.prop.in.moe=FALSE) {
+di_ppg <- function(success, group, cohort, reference=c('overall', 'hpg'), data, min_moe=0.03, use_prop_in_moe=FALSE) {
   ## require(magrittr)
   ## require(dplyr)
   ## require(rlang)
@@ -105,8 +105,8 @@ di_ppg <- function(success, group, cohort, reference=c('overall', 'hpg'), data, 
   }
   pct <- moe <- pct.hi <- NULL # to resolve CRAN NOTE: no visible binding for global variable
   dResults <- dResults %>% 
-    mutate(moe=case_when(use.prop.in.moe ~ ppg_moe(n=n, proportion=pct, min.moe=min.moe)
-                         , !use.prop.in.moe ~ ppg_moe(n=n, min.moe=min.moe)
+    mutate(moe=case_when(use_prop_in_moe ~ ppg_moe(n=n, proportion=pct, min_moe=min_moe)
+                         , !use_prop_in_moe ~ ppg_moe(n=n, min_moe=min_moe)
                          )
          , pct.lo=pct - moe
          , pct.hi=pct + moe
