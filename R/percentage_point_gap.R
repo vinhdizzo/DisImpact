@@ -10,7 +10,7 @@
 ##'
 ##' @title Margin of Error for the PPG
 ##' @param n Sample size for the group of interest.
-##' @param proportion The proportion of successes for the group of interest.  If specified, then the proportion is used in the MOE formula.  Otherwise, a default proportion of 0.50 is used (conservative and yields the maximum MOE).
+##' @param proportion (Optional) The proportion of successes for the group of interest.  If specified, then the proportion is used in the MOE formula.  Otherwise, a default proportion of 0.50 is used (conservative and yields the maximum MOE).
 ##' @param min_moe The minimum MOE returned even if the sample size is large.  Defaults to 0.03.
 ##' @return The margin of error for the PPG given the specified sample size.
 ##' @export
