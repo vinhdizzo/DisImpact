@@ -12,9 +12,9 @@
 di_prop_index <- function(success, group, cohort, data) {
   if (!missing(data)) {
     eq_success <- enquo(success)
-    success <- data %>% select(!!eq_success) %>% unlist
+    success <- data %>% ungroup %>% mutate(success=!!eq_success) %>% select(success) %>% unlist
     eq_group <- enquo(group)
-    group <- data %>% select(!!eq_group) %>% unlist
+    group <- data %>% ungroup %>% mutate(group=!!eq_group) %>% select(group) %>% unlist
   }
   # Check if success is binary or logical and that there are no NA's
   stopifnot(success %in% c(1, 0))
@@ -27,7 +27,7 @@ di_prop_index <- function(success, group, cohort, data) {
     remove_cohort <- FALSE
     if (!missing(data)) {
       eq_cohort <- enquo(cohort)
-      cohort <- data %>% select(!!eq_cohort) %>% unlist
+      cohort <- data %>% ungroup %>% mutate(cohort=!!eq_cohort) %>% select(cohort) %>% unlist
     }
   }
 
