@@ -13,6 +13,13 @@
 ##' @param proportion (Optional) The proportion of successes for the group of interest.  If specified, then the proportion is used in the MOE formula.  Otherwise, a default proportion of 0.50 is used (conservative and yields the maximum MOE).
 ##' @param min_moe The minimum MOE returned even if the sample size is large.  Defaults to 0.03.
 ##' @return The margin of error for the PPG given the specified sample size.
+##' @examples
+##' ppg_moe(n=800)
+##' ppg_moe(n=c(200, 800, 1000, 2000))
+##' ppg_moe(n=800, proportion=0.20)
+##' ppg_moe(n=800, proportion=0.20, min_moe=0)
+##' ppg_moe(n=c(200, 800, 1000, 2000), min_moe=0.01)
+##' @references California Community Colleges Chancellor's Office (2017).  \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{Percentage Point Gap Method}.
 ##' @export
 ppg_moe <- function(n, proportion, min_moe=0.03) {
   if (missing(proportion)) {
@@ -38,6 +45,29 @@ ppg_moe <- function(n, proportion, min_moe=0.03) {
 ##' @param min_moe The minimum margin of error (MOE) to be used in the calculation of disproportionate impact and is passed to \link{ppg_moe}.  Defaults to \code{0.03}.
 ##' @param use_prop_in_moe A logical value indicating whether or not the MOE formula should use the observed success rates (\code{TRUE}).  Defaults to \code{FALSE}, which uses 0.50 as the proportion in the MOE formula.  If \code{TRUE}, the success rates are passed to the \code{proportion} argument of \link{ppg_moe}.
 ##' @return A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference (reference used in DI calculation), moe (margin of error), pct.lo (lower 95\% confidence interval for pct), pct.hi (upper 95\% confidence interval for pct), and di.indicator (1 if there is disproportionate impact).
+##' @examples
+##' data(student_equity)
+##' # Vector
+##' di_ppg(success=student_equity$Transfer, group=student_equity$Ethnicity) %>% as.data.frame
+##' # Tidy and column reference
+##' di_ppg(success=Transfer, group=Ethnicity, data=student_equity) %>%
+##'  as.data.frame
+##' # Cohort
+##' di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, data=student_equity) %>%
+##'   as.data.frame
+##' # With custom reference (single)
+##' di_ppg(success=Transfer, group=Ethnicity, reference=0.54, data=student_equity) %>%
+##'  as.data.frame
+##' # With custom reference (multiple)
+##' di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, reference=c(0.5, 0.55), data=student_equity) %>%
+##'   as.data.frame
+##' # min_moe
+##' di_ppg(success=Transfer, group=Ethnicity, data=student_equity, min_moe=0.02) %>%
+##'   as.data.frame
+##' # use_prop_in_moe
+##' di_ppg(success=Transfer, group=Ethnicity, data=student_equity, min_moe=0.02, use_prop_in_moe=TRUE) %>%
+##'   as.data.frame
+##' @references California Community Colleges Chancellor's Office (2017).  \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{Percentage Point Gap Method}.
 ##' @export
 ##' @import dplyr rlang
 di_ppg <- function(success, group, cohort, reference=c('overall', 'hpg'), data, min_moe=0.03, use_prop_in_moe=FALSE) {

@@ -2,14 +2,14 @@
 % Please edit documentation in R/percentage_point_gap.R
 \name{ppg_moe}
 \alias{ppg_moe}
-\title{Margin of Error for the PPG}
+\title{Margin of error for the PPG}
 \usage{
 ppg_moe(n, proportion, min_moe = 0.03)
 }
 \arguments{
 \item{n}{Sample size for the group of interest.}
 
-\item{proportion}{The proportion of successes for the group of interest.  If specified, then the proportion is used in the MOE formula.  Otherwise, a default proportion of 0.50 is used (conservative and yields the maximum MOE).}
+\item{proportion}{(Optional) The proportion of successes for the group of interest.  If specified, then the proportion is used in the MOE formula.  Otherwise, a default proportion of 0.50 is used (conservative and yields the maximum MOE).}
 
 \item{min_moe}{The minimum MOE returned even if the sample size is large.  Defaults to 0.03.}
 }
@@ -17,5 +17,15 @@ ppg_moe(n, proportion, min_moe = 0.03)
 The margin of error for the PPG given the specified sample size.
 }
 \description{
-Calculate the Margin of Error (MOE) for the Percentage Point Gap (PPG) method.
+Calculate the margin of error (MOE) for the percentage point gap (PPG) method.
+}
+\examples{
+ppg_moe(n=800)
+ppg_moe(n=c(200, 800, 1000, 2000))
+ppg_moe(n=800, proportion=0.20)
+ppg_moe(n=800, proportion=0.20, min_moe=0)
+ppg_moe(n=c(200, 800, 1000, 2000), min_moe=0.01)
+}
+\references{
+California Community Colleges Chancellor's Office (2017).  \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{Percentage Point Gap Method}.
 }

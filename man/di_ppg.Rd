@@ -2,7 +2,7 @@
 % Please edit documentation in R/percentage_point_gap.R
 \name{di_ppg}
 \alias{di_ppg}
-\title{Calculate Disproportionate Impact per the Percentage Point Gap (PPG) method.}
+\title{Calculate disproportionate impact per the percentage point gap (PPG) method.}
 \usage{
 di_ppg(success, group, cohort, reference = c("overall", "hpg"), data,
   min_moe = 0.03, use_prop_in_moe = FALSE)
@@ -12,9 +12,9 @@ di_ppg(success, group, cohort, reference = c("overall", "hpg"), data,
 
 \item{group}{A vector of group names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.}
 
-\item{cohort}{(Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  Disproportionate Impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.}
+\item{cohort}{(Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  disproportionate impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.}
 
-\item{reference}{Either \code{'overall'} (default), \code{'hpg'} (highest performing group), a single proportion (eg, 0.50), or a vector of proportions.  Reference is used as a point of comparison for Disproportionate Impact for each group.  When \code{cohort} is specified:\cr
+\item{reference}{Either \code{'overall'} (default), \code{'hpg'} (highest performing group), a single proportion (eg, 0.50), or a vector of proportions.  Reference is used as a point of comparison for disproportionate impact for each group.  When \code{cohort} is specified:\cr
 1. \code{'overall'} will use the overall success rate of each cohort group as the reference;\cr
 2. \code{'hpg'} will use the highest performing group in each cohort as reference;\cr
 3. the specified proportion will be used for all cohorts;\cr
@@ -22,16 +22,42 @@ di_ppg(success, group, cohort, reference = c("overall", "hpg"), data,
 
 \item{data}{(Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.}
 
-\item{min_moe}{The minimum margin of error (MOE) to be used in the calculation of Disproportionate Impact and is passed to \link{ppg_moe}.  Defaults to \code{0.03}.}
+\item{min_moe}{The minimum margin of error (MOE) to be used in the calculation of disproportionate impact and is passed to \link{ppg_moe}.  Defaults to \code{0.03}.}
 
 \item{use_prop_in_moe}{A logical value indicating whether or not the MOE formula should use the observed success rates (\code{TRUE}).  Defaults to \code{FALSE}, which uses 0.50 as the proportion in the MOE formula.  If \code{TRUE}, the success rates are passed to the \code{proportion} argument of \link{ppg_moe}.}
 }
 \value{
-A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference (reference used in DI calculation), moe (margin of error), pct.lo (lower 95\% confidence interval for pct), pct.hi (upper 95\% confidence interval for pct), and di.indicator (1 if there is Disproportionate Impact).
+A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference (reference used in DI calculation), moe (margin of error), pct.lo (lower 95\% confidence interval for pct), pct.hi (upper 95\% confidence interval for pct), and di.indicator (1 if there is disproportionate impact).
 }
 \description{
-Calculate Disproportionate Impact per the Percentage Point Gap (PPG) method.
+Calculate disproportionate impact per the percentage point gap (PPG) method.
 }
 \details{
-This function determines Disproportionate Impact based on the Percentage Point Gap (PPG) method, as described in \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.  Note that the margin of error (MOE) is calculated using using 1.96*sqrt(0.25^2/n), with a \code{min_moe} used as the minimum by default.
+This function determines disproportionate impact based on the percentage point gap (PPG) method, as described in \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.  Note that the margin of error (MOE) is calculated using using 1.96*sqrt(0.25^2/n), with a \code{min_moe} used as the minimum by default.
+}
+\examples{
+data(student_equity)
+# Vector
+di_ppg(success=student_equity$Transfer, group=student_equity$Ethnicity) \%>\% as.data.frame
+# Tidy and column reference
+di_ppg(success=Transfer, group=Ethnicity, data=student_equity) \%>\%
+ as.data.frame
+# Cohort
+di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, data=student_equity) \%>\%
+  as.data.frame
+# With custom reference (single)
+di_ppg(success=Transfer, group=Ethnicity, reference=0.54, data=student_equity) \%>\%
+ as.data.frame
+# With custom reference (multiple)
+di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, reference=c(0.5, 0.55), data=student_equity) \%>\%
+  as.data.frame
+# min_moe
+di_ppg(success=Transfer, group=Ethnicity, data=student_equity, min_moe=0.02) \%>\%
+  as.data.frame
+# use_prop_in_moe
+di_ppg(success=Transfer, group=Ethnicity, data=student_equity, min_moe=0.02, use_prop_in_moe=TRUE) \%>\%
+  as.data.frame
+}
+\references{
+California Community Colleges Chancellor's Office (2017).  \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{Percentage Point Gap Method}.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/proportionality_index.R
 \name{di_prop_index}
 \alias{di_prop_index}
-\title{Calculate Disproportionate Impact per the Proportionality Index (PI) method.}
+\title{Calculate disproportionate impact per the proportionality index (PI) method.}
 \usage{
 di_prop_index(success, group, cohort, data)
 }
@@ -11,16 +11,24 @@ di_prop_index(success, group, cohort, data)
 
 \item{group}{A vector of group names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.}
 
-\item{cohort}{(Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  Disproportionate Impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.}
+\item{cohort}{(Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  disproportionate impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.}
 
 \item{data}{(Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.}
 }
 \value{
-A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct_success (proportion of successes attributed to the group within the cohort), pct_group (proportion of sample attributed to the group within the cohort), and di_prop_index (ratio of pct_success to pct_group).  When di_prop_index < 1, then there are signs of Disproportionate Impact.
+A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct_success (proportion of successes attributed to the group within the cohort), pct_group (proportion of sample attributed to the group within the cohort), and di_prop_index (ratio of pct_success to pct_group).  When di_prop_index < 1, then there are signs of disproportionate impact.
 }
 \description{
-Calculate Disproportionate Impact per the Proportionality Index (PI) method.
+Calculate disproportionate impact per the proportionality index (PI) method.
 }
 \details{
-This function determines Disproportionate Impact based on the Proportionality Index (PI) method, as described in \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES\%20FOR\%20MEASURING\%20DISPROPORTIONATE\%20IMPACT\%20IN\%20EQUITY\%20PLANS.pdf}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.
+This function determines disproportionate impact based on the proportionality index (PI) method, as described in \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES\%20FOR\%20MEASURING\%20DISPROPORTIONATE\%20IMPACT\%20IN\%20EQUITY\%20PLANS.pdf}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.
+}
+\examples{
+data(student_equity)
+di_prop_index(success=Transfer, group=Ethnicity, data=student_equity) \%>\%
+  as.data.frame
+}
+\references{
+California Community Colleges Chancellor's Office (2014).  \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES\%20FOR\%20MEASURING\%20DISPROPORTIONATE\%20IMPACT\%20IN\%20EQUITY\%20PLANS.pdf}{Guidelines for Measuring Disproportionate Impact in Equity Plans}.
 }

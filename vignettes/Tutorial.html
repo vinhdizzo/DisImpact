@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vinh Nguyen" />
 
-<meta name="date" content="2018-05-23" />
+<meta name="date" content="2018-05-24" />
 
 <title>DisImpact Tutorial</title>
 
@@ -70,15 +70,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">DisImpact Tutorial</h1>
 <h4 class="author"><em>Vinh Nguyen</em></h4>
-<h4 class="date"><em>2018-05-23</em></h4>
+<h4 class="date"><em>2018-05-24</em></h4>
 
 
 
-<p>The <code>DisImpact</code> R package contains functions that help in determining Disproportionate Impact (DI) based on the following methodologies:</p>
+<p>The <code>DisImpact</code> R package contains functions that help in determining disproportionate impact (DI) based on the following methodologies:</p>
 <ol style="list-style-type: decimal">
-<li><a href="http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf">Percentage Point Gap</a> (PPG) method,</li>
-<li><a href="http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES%20FOR%20MEASURING%20DISPROPORTIONATE%20IMPACT%20IN%20EQUITY%20PLANS.pdf">Proportionality Index</a> method (method #1 in reference), and</li>
-<li><a href="http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES%20FOR%20MEASURING%20DISPROPORTIONATE%20IMPACT%20IN%20EQUITY%20PLANS.pdf">80% Index</a> method (method #2 in reference).</li>
+<li><a href="http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf">percentage point gap</a> (PPG) method,</li>
+<li><a href="http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES%20FOR%20MEASURING%20DISPROPORTIONATE%20IMPACT%20IN%20EQUITY%20PLANS.pdf">proportionality index</a> method (method #1 in reference), and</li>
+<li><a href="http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES%20FOR%20MEASURING%20DISPROPORTIONATE%20IMPACT%20IN%20EQUITY%20PLANS.pdf">80% index</a> method (method #2 in reference).</li>
 </ol>
 <div id="install-package" class="section level2">
 <h2>Install Package</h2>
@@ -93,31 +93,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(DisImpact)
 <span class="kw">library</span>(dplyr) <span class="co"># Ease in manipulations with data frames</span></code></pre></div>
 </div>
-<div id="generate-toy-data-set" class="section level2">
-<h2>Generate Toy Data Set</h2>
-<p>To illustrate the functionality of the package, let’s generate a toy data set using random numbers:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Data parameters</span>
-true.p &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.4</span>, <span class="fl">0.5</span>, <span class="fl">0.3</span>, <span class="fl">0.2</span>, <span class="fl">0.7</span>, <span class="fl">0.6</span>)
-nPerGroup &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">100</span>, <span class="dv">500</span>, <span class="dv">1000</span>, <span class="dv">2000</span>, <span class="dv">3000</span>, <span class="dv">3400</span>)
-nGroups &lt;-<span class="st"> </span><span class="kw">length</span>(nPerGroup); nGroups</code></pre></div>
-<pre><code>## [1] 6</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nEachCohort &lt;-<span class="st"> </span><span class="kw">sum</span>(nPerGroup); nEachCohort</code></pre></div>
-<pre><code>## [1] 10000</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nCohorts &lt;-<span class="st"> </span><span class="dv">2</span>
-
-<span class="co"># Generate toy data</span>
-<span class="kw">set.seed</span>(<span class="dv">1</span>)
-df &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">Cohort=</span><span class="kw">rep</span>(<span class="dv">2017</span><span class="op">:</span><span class="dv">2018</span>, <span class="dt">each=</span>nEachCohort)
-                 , <span class="dt">Ethnicity=</span><span class="kw">rep</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">'Native American'</span>, <span class="st">'Multi-Ethnicity'</span>, <span class="st">'Black'</span>, <span class="st">'Hispanic'</span>, <span class="st">'Asian'</span>, <span class="st">'White'</span>), <span class="dt">times=</span>nPerGroup), <span class="dv">2</span>)
-                 , <span class="dt">Transfer=</span><span class="kw">c</span>(<span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span>nGroups, <span class="cf">function</span>(i) <span class="kw">sample</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">1</span>, <span class="dt">size=</span>nPerGroup[i], <span class="dt">replace=</span><span class="ot">TRUE</span>, <span class="dt">prob=</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">-</span>true.p[i], true.p[i]))) <span class="op">%&gt;%</span><span class="st"> </span>unlist
-                              , <span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span>nGroups, <span class="cf">function</span>(i) <span class="kw">sample</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">1</span>, <span class="dt">size=</span>nPerGroup[i], <span class="dt">replace=</span><span class="ot">TRUE</span>, <span class="dt">prob=</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">-</span>true.p[i]<span class="op">*</span><span class="fl">1.05</span>, true.p[i]<span class="op">*</span><span class="fl">1.05</span>))) <span class="op">%&gt;%</span><span class="st"> </span>unlist
-                              )
-                 )</code></pre></div>
+<div id="load-toy-student-equity-data" class="section level2">
+<h2>Load toy student equity data</h2>
+<p>To illustrate the functionality of the package, let’s load a toy data set:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Load fake data set</span>
+<span class="kw">data</span>(student_equity)</code></pre></div>
 <p>The toy data set can be summarized as follows:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Summarize toy data</span>
-<span class="kw">dim</span>(df)</code></pre></div>
+<span class="kw">dim</span>(student_equity)</code></pre></div>
 <pre><code>## [1] 20000     3</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dSumm &lt;-<span class="st"> </span>df <span class="op">%&gt;%</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dSumm &lt;-<span class="st"> </span>student_equity <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(Cohort, Ethnicity) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarize</span>(<span class="dt">n=</span><span class="kw">n</span>(), <span class="dt">Transfer_Rate=</span><span class="kw">mean</span>(Transfer))
 dSumm</code></pre></div>
@@ -139,10 +124,10 @@ dSumm</code></pre></div>
 ## 12   2018           White  3400     0.6314706</code></pre>
 </div>
 <div id="percentage-point-gap-ppg-method" class="section level2">
-<h2>Percentage Point Gap (PPG) method</h2>
+<h2>Percentage point gap (PPG) method</h2>
 <p><code>di_ppg</code> is the main work function, and it can take on vectors or column names the tidy way:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Vector</span>
-<span class="kw">di_ppg</span>(<span class="dt">success=</span>df<span class="op">$</span>Transfer, <span class="dt">group=</span>df<span class="op">$</span>Ethnicity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
+<span class="kw">di_ppg</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
 <pre><code>##             group    n success       pct reference        moe    pct.lo
 ## 1           Asian 6000    4292 0.7153333    0.5264 0.03000000 0.6853333
 ## 2           Black 2000     607 0.3035000    0.5264 0.03000000 0.2735000
@@ -158,7 +143,7 @@ dSumm</code></pre></div>
 ## 5 0.4592965            1
 ## 6 0.6476471            0</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Tidy and column reference</span>
-<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>df) <span class="op">%&gt;%</span>
+<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
 <span class="st">  </span>as.data.frame</code></pre></div>
 <pre><code>##             group    n success       pct reference        moe    pct.lo
 ## 1           Asian 6000    4292 0.7153333    0.5264 0.03000000 0.6853333
@@ -176,7 +161,7 @@ dSumm</code></pre></div>
 ## 6 0.6476471            0</code></pre>
 <p>Sometimes, one might want to break out the DI calculation by cohort:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Tidy and column reference</span>
-<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">data=</span>df) <span class="op">%&gt;%</span>
+<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
 <span class="st">  </span>as.data.frame</code></pre></div>
 <pre><code>##    cohort           group    n success       pct reference        moe
 ## 1    2017           Asian 3000    2062 0.6873333    0.5140 0.03000000
@@ -206,7 +191,7 @@ dSumm</code></pre></div>
 ## 12 0.6014706 0.6614706            0</code></pre>
 <p>The user could also pass in custom reference points for comparison (eg, a state-wide rate). <code>di_ppg</code> accepts either a single reference point to be used or a vector of reference points, one for each cohort. For the latter, the vector of reference points will be taken to correspond to the <code>cohort</code> variable, alphabetically ordered.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># With custom reference (single)</span>
-<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">reference=</span><span class="fl">0.54</span>, <span class="dt">data=</span>df) <span class="op">%&gt;%</span>
+<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">reference=</span><span class="fl">0.54</span>, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
 <span class="st">  </span>as.data.frame</code></pre></div>
 <pre><code>##             group    n success       pct reference        moe    pct.lo
 ## 1           Asian 6000    4292 0.7153333      0.54 0.03000000 0.6853333
@@ -224,7 +209,7 @@ dSumm</code></pre></div>
 ## 6 0.6476471            0</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># With custom reference (multiple)</span>
 ## Tidy and column reference
-<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">reference=</span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.55</span>), <span class="dt">data=</span>df) <span class="op">%&gt;%</span>
+<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">reference=</span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.55</span>), <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
 <span class="st">  </span>as.data.frame</code></pre></div>
 <pre><code>## Joining, by = &quot;cohort&quot;</code></pre>
 <pre><code>##    cohort           group    n success       pct reference        moe
@@ -259,7 +244,7 @@ dSumm</code></pre></div>
 <li>using 0.50 as the proportion in the margin of error formula, <span class="math inline">\(1.96 \times \sqrt{\hat{p} (1-\hat{p}) / n}\)</span>.</li>
 </ol>
 <p>To override 1, the user could specify <code>min_moe</code> in <code>di_ppg</code>. To override 2, the user could specify <code>use_prop_in_moe=TRUE</code> in <code>di_ppg</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>df, <span class="dt">min_moe=</span><span class="fl">0.02</span>) <span class="op">%&gt;%</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity, <span class="dt">min_moe=</span><span class="fl">0.02</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span>as.data.frame</code></pre></div>
 <pre><code>##             group    n success       pct reference        moe    pct.lo
 ## 1           Asian 6000    4292 0.7153333    0.5264 0.02000000 0.6953333
@@ -275,7 +260,7 @@ dSumm</code></pre></div>
 ## 4 0.5349903            0
 ## 5 0.4592965            1
 ## 6 0.6376471            0</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>df, <span class="dt">min_moe=</span><span class="fl">0.02</span>, <span class="dt">use_prop_in_moe=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity, <span class="dt">min_moe=</span><span class="fl">0.02</span>, <span class="dt">use_prop_in_moe=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span>as.data.frame</code></pre></div>
 <pre><code>##             group    n success       pct reference        moe    pct.lo
 ## 1           Asian 6000    4292 0.7153333    0.5264 0.02000000 0.6953333
@@ -293,11 +278,11 @@ dSumm</code></pre></div>
 ## 6 0.6376471            0</code></pre>
 </div>
 <div id="proportionality-index" class="section level2">
-<h2>Proportionality Index</h2>
+<h2>Proportionality index</h2>
 <p><code>di_prop_index</code> is the main work function for this method, and it can take on vectors or column names the tidy way:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Without cohort</span>
 ## Vector
-<span class="kw">di_prop_index</span>(<span class="dt">success=</span>df<span class="op">$</span>Transfer, <span class="dt">group=</span>df<span class="op">$</span>Ethnicity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
+<span class="kw">di_prop_index</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
 <pre><code>##             group    n success pct_success pct_group di_prop_index
 ## 1           Asian 6000    4292 0.407674772      0.30     1.3589159
 ## 2           Black 2000     607 0.057655775      0.10     0.5765578
@@ -306,7 +291,7 @@ dSumm</code></pre></div>
 ## 5 Native American  200      78 0.007408815      0.01     0.7408815
 ## 6           White 6800    4200 0.398936170      0.34     1.1733417</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Tidy and column reference
-<span class="kw">di_prop_index</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>df) <span class="op">%&gt;%</span>
+<span class="kw">di_prop_index</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
 <span class="st">  </span>as.data.frame</code></pre></div>
 <pre><code>##             group    n success pct_success pct_group di_prop_index
 ## 1           Asian 6000    4292 0.407674772      0.30     1.3589159
@@ -317,7 +302,7 @@ dSumm</code></pre></div>
 ## 6           White 6800    4200 0.398936170      0.34     1.1733417</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># With cohort</span>
 ## Vector
-<span class="kw">di_prop_index</span>(<span class="dt">success=</span>df<span class="op">$</span>Transfer, <span class="dt">group=</span>df<span class="op">$</span>Ethnicity, <span class="dt">cohort=</span>df<span class="op">$</span>Cohort) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
+<span class="kw">di_prop_index</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity, <span class="dt">cohort=</span>student_equity<span class="op">$</span>Cohort) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
 <pre><code>##    cohort           group    n success pct_success pct_group di_prop_index
 ## 1    2017           Asian 3000    2062 0.401167315      0.30     1.3372244
 ## 2    2017           Black 1000     310 0.060311284      0.10     0.6031128
@@ -332,7 +317,7 @@ dSumm</code></pre></div>
 ## 11   2018 Native American  100      35 0.006495917      0.01     0.6495917
 ## 12   2018           White 3400    2147 0.398478099      0.34     1.1719944</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Tidy and column reference
-<span class="kw">di_prop_index</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">data=</span>df) <span class="op">%&gt;%</span>
+<span class="kw">di_prop_index</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
 <span class="st">  </span>as.data.frame</code></pre></div>
 <pre><code>##    cohort           group    n success pct_success pct_group di_prop_index
 ## 1    2017           Asian 3000    2062 0.401167315      0.30     1.3372244
@@ -349,11 +334,11 @@ dSumm</code></pre></div>
 ## 12   2018           White 3400    2147 0.398478099      0.34     1.1719944</code></pre>
 </div>
 <div id="index" class="section level2">
-<h2>80% Index</h2>
+<h2>80% index</h2>
 <p><code>di_80_index</code> is the main work function for this method, and it can take on vectors or column names the tidy way:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Without cohort</span>
 ## Vector
-<span class="kw">di_80_index</span>(<span class="dt">success=</span>df<span class="op">$</span>Transfer, <span class="dt">group=</span>df<span class="op">$</span>Ethnicity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
+<span class="kw">di_80_index</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
 <pre><code>##             group    n success       pct reference di_80_index
 ## 1           Asian 6000    4292 0.7153333 0.7153333   1.0000000
 ## 2           Black 2000     607 0.3035000 0.7153333   0.4242777
@@ -369,7 +354,7 @@ dSumm</code></pre></div>
 ## 5            1
 ## 6            0</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Tidy and column reference
-<span class="kw">di_80_index</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>df) <span class="op">%&gt;%</span>
+<span class="kw">di_80_index</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
 <span class="st">  </span>as.data.frame</code></pre></div>
 <pre><code>##             group    n success       pct reference di_80_index
 ## 1           Asian 6000    4292 0.7153333 0.7153333   1.0000000
@@ -387,7 +372,7 @@ dSumm</code></pre></div>
 ## 6            0</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># With cohort</span>
 ## Vector
-<span class="kw">di_80_index</span>(<span class="dt">success=</span>df<span class="op">$</span>Transfer, <span class="dt">group=</span>df<span class="op">$</span>Ethnicity, <span class="dt">cohort=</span>df<span class="op">$</span>Cohort) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
+<span class="kw">di_80_index</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity, <span class="dt">cohort=</span>student_equity<span class="op">$</span>Cohort) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
 <pre><code>##    cohort           group    n success       pct reference di_80_index
 ## 1    2017           Asian 3000    2062 0.6873333 0.6873333   1.0000000
 ## 2    2017           Black 1000     310 0.3100000 0.6873333   0.4510184
@@ -415,7 +400,7 @@ dSumm</code></pre></div>
 ## 11            1
 ## 12            0</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Tidy and column reference
-<span class="kw">di_80_index</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">data=</span>df) <span class="op">%&gt;%</span>
+<span class="kw">di_80_index</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
 <span class="st">  </span>as.data.frame</code></pre></div>
 <pre><code>##    cohort           group    n success       pct reference di_80_index
 ## 1    2017           Asian 3000    2062 0.6873333 0.6873333   1.0000000
@@ -447,7 +432,7 @@ dSumm</code></pre></div>
 <div id="when-we-have-a-non-success-variable-like-drop-out" class="section level2">
 <h2>When we have a non-success variable like drop-out</h2>
 <p>Suppose we have a variable that indicates something nevative. We could calculate DI on the converse of it:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">di_ppg</span>(<span class="dt">success=</span><span class="op">!</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>df) <span class="op">%&gt;%</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">di_ppg</span>(<span class="dt">success=</span><span class="op">!</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
 <span class="st">  </span>as.data.frame</code></pre></div>
 <pre><code>##             group    n success       pct reference        moe    pct.lo
 ## 1           Asian 6000    1708 0.2846667    0.4736 0.03000000 0.2546667
@@ -468,27 +453,27 @@ dSumm</code></pre></div>
 <h2>Transformations on the fly</h2>
 <p>We can compute the success, group, and cohort variables on the fly:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Transform success</span>
-a &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">1</span>, <span class="dt">size=</span><span class="kw">sum</span>(nPerGroup)<span class="op">*</span>nCohorts, <span class="dt">replace=</span><span class="ot">TRUE</span>, <span class="dt">prob=</span><span class="kw">c</span>(<span class="fl">0.95</span>, <span class="fl">0.05</span>))
+a &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">1</span>, <span class="dt">size=</span><span class="kw">nrow</span>(student_equity), <span class="dt">replace=</span><span class="ot">TRUE</span>, <span class="dt">prob=</span><span class="kw">c</span>(<span class="fl">0.95</span>, <span class="fl">0.05</span>))
 <span class="kw">mean</span>(a)</code></pre></div>
-<pre><code>## [1] 0.0486</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">di_ppg</span>(<span class="dt">success=</span><span class="kw">pmax</span>(Transfer, a), <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>df) <span class="op">%&gt;%</span>
+<pre><code>## [1] 0.04755</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">di_ppg</span>(<span class="dt">success=</span><span class="kw">pmax</span>(Transfer, a), <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
 <span class="st">  </span>as.data.frame</code></pre></div>
 <pre><code>##             group    n success       pct reference        moe    pct.lo
-## 1           Asian 6000    4378 0.7296667    0.5497 0.03000000 0.6996667
-## 2           Black 2000     681 0.3405000    0.5497 0.03000000 0.3105000
-## 3        Hispanic 4000    1004 0.2510000    0.5497 0.03000000 0.2210000
-## 4 Multi-Ethnicity 1000     515 0.5150000    0.5497 0.03099032 0.4840097
-## 5 Native American  200      85 0.4250000    0.5497 0.06929646 0.3557035
-## 6           White 6800    4331 0.6369118    0.5497 0.03000000 0.6069118
+## 1           Asian 6000    4357 0.7261667   0.54975 0.03000000 0.6961667
+## 2           Black 2000     673 0.3365000   0.54975 0.03000000 0.3065000
+## 3        Hispanic 4000    1019 0.2547500   0.54975 0.03000000 0.2247500
+## 4 Multi-Ethnicity 1000     525 0.5250000   0.54975 0.03099032 0.4940097
+## 5 Native American  200      83 0.4150000   0.54975 0.06929646 0.3457035
+## 6           White 6800    4338 0.6379412   0.54975 0.03000000 0.6079412
 ##      pct.hi di.indicator
-## 1 0.7596667            0
-## 2 0.3705000            1
-## 3 0.2810000            1
-## 4 0.5459903            1
-## 5 0.4942965            1
-## 6 0.6669118            0</code></pre>
+## 1 0.7561667            0
+## 2 0.3665000            1
+## 3 0.2847500            1
+## 4 0.5559903            0
+## 5 0.4842965            1
+## 6 0.6679412            0</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Collapse Black and Hispanic</span>
-<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span><span class="kw">ifelse</span>(Ethnicity <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">'Black'</span>, <span class="st">'Hispanic'</span>), <span class="st">'Black/Hispanic'</span>, Ethnicity), <span class="dt">data=</span>df) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
+<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span><span class="kw">ifelse</span>(Ethnicity <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">'Black'</span>, <span class="st">'Hispanic'</span>), <span class="st">'Black/Hispanic'</span>, Ethnicity), <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
 <pre><code>##             group    n success       pct reference        moe    pct.lo
 ## 1           Asian 6000    4292 0.7153333    0.5264 0.03000000 0.6853333
 ## 2  Black/Hispanic 6000    1454 0.2423333    0.5264 0.03000000 0.2123333
