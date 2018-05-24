@@ -9,11 +9,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-The `DisImpact` R package contains functions that help in determining Disproportionate Impact (DI) based on the following methodologies:
+The `DisImpact` R package contains functions that help in determining disproportionate impact (DI) based on the following methodologies:
 
-1. [Percentage Point Gap](http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf) (PPG) method,
-2. [Proportionality Index](http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES%20FOR%20MEASURING%20DISPROPORTIONATE%20IMPACT%20IN%20EQUITY%20PLANS.pdf) method (method #1 in reference), and
-3. [80% Index](http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES%20FOR%20MEASURING%20DISPROPORTIONATE%20IMPACT%20IN%20EQUITY%20PLANS.pdf) method (method #2 in reference).
+1. [percentage point gap](http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf) (PPG) method,
+2. [proportionality index](http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES%20FOR%20MEASURING%20DISPROPORTIONATE%20IMPACT%20IN%20EQUITY%20PLANS.pdf) method (method #1 in reference), and
+3. [80% index](http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES%20FOR%20MEASURING%20DISPROPORTIONATE%20IMPACT%20IN%20EQUITY%20PLANS.pdf) method (method #2 in reference).
 
 ## Install Package
 ```{r}
@@ -60,7 +60,7 @@ dSumm <- df %>%
 dSumm
 ```
 
-## Percentage Point Gap (PPG) method
+## Percentage point gap (PPG) method
 `di_ppg` is the main work function, and it can take on vectors or column names the tidy way:
 ```{r}
 # Vector
@@ -103,7 +103,7 @@ di_ppg(success=Transfer, group=Ethnicity, data=df, min_moe=0.02, use_prop_in_moe
   as.data.frame
 ```
 
-## Proportionality Index
+## Proportionality index
 `di_prop_index` is the main work function for this method, and it can take on vectors or column names the tidy way:
 
 ```{r}
@@ -122,7 +122,7 @@ di_prop_index(success=Transfer, group=Ethnicity, cohort=Cohort, data=df) %>%
   as.data.frame
 ```
 
-## 80% Index
+## 80% index
 `di_80_index` is the main work function for this method, and it can take on vectors or column names the tidy way:
 
 ```{r}
