@@ -36,26 +36,34 @@ Calculate disproportionate impact per the percentage point gap (PPG) method.
 This function determines disproportionate impact based on the percentage point gap (PPG) method, as described in \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.  Note that the margin of error (MOE) is calculated using using 1.96*sqrt(0.25^2/n), with a \code{min_moe} used as the minimum by default.
 }
 \examples{
+library(dplyr)
 data(student_equity)
 # Vector
-di_ppg(success=student_equity$Transfer, group=student_equity$Ethnicity) \%>\% as.data.frame
+di_ppg(success=student_equity$Transfer
+  , group=student_equity$Ethnicity) \%>\% as.data.frame
 # Tidy and column reference
 di_ppg(success=Transfer, group=Ethnicity, data=student_equity) \%>\%
- as.data.frame
+  as.data.frame
 # Cohort
-di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, data=student_equity) \%>\%
+di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort
+ , data=student_equity) \%>\%
   as.data.frame
 # With custom reference (single)
-di_ppg(success=Transfer, group=Ethnicity, reference=0.54, data=student_equity) \%>\%
- as.data.frame
+di_ppg(success=Transfer, group=Ethnicity, reference=0.54
+  , data=student_equity) \%>\%
+  as.data.frame
 # With custom reference (multiple)
-di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, reference=c(0.5, 0.55), data=student_equity) \%>\%
+di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort
+  , reference=c(0.5, 0.55), data=student_equity) \%>\%
   as.data.frame
 # min_moe
-di_ppg(success=Transfer, group=Ethnicity, data=student_equity, min_moe=0.02) \%>\%
+di_ppg(success=Transfer, group=Ethnicity, data=student_equity
+  , min_moe=0.02) \%>\%
   as.data.frame
 # use_prop_in_moe
-di_ppg(success=Transfer, group=Ethnicity, data=student_equity, min_moe=0.02, use_prop_in_moe=TRUE) \%>\%
+di_ppg(success=Transfer, group=Ethnicity, data=student_equity
+  , min_moe=0.02
+  , use_prop_in_moe=TRUE) \%>\%
   as.data.frame
 }
 \references{

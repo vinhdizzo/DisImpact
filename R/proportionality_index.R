@@ -8,6 +8,7 @@
 ##' @param data (Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.
 ##' @return A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct_success (proportion of successes attributed to the group within the cohort), pct_group (proportion of sample attributed to the group within the cohort), and di_prop_index (ratio of pct_success to pct_group).  When di_prop_index < 1, then there are signs of disproportionate impact.
 ##' @examples
+##' library(dplyr)
 ##' data(student_equity)
 ##' di_prop_index(success=Transfer, group=Ethnicity, data=student_equity) %>%
 ##'   as.data.frame

@@ -25,6 +25,7 @@ Calculate disproportionate impact per the proportionality index (PI) method.
 This function determines disproportionate impact based on the proportionality index (PI) method, as described in \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES\%20FOR\%20MEASURING\%20DISPROPORTIONATE\%20IMPACT\%20IN\%20EQUITY\%20PLANS.pdf}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.
 }
 \examples{
+library(dplyr)
 data(student_equity)
 di_prop_index(success=Transfer, group=Ethnicity, data=student_equity) \%>\%
   as.data.frame
