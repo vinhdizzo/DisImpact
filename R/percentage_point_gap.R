@@ -33,9 +33,10 @@ ppg_moe <- function(n, proportion, min_moe=0.03) {
 ##'
 ##' This function determines disproportionate impact based on the percentage point gap (PPG) method, as described in \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.  Note that the margin of error (MOE) is calculated using using 1.96*sqrt(0.25^2/n), with a \code{min_moe} used as the minimum by default.
 ##' @title Calculate disproportionate impact per the percentage point gap (PPG) method.
-##' @param success A vector of success indicators (\code{1}/\code{0} or \code{TRUE}/\code{FALSE}) or an unquoted reference (name) to a column in \code{data} if it is specified.
+##' @param success A vector of success indicators (\code{1}/\code{0} or \code{TRUE}/\code{FALSE}) or an unquoted reference (name) to a column in \code{data} if it is specified.  It could also be a vector of counts, in which case \code{weight} should also be specified (group size).
 ##' @param group A vector of group names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.
-##' @param cohort (Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  disproportionate impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.
+##' @param cohort (Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  Disproportionate impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.
+##' @param weight (Optional) A vector of case weights of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  If \code{success} consists of counts instead of success indicators (1/0), then \code{weight} should also be specified to indicate the group size.
 ##' @param reference Either \code{'overall'} (default), \code{'hpg'} (highest performing group), a single proportion (eg, 0.50), or a vector of proportions.  Reference is used as a point of comparison for disproportionate impact for each group.  When \code{cohort} is specified:\cr
 ##'   1. \code{'overall'} will use the overall success rate of each cohort group as the reference;\cr
 ##'   2. \code{'hpg'} will use the highest performing group in each cohort as reference;\cr
@@ -44,7 +45,7 @@ ppg_moe <- function(n, proportion, min_moe=0.03) {
 ##' @param data (Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.
 ##' @param min_moe The minimum margin of error (MOE) to be used in the calculation of disproportionate impact and is passed to \link{ppg_moe}.  Defaults to \code{0.03}.
 ##' @param use_prop_in_moe A logical value indicating whether or not the MOE formula should use the observed success rates (\code{TRUE}).  Defaults to \code{FALSE}, which uses 0.50 as the proportion in the MOE formula.  If \code{TRUE}, the success rates are passed to the \code{proportion} argument of \link{ppg_moe}.
-##' @return A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference (reference used in DI calculation), moe (margin of error), pct.lo (lower 95\% confidence interval for pct), pct.hi (upper 95\% confidence interval for pct), and di.indicator (1 if there is disproportionate impact).
+##' @return A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference (reference used in DI calculation), moe (margin of error), pct_lo (lower 95\% confidence interval for pct), pct_hi (upper 95\% confidence interval for pct), and di_indicator (1 if there is disproportionate impact).
 ##' @examples
 ##' library(dplyr)
 ##' data(student_equity)
@@ -78,7 +79,7 @@ ppg_moe <- function(n, proportion, min_moe=0.03) {
 ##' @references California Community Colleges Chancellor's Office (2017).  \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{Percentage Point Gap Method}.
 ##' @export
 ##' @import dplyr rlang
-di_ppg <- function(success, group, cohort, reference=c('overall', 'hpg'), data, min_moe=0.03, use_prop_in_moe=FALSE) {
+di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg'), data, min_moe=0.03, use_prop_in_moe=FALSE) {
   ## require(magrittr)
   ## require(dplyr)
   ## require(rlang)
@@ -90,7 +91,8 @@ di_ppg <- function(success, group, cohort, reference=c('overall', 'hpg'), data, 
     group <- data %>% ungroup %>% mutate(group=!!eq_group) %>% select(group) %>% unlist
   }
   # Check if success is binary or logical and that there are no NA's
-  stopifnot(success %in% c(1, 0))
+  #stopifnot(success %in% c(1, 0))
+  stopifnot(!is.na(success), success>=0) # can be counts
 
   # Check if cohort is specified
   if (missing(cohort)) {
@@ -104,6 +106,16 @@ di_ppg <- function(success, group, cohort, reference=c('overall', 'hpg'), data, 
     }
   }
 
+  # Check if weight is specified
+  if (missing(weight)) {
+    weight <- rep(1, length(success))
+  } else {
+    if (!missing(data)) {
+      eq_weight <- enquo(weight)
+      weight <- data %>% ungroup %>% mutate(weight=!!eq_weight) %>% select(weight) %>% unlist
+    } # else: weight should be defined
+  }
+  
   # Check if reference is specified: overall, hpg, or user-defined references
   if (!is.numeric(reference)) {
     reference <- match.arg(reference)
@@ -122,10 +134,10 @@ di_ppg <- function(success, group, cohort, reference=c('overall', 'hpg'), data, 
   }
 
   # Calculate
-  df <- data_frame(cohort, group, success)
+  df <- data_frame(cohort, group, success, weight)
   dResults <- df %>%
     group_by(cohort, group) %>%
-    summarize(n=n(), success=sum(success), pct=success/n) %>%
+    summarize(n=sum(weight), success=sum(success), pct=success/n) %>%
     ungroup %>%
     arrange(cohort, group)
   if (!exists('dReference')) {
@@ -141,14 +153,14 @@ di_ppg <- function(success, group, cohort, reference=c('overall', 'hpg'), data, 
     dResults <- dResults %>%
       left_join(dReference)
   }
-  pct <- moe <- pct.hi <- NULL # to resolve CRAN NOTE: no visible binding for global variable
+  pct <- moe <- pct_lo <- pct_hi <- NULL # to resolve CRAN NOTE: no visible binding for global variable
   dResults <- dResults %>% 
     mutate(moe=case_when(use_prop_in_moe ~ ppg_moe(n=n, proportion=pct, min_moe=min_moe)
                          , !use_prop_in_moe ~ ppg_moe(n=n, min_moe=min_moe)
                          )
-         , pct.lo=pct - moe
-         , pct.hi=pct + moe
-         , di.indicator=ifelse(pct.hi < reference, 1, 0)
+         , pct_lo=pct - moe
+         , pct_hi=pct + moe
+         , di_indicator=ifelse(pct_hi < reference, 1, 0)
            ) %>%
     arrange(cohort, group)
   

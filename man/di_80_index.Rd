@@ -4,14 +4,16 @@
 \alias{di_80_index}
 \title{Calculate disproportionate impact per the 80\% index}
 \usage{
-di_80_index(success, group, cohort, data)
+di_80_index(success, group, cohort, weight, data)
 }
 \arguments{
-\item{success}{A vector of success indicators (\code{1}/\code{0} or \code{TRUE}/\code{FALSE}) or an unquoted reference (name) to a column in \code{data} if it is specified.}
+\item{success}{A vector of success indicators (\code{1}/\code{0} or \code{TRUE}/\code{FALSE}) or an unquoted reference (name) to a column in \code{data} if it is specified.  It could also be a vector of counts, in which case \code{weight} should also be specified (group size).}
 
 \item{group}{A vector of group names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.}
 
 \item{cohort}{(Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  disproportionate impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.}
+
+\item{weight}{(Optional) A vector of case weights of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  If \code{success} consists of counts instead of success indicators (1/0), then \code{weight} should also be specified to indicate the group size.}
 
 \item{data}{(Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.}
 }

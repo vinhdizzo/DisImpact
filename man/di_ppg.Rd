@@ -4,15 +4,17 @@
 \alias{di_ppg}
 \title{Calculate disproportionate impact per the percentage point gap (PPG) method.}
 \usage{
-di_ppg(success, group, cohort, reference = c("overall", "hpg"), data,
+di_ppg(success, group, cohort, weight, reference = c("overall", "hpg"), data,
   min_moe = 0.03, use_prop_in_moe = FALSE)
 }
 \arguments{
-\item{success}{A vector of success indicators (\code{1}/\code{0} or \code{TRUE}/\code{FALSE}) or an unquoted reference (name) to a column in \code{data} if it is specified.}
+\item{success}{A vector of success indicators (\code{1}/\code{0} or \code{TRUE}/\code{FALSE}) or an unquoted reference (name) to a column in \code{data} if it is specified.  It could also be a vector of counts, in which case \code{weight} should also be specified (group size).}
 
 \item{group}{A vector of group names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.}
 
-\item{cohort}{(Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  disproportionate impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.}
+\item{cohort}{(Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  Disproportionate impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.}
+
+\item{weight}{(Optional) A vector of case weights of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  If \code{success} consists of counts instead of success indicators (1/0), then \code{weight} should also be specified to indicate the group size.}
 
 \item{reference}{Either \code{'overall'} (default), \code{'hpg'} (highest performing group), a single proportion (eg, 0.50), or a vector of proportions.  Reference is used as a point of comparison for disproportionate impact for each group.  When \code{cohort} is specified:\cr
 1. \code{'overall'} will use the overall success rate of each cohort group as the reference;\cr
@@ -27,7 +29,7 @@ di_ppg(success, group, cohort, reference = c("overall", "hpg"), data,
 \item{use_prop_in_moe}{A logical value indicating whether or not the MOE formula should use the observed success rates (\code{TRUE}).  Defaults to \code{FALSE}, which uses 0.50 as the proportion in the MOE formula.  If \code{TRUE}, the success rates are passed to the \code{proportion} argument of \link{ppg_moe}.}
 }
 \value{
-A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference (reference used in DI calculation), moe (margin of error), pct.lo (lower 95\% confidence interval for pct), pct.hi (upper 95\% confidence interval for pct), and di.indicator (1 if there is disproportionate impact).
+A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference (reference used in DI calculation), moe (margin of error), pct_lo (lower 95\% confidence interval for pct), pct_hi (upper 95\% confidence interval for pct), and di_indicator (1 if there is disproportionate impact).
 }
 \description{
 Calculate disproportionate impact per the percentage point gap (PPG) method.

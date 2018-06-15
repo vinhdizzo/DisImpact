@@ -64,6 +64,12 @@ di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, data=student_equity) %>
   as.data.frame
 ```
 
+`di_ppg` is also applicable to summarized data; just pass the counts to `success` and group size to `weight`:
+```{r}
+di_ppg(success=Transfer_Rate*n, group=Ethnicity, cohort=Cohort, weight=n, data=dSumm) %>%
+  as.data.frame
+```
+
 The user could also pass in custom reference points for comparison (eg, a state-wide rate).  `di_ppg` accepts either a single reference point to be used or a vector of reference points, one for each cohort.  For the latter, the vector of reference points will be taken to correspond to the `cohort` variable, alphabetically ordered.
 ```{r}
 # With custom reference (single)
