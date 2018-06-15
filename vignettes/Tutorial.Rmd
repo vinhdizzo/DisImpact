@@ -129,7 +129,7 @@ di_80_index(success=Transfer, group=Ethnicity, cohort=Cohort, data=student_equit
 ```
 
 ## When we have a non-success variable like drop-out
-Suppose we have a variable that indicates something nevative.  We could calculate DI on the converse of it:
+Suppose we have a variable that indicates something negative.  We could calculate DI on the converse of it:
 ```{r}
 di_ppg(success=!Transfer, group=Ethnicity, data=student_equity) %>%
   as.data.frame
