@@ -15,4 +15,4 @@ The `DisImpact` R package contains functions that help in determining Disproport
 ```
 
 ## Tutorial
-A vignette on how to use the package can be found [here](https://cran.r-project.org/web/packages/DisImpact/vignettes/Tutorial.html).
+A vignette on how to use the package can be found [here](https://CRAN.R-project.org/package=DisImpact/vignettes/Tutorial.html).
