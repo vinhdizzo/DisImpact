@@ -1,0 +1,3 @@
+* 0.0.3
+ - Document definition of `di_indicator` in `di_ppg`
+ - Change `pct_hi < reference` to `pct_hi <= reference` in determining DI to be consistent with the methods document from the Chancellor's office

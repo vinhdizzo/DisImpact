@@ -45,7 +45,7 @@ ppg_moe <- function(n, proportion, min_moe=0.03) {
 ##' @param data (Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.
 ##' @param min_moe The minimum margin of error (MOE) to be used in the calculation of disproportionate impact and is passed to \link{ppg_moe}.  Defaults to \code{0.03}.
 ##' @param use_prop_in_moe A logical value indicating whether or not the MOE formula should use the observed success rates (\code{TRUE}).  Defaults to \code{FALSE}, which uses 0.50 as the proportion in the MOE formula.  If \code{TRUE}, the success rates are passed to the \code{proportion} argument of \link{ppg_moe}.
-##' @return A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference (reference used in DI calculation), moe (margin of error), pct_lo (lower 95\% confidence interval for pct), pct_hi (upper 95\% confidence interval for pct), and di_indicator (1 if there is disproportionate impact).
+##' @return A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference (reference used in DI calculation), moe (margin of error), pct_lo (lower 95\% confidence interval for pct), pct_hi (upper 95\% confidence interval for pct), and di_indicator (1 if there is disproportionate impact, ie, when \code{pct_hi} <= \code{reference}).
 ##' @examples
 ##' library(dplyr)
 ##' data(student_equity)
@@ -160,7 +160,7 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg')
                          )
          , pct_lo=pct - moe
          , pct_hi=pct + moe
-         , di_indicator=ifelse(pct_hi < reference, 1, 0)
+         , di_indicator=ifelse(pct_hi <= reference, 1, 0)
            ) %>%
     arrange(cohort, group)
   

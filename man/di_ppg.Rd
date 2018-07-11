@@ -29,7 +29,7 @@ di_ppg(success, group, cohort, weight, reference = c("overall", "hpg"), data,
 \item{use_prop_in_moe}{A logical value indicating whether or not the MOE formula should use the observed success rates (\code{TRUE}).  Defaults to \code{FALSE}, which uses 0.50 as the proportion in the MOE formula.  If \code{TRUE}, the success rates are passed to the \code{proportion} argument of \link{ppg_moe}.}
 }
 \value{
-A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference (reference used in DI calculation), moe (margin of error), pct_lo (lower 95\% confidence interval for pct), pct_hi (upper 95\% confidence interval for pct), and di_indicator (1 if there is disproportionate impact).
+A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference (reference used in DI calculation), moe (margin of error), pct_lo (lower 95\% confidence interval for pct), pct_hi (upper 95\% confidence interval for pct), and di_indicator (1 if there is disproportionate impact, ie, when \code{pct_hi} <= \code{reference}).
 }
 \description{
 Calculate disproportionate impact per the percentage point gap (PPG) method.
