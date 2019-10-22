@@ -11,9 +11,9 @@ vignette: >
 
 The `DisImpact` R package contains functions that help in determining disproportionate impact (DI) based on the following methodologies:
 
-1. [percentage point gap](http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf) (PPG) method,
-2. [proportionality index](http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES%20FOR%20MEASURING%20DISPROPORTIONATE%20IMPACT%20IN%20EQUITY%20PLANS.pdf) method (method #1 in reference), and
-3. [80% index](http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES%20FOR%20MEASURING%20DISPROPORTIONATE%20IMPACT%20IN%20EQUITY%20PLANS.pdf) method (method #2 in reference).
+1. [percentage point gap](https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Research/Files/PercentagePointGapMethod2017.ashx) (PPG) method,
+2. [proportionality index](https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Network-Operations/Accountability/Files/GUIDELINES-FOR-MEASURING-DISPROPORTIONATE-IMPACT-IN-EQUITY-PLANS.ashx) method (method #1 in reference), and
+3. [80% index](https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Network-Operations/Accountability/Files/GUIDELINES-FOR-MEASURING-DISPROPORTIONATE-IMPACT-IN-EQUITY-PLANS.ashx) method (method #2 in reference).
 
 ## Install Package
 ```{r}
