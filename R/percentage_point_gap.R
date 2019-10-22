@@ -207,7 +207,7 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
   
   dCombination <- expand.grid(success_var=success_vars, group_var=group_vars, cohort_var=cohort_vars, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1, stringsAsFactors=FALSE) %>%
     left_join(dRef) %>%
-    select(success_var, group_var, cohort_var, reference_group, min_moe, use_prop_in_moe)
+    select(success_var, group_var, cohort_var, reference_group, min_moe, use_prop_in_moe, prop_sub_0, prop_sub_1)
 
   iterate <- function(success_var, group_var, cohort_var, reference_group, min_moe, use_prop_in_moe, prop_sub_0, prop_sub_1) {
     if (!(reference_group %in% c('overall', 'hpg'))) {
