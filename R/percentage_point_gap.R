@@ -197,7 +197,7 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg')
 ##' @return A data frame with all relevant returned fields from `di_ppg` plus `success_variable` (elements of `success_vars`), `disaggregation` (elements of `group_vars`), and `reference_group` (elements of `reference_groups`).
 ##' @import dplyr tidyselect purrr
 ##' @export
-di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, reference_groups, min_moe=0.03, use_prop_in_moe=FALSE) {
+di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, reference_groups, min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5) {
   stopifnot(length(group_vars) == length(reference_groups) | length(reference_groups) == 1)
   if (length(unique(sapply(data[, group_vars], class))) > 1) {
     stop("All variables specified in `group_vars` should be of the same class.  Suggestion: set them all as character data.")
@@ -205,17 +205,17 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
 
   dRef <- data.frame(group_var=group_vars, reference_group=reference_groups, stringsAsFactors=FALSE)
   
-  dCombination <- expand.grid(success_var=success_vars, group_var=group_vars, cohort_var=cohort_vars, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, stringsAsFactors=FALSE) %>%
+  dCombination <- expand.grid(success_var=success_vars, group_var=group_vars, cohort_var=cohort_vars, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1, stringsAsFactors=FALSE) %>%
     left_join(dRef) %>%
     select(success_var, group_var, cohort_var, reference_group, min_moe, use_prop_in_moe)
 
-  iterate <- function(success_var, group_var, cohort_var, reference_group, min_moe, use_prop_in_moe) {
+  iterate <- function(success_var, group_var, cohort_var, reference_group, min_moe, use_prop_in_moe, prop_sub_0, prop_sub_1) {
     if (!(reference_group %in% c('overall', 'hpg'))) {
       reference_val <- sapply(sort(unique(data[[cohort_var]])), function(cohort) mean(data[[success_var]][data[[group_var]] == reference_group & data[[cohort_var]] == cohort])) # one for each non-NA cohort
     } else {
       reference_val <- reference_group # overall
     }
-    di_ppg(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], reference=reference_val, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe) %>%
+    di_ppg(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], reference=reference_val, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1) %>%
       mutate(
         success_variable=success_var
       , disaggregation=group_var
