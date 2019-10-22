@@ -40,5 +40,7 @@ Iteratively calculate disproportionate impact via the percentage point gap (PPG)
 library(dplyr)
 data(student_equity)
 # Multiple group variables
-di_ppg_iterate(data=student_equity, success_vars=c('Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort'), reference_groups='overall')
+di_ppg_iterate(data=student_equity, success_vars=c('Transfer')
+  , group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort')
+  , reference_groups='overall')
 }
