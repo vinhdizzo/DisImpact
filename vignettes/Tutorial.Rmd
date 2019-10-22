@@ -96,6 +96,15 @@ di_ppg(success=Transfer, group=Ethnicity, data=student_equity, min_moe=0.02, use
   as.data.frame
 ```
 
+In cases where the proportion is used in calculating MOE, a proportion of 0 or 1 would lead to a zero MOE.  To account for these scenarios, the user could leverage the `prop_sub_0` and `prop_sub_1` parameters in `di_ppg` and `ppg_moe`  as substitutes.  These parameters default to `0.5`.
+
+```{r}
+# Set Native American to have have zero transfers and see what the results
+di_ppg(success=Transfer, group=Ethnicity, data=student_equity %>% mutate(Transfer=ifelse(Ethnicity=='Native American', 0, Transfer)), use_prop_in_moe=TRUE, prop_sub_0=0.1, prop_sub_1=0.9) %>%
+  as.data.frame
+```
+
+
 ## Proportionality index
 `di_prop_index` is the main work function for this method, and it can take on vectors or column names the tidy way:
 
@@ -152,4 +161,17 @@ di_ppg(success=pmax(Transfer, a), group=Ethnicity, data=student_equity) %>%
 
 # Collapse Black and Hispanic
 di_ppg(success=Transfer, group=ifelse(Ethnicity %in% c('Black', 'Hispanic'), 'Black/Hispanic', Ethnicity), data=student_equity) %>% as.data.frame
+```
+
+## Calculate DI for many variables and groups
+It is often the case that the user desires to calculate disproportionate impact across many outcome variables and many disaggregation/group variables.  The function `di_ppg_iterate` allows the user to specify a data set and the various variables to iterate across:
+```{r}
+# Multiple group variables
+di_ppg_iterate(data=student_equity, success_vars=c('Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort'), reference_groups='overall')
+
+# Multiple group variables and different reference groups
+bind_rows(
+  di_ppg_iterate(data=student_equity, success_vars=c('Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort'), reference_groups=c('White', 'Male'))
+  , di_ppg_iterate(data=student_equity, success_vars=c('Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort'), reference_groups='overall')
+)
 ```
