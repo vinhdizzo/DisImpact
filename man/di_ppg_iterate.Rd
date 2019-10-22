@@ -22,6 +22,10 @@ di_ppg_iterate(data, success_vars, group_vars, cohort_vars, reference_groups,
 \item{min_moe}{The minimum margin of error to be used in the PPG calculation, passed to `di_ppg`.}
 
 \item{use_prop_in_moe}{Whether the estimated proportions should be used in the margin of error calculation by the PPG, passed to `di_ppg`.}
+
+\item{prop_sub_0}{Passed to `di_ppg`.}
+
+\item{prop_sub_1}{Passed to `di_ppg`.}
 }
 \value{
 A data frame with all relevant returned fields from `di_ppg` plus `success_variable` (elements of `success_vars`), `disaggregation` (elements of `group_vars`), and `reference_group` (elements of `reference_groups`).
@@ -30,5 +34,5 @@ A data frame with all relevant returned fields from `di_ppg` plus `success_varia
 Iteratively calculate disproportionate impact via the percentage point gap (PPG) method for many variables.
 }
 \details{
-Iteratively calculate disproportionate impact via the percentage point gap (PPG) method for all combinations of `success_var`, `group_var`, and `cohort_var`.
+Iteratively calculate disproportionate impact via the percentage point gap (PPG) method for all combinations of `success_vars`, `group_vars`, and `cohort_vars`.
 }

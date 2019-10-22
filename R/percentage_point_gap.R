@@ -185,7 +185,7 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg')
 
 ##' Iteratively calculate disproportionate impact via the percentage point gap (PPG) method for many variables.
 ##' 
-##' Iteratively calculate disproportionate impact via the percentage point gap (PPG) method for all combinations of `success_var`, `group_var`, and `cohort_var`.
+##' Iteratively calculate disproportionate impact via the percentage point gap (PPG) method for all combinations of `success_vars`, `group_vars`, and `cohort_vars`.
 ##' @title Iteratively calculate disproportionate impact via the percentage point gap (PPG) method for many variables.
 ##' @param data A data frame for which to iterate DI calculation for a set of variables.
 ##' @param success_vars A character vector of success variable names to iterate across.
@@ -194,6 +194,8 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg')
 ##' @param reference_groups Either 'overall', 'hpg', or a character vector of the same length as `group_vars` that indicates the reference group value for each group variable in `group_vars`.
 ##' @param min_moe The minimum margin of error to be used in the PPG calculation, passed to `di_ppg`.
 ##' @param use_prop_in_moe Whether the estimated proportions should be used in the margin of error calculation by the PPG, passed to `di_ppg`.
+##' @param prop_sub_0 Passed to `di_ppg`.
+##' @param prop_sub_1 Passed to `di_ppg`.
 ##' @return A data frame with all relevant returned fields from `di_ppg` plus `success_variable` (elements of `success_vars`), `disaggregation` (elements of `group_vars`), and `reference_group` (elements of `reference_groups`).
 ##' @import dplyr tidyselect purrr
 ##' @export
