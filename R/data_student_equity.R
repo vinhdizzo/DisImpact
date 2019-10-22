@@ -10,7 +10,7 @@
 #'
 #' @examples
 #' data(student_equity)
-## "student_equity"
+"student_equity"
 ## # Data parameters
 ## true.p <- c(0.4, 0.5, 0.3, 0.2, 0.7, 0.6)
 ## nPerGroup <- c(100, 500, 1000, 2000, 3000, 3400)
@@ -32,3 +32,4 @@
 
 ## # Export data set to ./data
 ## devtools::use_data(student_equity, overwrite=TRUE)
+

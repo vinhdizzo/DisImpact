@@ -2,7 +2,10 @@
 
 export(di_80_index)
 export(di_ppg)
+export(di_ppg_iterate)
 export(di_prop_index)
 export(ppg_moe)
 import(dplyr)
+import(purrr)
 import(rlang)
+import(tidyselect)

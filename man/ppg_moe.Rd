@@ -4,14 +4,18 @@
 \alias{ppg_moe}
 \title{Margin of error for the PPG}
 \usage{
-ppg_moe(n, proportion, min_moe = 0.03)
+ppg_moe(n, proportion, min_moe = 0.03, prop_sub_0 = 0.5, prop_sub_1 = 0.5)
 }
 \arguments{
 \item{n}{Sample size for the group of interest.}
 
 \item{proportion}{(Optional) The proportion of successes for the group of interest.  If specified, then the proportion is used in the MOE formula.  Otherwise, a default proportion of 0.50 is used (conservative and yields the maximum MOE).}
 
-\item{min_moe}{The minimum MOE returned even if the sample size is large.  Defaults to 0.03.}
+\item{min_moe}{The minimum MOE returned even if the sample size is large.  Defaults to 0.03.  This equates to a minimum threshold gap for declaring disproportionate impact.}
+
+\item{prop_sub_0}{For cases where `proportion` is 0, substitute with `prop_sub_0` (defaults to 0.5) to account for the zero MOE.}
+
+\item{prop_sub_1}{For cases where `proportion` is 1, substitute with `prop_sub_1` (defaults to 0.5) to account for the zero MOE.}
 }
 \value{
 The margin of error for the PPG given the specified sample size.
