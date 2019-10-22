@@ -211,7 +211,10 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
   if (length(unique(sapply(data[, group_vars], class))) > 1) {
     stop("All variables specified in `group_vars` should be of the same class.  Suggestion: set them all as character data.")
   }
-
+  
+  # CRAN: no visible binding for global variable
+  success_var <- group_var <- cohort_var <- reference_group <- NULL
+  
   dRef <- data.frame(group_var=group_vars, reference_group=reference_groups, stringsAsFactors=FALSE)
   
   dCombination <- expand.grid(success_var=success_vars, group_var=group_vars, cohort_var=cohort_vars, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1, stringsAsFactors=FALSE) %>%
@@ -224,6 +227,10 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
     } else {
       reference_val <- reference_group # overall
     }
+
+    # CRAN: no visible binding for global variable
+    success_variable <- disaggregation <- NULL
+    
     di_ppg(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], reference=reference_val, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1) %>%
       mutate(
         success_variable=success_var
