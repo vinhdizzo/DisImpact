@@ -197,7 +197,14 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg')
 ##' @param prop_sub_0 Passed to `di_ppg`.
 ##' @param prop_sub_1 Passed to `di_ppg`.
 ##' @return A data frame with all relevant returned fields from `di_ppg` plus `success_variable` (elements of `success_vars`), `disaggregation` (elements of `group_vars`), and `reference_group` (elements of `reference_groups`).
-##' @import dplyr tidyselect purrr
+##' @examples
+##' library(dplyr)
+##' data(student_equity)
+##' # Multiple group variables
+##' di_ppg_iterate(data=student_equity, success_vars=c('Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort'), reference_groups='overall')
+##' @import dplyr
+##' @importFrom tidyselect everything
+##' @importFrom purrr pmap
 ##' @export
 di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, reference_groups, min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5) {
   stopifnot(length(group_vars) == length(reference_groups) | length(reference_groups) == 1)
