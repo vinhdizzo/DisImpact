@@ -21,7 +21,7 @@
 ##' ppg_moe(n=800, proportion=0.20)
 ##' ppg_moe(n=800, proportion=0.20, min_moe=0)
 ##' ppg_moe(n=c(200, 800, 1000, 2000), min_moe=0.01)
-##' @references California Community Colleges Chancellor's Office (2017).  \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{Percentage Point Gap Method}.
+##' @references California Community Colleges Chancellor's Office (2017).  \href{https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Research/Files/PercentagePointGapMethod2017.ashx}{Percentage Point Gap Method}.
 ##' @export
 ppg_moe <- function(n, proportion, min_moe=0.03, prop_sub_0=0.5, prop_sub_1=0.5) {
   if (missing(proportion)) {
@@ -41,7 +41,7 @@ ppg_moe <- function(n, proportion, min_moe=0.03, prop_sub_0=0.5, prop_sub_1=0.5)
 }
 ##' Calculate disproportionate impact per the percentage point gap (PPG) method.
 ##'
-##' This function determines disproportionate impact based on the percentage point gap (PPG) method, as described in \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.  Note that the margin of error (MOE) is calculated using using 1.96*sqrt(0.25^2/n), with a \code{min_moe} used as the minimum by default.
+##' This function determines disproportionate impact based on the percentage point gap (PPG) method, as described in \href{https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Research/Files/PercentagePointGapMethod2017.ashx}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.  Note that the margin of error (MOE) is calculated using using 1.96*sqrt(0.25^2/n), with a \code{min_moe} used as the minimum by default.
 ##' @title Calculate disproportionate impact per the percentage point gap (PPG) method.
 ##' @param success A vector of success indicators (\code{1}/\code{0} or \code{TRUE}/\code{FALSE}) or an unquoted reference (name) to a column in \code{data} if it is specified.  It could also be a vector of counts, in which case \code{weight} (group size) should also be specified.
 ##' @param group A vector of group names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.
@@ -88,7 +88,7 @@ ppg_moe <- function(n, proportion, min_moe=0.03, prop_sub_0=0.5, prop_sub_1=0.5)
 ##'   , min_moe=0.02
 ##'   , use_prop_in_moe=TRUE) %>%
 ##'   as.data.frame
-##' @references California Community Colleges Chancellor's Office (2017).  \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{Percentage Point Gap Method}.
+##' @references California Community Colleges Chancellor's Office (2017).  \href{https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Research/Files/PercentagePointGapMethod2017.ashx}{Percentage Point Gap Method}.
 ##' @export
 ##' @import dplyr rlang
 di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg'), data, min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5) {

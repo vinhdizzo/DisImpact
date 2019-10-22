@@ -40,7 +40,7 @@ A data frame consisting of: cohort (if used), group, n (sample size), success (n
 Calculate disproportionate impact per the percentage point gap (PPG) method.
 }
 \details{
-This function determines disproportionate impact based on the percentage point gap (PPG) method, as described in \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.  Note that the margin of error (MOE) is calculated using using 1.96*sqrt(0.25^2/n), with a \code{min_moe} used as the minimum by default.
+This function determines disproportionate impact based on the percentage point gap (PPG) method, as described in \href{https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Research/Files/PercentagePointGapMethod2017.ashx}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.  Note that the margin of error (MOE) is calculated using using 1.96*sqrt(0.25^2/n), with a \code{min_moe} used as the minimum by default.
 }
 \examples{
 library(dplyr)
@@ -74,5 +74,5 @@ di_ppg(success=Transfer, group=Ethnicity, data=student_equity
   as.data.frame
 }
 \references{
-California Community Colleges Chancellor's Office (2017).  \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{Percentage Point Gap Method}.
+California Community Colleges Chancellor's Office (2017).  \href{https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Research/Files/PercentagePointGapMethod2017.ashx}{Percentage Point Gap Method}.
 }

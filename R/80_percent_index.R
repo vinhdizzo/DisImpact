@@ -1,6 +1,6 @@
 ##' Calculate disproportionate impact per the 80\% index method.
 ##'
-##' This function determines disproportionate impact based on the 80\% index method, as described in \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES\%20FOR\%20MEASURING\%20DISPROPORTIONATE\%20IMPACT\%20IN\%20EQUITY\%20PLANS.pdf}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.
+##' This function determines disproportionate impact based on the 80\% index method, as described in \href{https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Network-Operations/Accountability/Files/GUIDELINES-FOR-MEASURING-DISPROPORTIONATE-IMPACT-IN-EQUITY-PLANS.ashx}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.
 ##' @title Calculate disproportionate impact per the 80\% index
 ##' @param success A vector of success indicators (\code{1}/\code{0} or \code{TRUE}/\code{FALSE}) or an unquoted reference (name) to a column in \code{data} if it is specified.  It could also be a vector of counts, in which case \code{weight} should also be specified (group size).
 ##' @param group A vector of group names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.
@@ -13,7 +13,7 @@
 ##' data(student_equity)
 ##' di_80_index(success=Transfer, group=Ethnicity, data=student_equity) %>%
 ##'   as.data.frame
-##' @references California Community Colleges Chancellor's Office (2014).  \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Accountability/GUIDELINES\%20FOR\%20MEASURING\%20DISPROPORTIONATE\%20IMPACT\%20IN\%20EQUITY\%20PLANS.pdf}{Guidelines for Measuring Disproportionate Impact in Equity Plans}.
+##' @references California Community Colleges Chancellor's Office (2014).  \href{https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Network-Operations/Accountability/Files/GUIDELINES-FOR-MEASURING-DISPROPORTIONATE-IMPACT-IN-EQUITY-PLANS.ashx}{Guidelines for Measuring Disproportionate Impact in Equity Plans}.
 ##' @export
 ##' @import dplyr rlang
 di_80_index <- function(success, group, cohort, weight, data) {

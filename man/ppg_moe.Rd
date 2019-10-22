@@ -31,5 +31,5 @@ ppg_moe(n=800, proportion=0.20, min_moe=0)
 ppg_moe(n=c(200, 800, 1000, 2000), min_moe=0.01)
 }
 \references{
-California Community Colleges Chancellor's Office (2017).  \href{http://extranet.cccco.edu/Portals/1/TRIS/Research/Analysis/PercentagePointGapMethod2017.pdf}{Percentage Point Gap Method}.
+California Community Colleges Chancellor's Office (2017).  \href{https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Research/Files/PercentagePointGapMethod2017.ashx}{Percentage Point Gap Method}.
 }
