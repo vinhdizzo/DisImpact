@@ -167,9 +167,10 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg')
   }
   pct <- moe <- pct_lo <- pct_hi <- NULL # to resolve CRAN NOTE: no visible binding for global variable
   dResults <- dResults %>% 
-    mutate(moe=case_when(use_prop_in_moe ~ ppg_moe(n=n, proportion=pct, min_moe=min_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1)
-                         , !use_prop_in_moe ~ ppg_moe(n=n, min_moe=min_moe)
-                         )
+    mutate(## moe=case_when(use_prop_in_moe ~ ppg_moe(n=n, proportion=pct, min_moe=min_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1)
+           ##               , !use_prop_in_moe ~ ppg_moe(n=n, min_moe=min_moe)
+           ##               ) ## this always gets evaluated and warning message pops up from ppg_moe
+      moe=if (use_prop_in_moe) { ppg_moe(n=n, proportion=pct, min_moe=min_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1) } else { ppg_moe(n=n, min_moe=min_moe) }
          , pct_lo=pct - moe
          , pct_hi=pct + moe
          , di_indicator=ifelse(pct_hi <= reference, 1, 0)
