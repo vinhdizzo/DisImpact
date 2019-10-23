@@ -15,7 +15,8 @@
 ##'   as.data.frame
 ##' @references California Community Colleges Chancellor's Office (2014).  \href{https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Network-Operations/Accountability/Files/GUIDELINES-FOR-MEASURING-DISPROPORTIONATE-IMPACT-IN-EQUITY-PLANS.ashx}{Guidelines for Measuring Disproportionate Impact in Equity Plans}.
 ##' @export
-##' @import dplyr rlang
+##' @import dplyr
+##' @importFrom rlang !! enquo
 di_80_index <- function(success, group, cohort, weight, data) {
   if (!missing(data)) {
     eq_success <- enquo(success)

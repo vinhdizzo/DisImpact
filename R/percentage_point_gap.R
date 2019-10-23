@@ -90,7 +90,8 @@ ppg_moe <- function(n, proportion, min_moe=0.03, prop_sub_0=0.5, prop_sub_1=0.5)
 ##'   as.data.frame
 ##' @references California Community Colleges Chancellor's Office (2017).  \href{https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Research/Files/PercentagePointGapMethod2017.ashx}{Percentage Point Gap Method}.
 ##' @export
-##' @import dplyr rlang
+##' @import dplyr
+##' @importFrom rlang !! enquo
 di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg'), data, min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5) {
   ## require(magrittr)
   ## require(dplyr)
