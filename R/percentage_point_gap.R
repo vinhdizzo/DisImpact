@@ -238,11 +238,11 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
     # For each combination, determine row indices; take only combination with actual observations
 
     # CRAN: no visible binding for global variable
-    row_index <- want_indices <- n_obs <- <- NULL
+    row_index <- want_indices <- n_obs <- NULL
     dRepeatScenarios <- lapply(1:nrow(dRepeatScenarios0)
                              , FUN=function(i) {
                                # CRAN: no visible binding for global variable
-                               row_index <- want_indices <- n_obs <- <- NULL
+                               row_index <- want_indices <- n_obs <- NULL
                                
                                vars_specific <- colnames(dRepeatScenarios0)[!(dRepeatScenarios0[i, ] %in% '- All')]
                                vars_all <- colnames(dRepeatScenarios0)[dRepeatScenarios0[i, ] %in% '- All']
