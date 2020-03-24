@@ -4,8 +4,8 @@
 \alias{di_ppg}
 \title{Calculate disproportionate impact per the percentage point gap (PPG) method.}
 \usage{
-di_ppg(success, group, cohort, weight, reference = c("overall", "hpg"), data,
-  min_moe = 0.03, use_prop_in_moe = FALSE, prop_sub_0 = 0.5,
+di_ppg(success, group, cohort, weight, reference = c("overall", "hpg"),
+  data, min_moe = 0.03, use_prop_in_moe = FALSE, prop_sub_0 = 0.5,
   prop_sub_1 = 0.5)
 }
 \arguments{

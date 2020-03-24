@@ -136,11 +136,12 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg')
     reference_numeric <- 1
   } else {
     # expecting vector of length 1 or length equal to unique cohort
-    stopifnot(length(reference) == length(unique(cohort)))
+    #stopifnot(length(reference) == length(unique(cohort)))
+    stopifnot(length(reference) == length(sort(unique(cohort), na.last=TRUE))) # remove NA cohort
     reference_type <- 'custom'
     reference_numeric <- reference
     if (length(reference) > 1) {
-      dReference <- data_frame(cohort=sort(unique(cohort))
+      dReference <- data_frame(cohort=sort(unique(cohort), na.last=TRUE)
                              , reference
                                )
     }
@@ -185,15 +186,16 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg')
   return(dResults)
 }
 
-##' Iteratively calculate disproportionate impact via the percentage point gap (PPG) method for many variables.
+##' Iteratively calculate disproportionate impact via the percentage point gap (PPG) method for many disaggregation variables.
 ##' 
-##' Iteratively calculate disproportionate impact via the percentage point gap (PPG) method for all combinations of `success_vars`, `group_vars`, and `cohort_vars`.
+##' Iteratively calculate disproportionate impact via the percentage point gap (PPG) method for all combinations of `success_vars`, `group_vars`, and `cohort_vars`, for each combination of subgroups specified by `repeat_by_vars`.
 ##' @title Iteratively calculate disproportionate impact via the percentage point gap (PPG) method for many variables.
 ##' @param data A data frame for which to iterate DI calculation for a set of variables.
 ##' @param success_vars A character vector of success variable names to iterate across.
 ##' @param group_vars A character vector of group (disaggregation) variable names to iterate across.
 ##' @param cohort_vars A character vector of cohort variable names to iterate across.
 ##' @param reference_groups Either 'overall', 'hpg', or a character vector of the same length as `group_vars` that indicates the reference group value for each group variable in `group_vars`.
+##' @param repeat_by_vars A character vector of variables to repeat DI calculations for across all combination of these variables, including '- All' as a group for each variable.  The reference rate used for DI comparison differs for every combination of the variables listed here.
 ##' @param min_moe The minimum margin of error to be used in the PPG calculation, passed to `di_ppg`.
 ##' @param use_prop_in_moe Whether the estimated proportions should be used in the margin of error calculation by the PPG, passed to `di_ppg`.
 ##' @param prop_sub_0 Passed to `di_ppg`.
@@ -207,34 +209,122 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg')
 ##'   , group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort')
 ##'   , reference_groups='overall')
 ##' @import dplyr
-##' @importFrom tidyselect everything
+##' @importFrom tidyselect everything one_of
 ##' @importFrom purrr pmap
+##' @importFrom tidyr unnest
 ##' @export
-di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, reference_groups, min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5) {
+di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, reference_groups, repeat_by_vars=NULL, min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5) {
   stopifnot(length(group_vars) == length(reference_groups) | length(reference_groups) == 1)
   if (length(unique(sapply(data[, group_vars], class))) > 1) {
     stop("All variables specified in `group_vars` should be of the same class.  Suggestion: set them all as character data.")
   }
+  if (!is.null(repeat_by_vars)) {
+    if (length(unique(sapply(data[, repeat_by_vars], class))) > 1) {
+      stop("All variables specified in `repeat_by_vars` should be of the same class.  Suggestion: set them all as character data.")
+    } 
+  }
   
   # CRAN: no visible binding for global variable
   success_var <- group_var <- cohort_var <- reference_group <- NULL
+
+  # Set up different repeat-by data sets by determining row indices
+  if (!is.null(repeat_by_vars)) {
+    # All combinations, including '- All'
+    dRepeatScenarios0 <- data %>%
+      select(one_of(repeat_by_vars)) %>%
+      lapply(function(x) c(unique(x), '- All')) %>%
+      expand.grid(stringsAsFactors=FALSE)
+    
+    # For each combination, determine row indices; take only combination with actual observations
+    dRepeatScenarios <- lapply(1:nrow(dRepeatScenarios0)
+                             , FUN=function(i) {
+                               vars_specific <- colnames(dRepeatScenarios0)[!(dRepeatScenarios0[i, ] %in% '- All')]
+                               vars_all <- colnames(dRepeatScenarios0)[dRepeatScenarios0[i, ] %in% '- All']
+                               if (length(vars_specific) != 0) {
+                                 dRepeatScenarios0[i, ] %>%
+                                   select(one_of(vars_specific)) %>%
+                                   left_join(data %>% mutate(row_index=row_number())) %>%
+                                   group_by_at(vars(one_of(vars_specific))) %>%
+                                   summarize(want_indices=list(row_index), n_obs=n()) %>%
+                                   ungroup %>%             
+                                   mutate_at(.vars=vars_all, .fun=function(x) '- All')
+                               } else { # all variables are '- All'
+                                 data %>%
+                                   mutate(row_index=row_number()) %>%
+                                   summarize(want_indices=list(row_index), n_obs=n()) %>%
+                                   ungroup %>%
+                                   mutate_at(.vars=vars_all, .fun=function(x) '- All')
+                               }
+                             }
+                             ) %>%
+      bind_rows %>%
+      filter(n_obs > 0) %>%
+      select(-n_obs)
+  }
   
+  ## if (!is.null(repeat_by_vars)) {
+  ##   # Combination of subsets
+  ##   dRepeatData1 <- data %>%
+  ##     # expand(nesting(one_of(repeat_by_vars)))
+  ##     select(one_of(repeat_by_vars)) %>%
+  ##     distinct %>%
+  ##     left_join(data %>% mutate(row_index=row_number())) %>%
+  ##     group_by_at(vars(one_of(repeat_by_vars))) %>%
+  ##     summarize(want_indices=list(row_index)) %>%
+  ##     ungroup
+    
+  ##   # Combination of subsets: the 'All' group for each variable
+  ##   if (length(repeat_by_vars) > 1) {
+  ##     dRepeatData2 <- lapply(seq_along(repeat_by_vars)
+  ##                          , FUN=function(i) {
+  ##                            cur_var <- repeat_by_vars[i]
+  ##                            dRepeatData <- data %>%
+  ##                              # expand(nesting(one_of(repeat_by_vars)))
+  ##                              select(one_of(repeat_by_vars[-i])) %>%
+  ##                              distinct %>%
+  ##                              left_join(data %>% mutate(row_index=row_number())) %>%
+  ##                              group_by_at(vars(one_of(repeat_by_vars[-i]))) %>%
+  ##                              summarize(want_indices=list(row_index)) %>%
+  ##                              ungroup %>%
+  ##                              mutate(!!cur_var := "- All")
+  ##                          }
+  ##                          ) %>%
+  ##       bind_rows
+  ##   } else { # length(repeat_by_vars) == 1
+  ##     dRepeatData2 <- data %>%
+  ##       mutate(row_index=row_number()) %>% 
+  ##       mutate(!!repeat_by_vars := "- All") %>%
+  ##       group_by_at(vars(one_of(repeat_by_vars))) %>%
+  ##       summarize(want_indices=list(row_index)) %>%
+  ##       ungroup
+  ##   }
+  ##   # Combine
+  ##   dRepeatData <- bind_rows(dRepeatData1, dRepeatData2)
+  ## } else {
+
+  ## }
+  
+  # Set up scenarios
   dRef <- data.frame(group_var=group_vars, reference_group=reference_groups, stringsAsFactors=FALSE)
   
-  dCombination <- expand.grid(success_var=success_vars, group_var=group_vars, cohort_var=cohort_vars, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1, stringsAsFactors=FALSE) %>%
+  dScenarios <- expand.grid(success_var=success_vars, group_var=group_vars, cohort_var=cohort_vars, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1, stringsAsFactors=FALSE) %>%
     left_join(dRef) %>%
     select(success_var, group_var, cohort_var, reference_group, min_moe, use_prop_in_moe, prop_sub_0, prop_sub_1)
 
-  iterate <- function(success_var, group_var, cohort_var, reference_group, min_moe, use_prop_in_moe, prop_sub_0, prop_sub_1) {
+  # Function to iterate for each scenario
+  iterate <- function(success_var, group_var, cohort_var, reference_group, min_moe, use_prop_in_moe, prop_sub_0, prop_sub_1, subset_idx) {
+    
+    data <- data[subset_idx, ]
+    
     if (!(reference_group %in% c('overall', 'hpg'))) {
-      reference_val <- sapply(sort(unique(data[[cohort_var]])), function(cohort) mean(data[[success_var]][data[[group_var]] == reference_group & data[[cohort_var]] == cohort])) # one for each non-NA cohort
+      reference_val <- sapply(sort(unique(data[[cohort_var]]), na.last=TRUE), function(cohort) mean(data[[success_var]][data[[group_var]] %in% reference_group & data[[cohort_var]] %in% cohort])) # one for each non-NA cohort
     } else {
-      reference_val <- reference_group # overall
+      reference_val <- reference_group # overall or hpg
     }
 
     # CRAN: no visible binding for global variable
     success_variable <- disaggregation <- NULL
-    
+
     di_ppg(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], reference=reference_val, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1) %>%
       mutate(
         success_variable=success_var
@@ -243,6 +333,23 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
              ) %>%
       select(success_variable, disaggregation, reference_group, everything())
   }
-  pmap(dCombination, iterate) %>%
-    bind_rows
+
+  # Iterate for all scenarios
+  if (is.null(repeat_by_vars)) {
+    subset_idx <- 1:nrow(data)
+    pmap(dScenarios %>% mutate(subset_idx=list(subset_idx)), iterate) %>%
+      bind_rows
+  } else {
+    dRepeatScenarios$results <- lapply(1:nrow(dRepeatScenarios)
+                                     , FUN=function(i) {
+                                       # data <- data %>% slice(dRepeatScenarios[i, ] %>% select(want_indices) %>% unlist)
+                                       subset_idx <- dRepeatScenarios[i, ] %>% select(want_indices) %>% unlist
+                                       pmap(dScenarios %>% mutate(subset_idx=list(subset_idx)), iterate) %>%
+                                         bind_rows
+                                     }
+                                     )
+    dRepeatScenarios %>%
+      select(-want_indices) %>%
+      unnest
+  }
 }

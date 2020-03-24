@@ -1,3 +1,6 @@
+* 0.0.6
+  - Updated `di_ppg_iterate` helper function to include the parameter `repeat_by_vars`.  This allows for repeating DI calculations for every combination of variables specified in `repeat_by_vars`.
+
 * 0.0.5
   - Added `di_ppg_iterate` helper function to iteratively calculate DI across many variables.
 
