@@ -236,10 +236,17 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
       expand.grid(stringsAsFactors=FALSE)
     
     # For each combination, determine row indices; take only combination with actual observations
+
+    # CRAN: no visible binding for global variable
+    row_index <- want_indices <- n_obs <- <- NULL
     dRepeatScenarios <- lapply(1:nrow(dRepeatScenarios0)
                              , FUN=function(i) {
+                               # CRAN: no visible binding for global variable
+                               row_index <- want_indices <- n_obs <- <- NULL
+                               
                                vars_specific <- colnames(dRepeatScenarios0)[!(dRepeatScenarios0[i, ] %in% '- All')]
                                vars_all <- colnames(dRepeatScenarios0)[dRepeatScenarios0[i, ] %in% '- All']
+                               
                                if (length(vars_specific) != 0) {
                                  dRepeatScenarios0[i, ] %>%
                                    select(one_of(vars_specific)) %>%
@@ -247,13 +254,13 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
                                    group_by_at(vars(one_of(vars_specific))) %>%
                                    summarize(want_indices=list(row_index), n_obs=n()) %>%
                                    ungroup %>%             
-                                   mutate_at(.vars=vars_all, .fun=function(x) '- All')
+                                   mutate_at(.vars=vars_all, .funs=function(x) '- All')
                                } else { # all variables are '- All'
                                  data %>%
                                    mutate(row_index=row_number()) %>%
                                    summarize(want_indices=list(row_index), n_obs=n()) %>%
                                    ungroup %>%
-                                   mutate_at(.vars=vars_all, .fun=function(x) '- All')
+                                   mutate_at(.vars=vars_all, .funs=function(x) '- All')
                                }
                              }
                              ) %>%
