@@ -51,7 +51,7 @@ di_prop_index <- function(success, group, cohort, weight, data) {
   }
 
   # Calculate
-  df <- data_frame(cohort, group, success, weight)
+  df <- tibble(cohort, group, success, weight)
   pct_success <- pct_group <- NULL # to resolve CRAN NOTE: no visible binding for global variable
   dResults <- df %>%
     group_by(cohort, group) %>%

@@ -22,7 +22,7 @@
 ## library(devtools)
 ## library(dplyr)
 ## set.seed(1)
-## student_equity <- data_frame(Cohort=rep(2017:2018, each=nEachCohort)
+## student_equity <- tibble(Cohort=rep(2017:2018, each=nEachCohort)
 ##                  , Ethnicity=rep(rep(c('Native American', 'Multi-Ethnicity', 'Black', 'Hispanic', 'Asian', 'White'), times=nPerGroup), 2)
 ##                  , Transfer=c(lapply(1:nGroups, function(i) sample(0:1, size=nPerGroup[i], replace=TRUE, prob=c(1-true.p[i], true.p[i]))) %>% unlist
 ##                               , lapply(1:nGroups, function(i) sample(0:1, size=nPerGroup[i], replace=TRUE, prob=c(1-true.p[i]*1.05, true.p[i]*1.05))) %>% unlist

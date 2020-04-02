@@ -141,14 +141,14 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg')
     reference_type <- 'custom'
     reference_numeric <- reference
     if (length(reference) > 1) {
-      dReference <- data_frame(cohort=sort(unique(cohort), na.last=TRUE)
+      dReference <- tibble(cohort=sort(unique(cohort), na.last=TRUE)
                              , reference
                                )
     }
   }
 
   # Calculate
-  df <- data_frame(cohort, group, success, weight)
+  df <- tibble(cohort, group, success, weight)
   dResults <- df %>%
     group_by(cohort, group) %>%
     summarize(n=sum(weight), success=sum(success), pct=success/n) %>%
@@ -248,13 +248,15 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
                                vars_all <- colnames(dRepeatScenarios0)[dRepeatScenarios0[i, ] %in% '- All']
                                
                                if (length(vars_specific) != 0) {
-                                 dRepeatScenarios0[i, ] %>%
+                                 # dRepeatScenarios0[i, ] %>% # this gives an error when there is a single variable in repeat_by_vars
+                                 dRepeatScenarios0 %>%
+                                   slice(i) %>% 
                                    select(one_of(vars_specific)) %>%
                                    left_join(data %>% mutate(row_index=row_number())) %>%
                                    group_by_at(vars(one_of(vars_specific))) %>%
                                    summarize(want_indices=list(row_index), n_obs=n()) %>%
                                    ungroup %>%             
-                                   mutate_at(.vars=vars_all, .funs=function(x) '- All')
+                                   mutate_at(.vars=vars_all, .funs=function(x) '- All')                                   
                                } else { # all variables are '- All'
                                  data %>%
                                    mutate(row_index=row_number()) %>%
@@ -350,7 +352,8 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
     dRepeatScenarios$results <- lapply(1:nrow(dRepeatScenarios)
                                      , FUN=function(i) {
                                        # data <- data %>% slice(dRepeatScenarios[i, ] %>% select(want_indices) %>% unlist)
-                                       subset_idx <- dRepeatScenarios[i, ] %>% select(want_indices) %>% unlist
+                                       # subset_idx <- dRepeatScenarios[i, ] %>% select(want_indices) %>% unlist
+                                       subset_idx <- dRepeatScenarios %>% slice(i) %>% select(want_indices) %>% unlist
                                        pmap(dScenarios %>% mutate(subset_idx=list(subset_idx)), iterate) %>%
                                          bind_rows
                                      }
