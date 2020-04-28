@@ -1,6 +1,10 @@
+* 0.0.8
+  - Updated `di_ppg_iterate` to filter out scenarios when there are no matched rows when `repeat_by_vars` is used.
+
 * 0.0.7
   - Updated `di_ppg_iterate` to use `slice(i)` instead of manually subsetting rows in order to preserve data frame when `repeat_by_vars` has a single variable
   - Use `tibble` instead of `data_frame` since the latter is deprecated
+
 * 0.0.6
   - Updated `di_ppg_iterate` helper function to include the parameter `repeat_by_vars`.  This allows for repeating DI calculations for every combination of variables specified in `repeat_by_vars`.
 
