@@ -1,3 +1,7 @@
+* 0.0.9
+  - Updated `di_ppg_iterate`: remove rows with missing value for success_var, implemented inside `iterate` function within `di_ppg_iterate`.
+  - Updated `di_ppg_iterate`: addition of the `weight_var` parameter; if this isn't specified (data set at the individual level), then summarize the input data set to use weights in order to more efficiently calculate DI in multiple iterations.
+  - Updated `di_ppg_iterate`: specify columns when using `unnest`.
 * 0.0.8
   - Updated `di_ppg_iterate` to filter out scenarios when there are no matched rows when `repeat_by_vars` is used.
 

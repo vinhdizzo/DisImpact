@@ -4,18 +4,9 @@
 \alias{di_ppg}
 \title{Calculate disproportionate impact per the percentage point gap (PPG) method.}
 \usage{
-di_ppg(
-  success,
-  group,
-  cohort,
-  weight,
-  reference = c("overall", "hpg"),
-  data,
-  min_moe = 0.03,
-  use_prop_in_moe = FALSE,
-  prop_sub_0 = 0.5,
-  prop_sub_1 = 0.5
-)
+di_ppg(success, group, cohort, weight, reference = c("overall", "hpg"),
+  data, min_moe = 0.03, use_prop_in_moe = FALSE, prop_sub_0 = 0.5,
+  prop_sub_1 = 0.5)
 }
 \arguments{
 \item{success}{A vector of success indicators (\code{1}/\code{0} or \code{TRUE}/\code{FALSE}) or an unquoted reference (name) to a column in \code{data} if it is specified.  It could also be a vector of counts, in which case \code{weight} (group size) should also be specified.}

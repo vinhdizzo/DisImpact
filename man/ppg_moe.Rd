@@ -4,7 +4,8 @@
 \alias{ppg_moe}
 \title{Margin of error for the PPG}
 \usage{
-ppg_moe(n, proportion, min_moe = 0.03, prop_sub_0 = 0.5, prop_sub_1 = 0.5)
+ppg_moe(n, proportion, min_moe = 0.03, prop_sub_0 = 0.5,
+  prop_sub_1 = 0.5)
 }
 \arguments{
 \item{n}{Sample size for the group of interest.}

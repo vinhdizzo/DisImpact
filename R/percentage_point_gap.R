@@ -196,6 +196,7 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg')
 ##' @param cohort_vars A character vector of cohort variable names to iterate across.
 ##' @param reference_groups Either 'overall', 'hpg', or a character vector of the same length as `group_vars` that indicates the reference group value for each group variable in `group_vars`.
 ##' @param repeat_by_vars A character vector of variables to repeat DI calculations for across all combination of these variables, including '- All' as a group for each variable.  The reference rate used for DI comparison differs for every combination of the variables listed here.
+##' @param weight_var A character scalar specifying the weight variable if the input data set is summarized (ie,  the the success variables specified in `success_vars` contain count of successes).  Weight here corresponds to the denominator when calculating the success rate.  Defaults to `NULL` for an input data set where each row describes each individual.
 ##' @param min_moe The minimum margin of error to be used in the PPG calculation, passed to `di_ppg`.
 ##' @param use_prop_in_moe Whether the estimated proportions should be used in the margin of error calculation by the PPG, passed to `di_ppg`.
 ##' @param prop_sub_0 Passed to `di_ppg`.
@@ -213,7 +214,7 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg')
 ##' @importFrom purrr pmap
 ##' @importFrom tidyr unnest
 ##' @export
-di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, reference_groups, repeat_by_vars=NULL, min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5) {
+di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, reference_groups, repeat_by_vars=NULL, weight_var=NULL, min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5) {
   stopifnot(length(group_vars) == length(reference_groups) | length(reference_groups) == 1)
   if (length(unique(sapply(data[, group_vars], class))) > 1) {
     stop("All variables specified in `group_vars` should be of the same class.  Suggestion: set them all as character data.")
@@ -224,6 +225,26 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
     } 
   }
   
+  if (is.null(weight_var)) {
+    weight_var <- '- Weight'
+    ## data[[weight_var]] <- 1
+
+    # Create summarized data set for faster computations down the line
+    data <- data %>%
+      mutate_at(vars(one_of(success_vars)), .funs=list('NA_FLAG'= ~ is.na(.))) %>% # sum up successes
+      group_by_at(vars(one_of(group_vars, cohort_vars, repeat_by_vars, paste0(success_vars, '_NA_FLAG')))) %>% # Break out by missingness in the success variables in order to sum separately for valid weights
+      mutate(`- Weight`=1) %>%
+      summarize_at(vars(success_vars, '- Weight'), .funs=sum) %>%  # sum of success variables and cases (weight)
+      ungroup
+  } else {
+    if (any(is.na(data[[weight_var]]))) {
+      stop(paste0("The specified column corresponding to weight_var='", weight_var, "' contain NA values."))
+    }
+    if (any(data[[weight_var]] <= 0)) {
+      stop(paste0("The specified column corresponding to weight_var='", weight_var, "' contain non-positive values."))
+    }
+  }
+ 
   # CRAN: no visible binding for global variable
   success_var <- group_var <- cohort_var <- reference_group <- NULL
 
@@ -238,38 +259,43 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
     # For each combination, determine row indices; take only combination with actual observations
 
     # CRAN: no visible binding for global variable
-    row_index <- want_indices <- n_obs <- NULL
+    row_index <- want_indices <- n_rows <- NULL
     dRepeatScenarios <- lapply(1:nrow(dRepeatScenarios0)
                              , FUN=function(i) {
                                # CRAN: no visible binding for global variable
-                               row_index <- want_indices <- n_obs <- NULL
+                               row_index <- want_indices <- n_rows <- NULL
                                
                                vars_specific <- colnames(dRepeatScenarios0)[!(dRepeatScenarios0[i, ] %in% '- All')]
                                vars_all <- colnames(dRepeatScenarios0)[dRepeatScenarios0[i, ] %in% '- All']
                                
                                if (length(vars_specific) != 0) {
                                  # dRepeatScenarios0[i, ] %>% # this gives an error when there is a single variable in repeat_by_vars
-                                 dRepeatScenarios0 %>%
+                                 d_interm <- dRepeatScenarios0 %>%
                                    slice(i) %>% 
                                    select(one_of(vars_specific)) %>%
                                    left_join(data %>% mutate(row_index=row_number())) %>%
                                    filter(!is.na(row_index)) %>% # No match
                                    group_by_at(vars(one_of(vars_specific))) %>%
-                                   summarize(want_indices=list(row_index), n_obs=n()) %>%
-                                   ungroup %>%             
-                                   mutate_at(.vars=vars_all, .funs=function(x) '- All')                                   
+                                   summarize(want_indices=list(row_index), n_rows=n()) %>%
+                                   ungroup # %>%
+                                   # mutate_at(.vars=vars(one_of(vars_all)), .funs=function(x) '- All') ## do this below
+
+                                 d_interm[, vars_all] <- '- All' # No impact if vars_all is empty
+                                 d_interm
                                } else { # all variables are '- All'
-                                 data %>%
+                                 d_interm <- data %>%
                                    mutate(row_index=row_number()) %>%
-                                   summarize(want_indices=list(row_index), n_obs=n()) %>%
-                                   ungroup %>%
-                                   mutate_at(.vars=vars_all, .funs=function(x) '- All')
+                                   summarize(want_indices=list(row_index), n_rows=n()) %>%
+                                   ungroup # %>%
+                                   # mutate_at(.vars=vars(one_of(vars_all)), .funs=function(x) '- All')
+                                 d_interm[, vars_all] <- '- All' # No impact if vars_all is empty
+                                 d_interm
                                }
                              }
                              ) %>%
       bind_rows %>%
-      filter(n_obs > 0) %>%
-      select(-n_obs)
+      filter(n_rows > 0) %>%
+      select(-n_rows)
   }
   
   ## if (!is.null(repeat_by_vars)) {
@@ -325,6 +351,14 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
   iterate <- function(success_var, group_var, cohort_var, reference_group, min_moe, use_prop_in_moe, prop_sub_0, prop_sub_1, subset_idx) {
     
     data <- data[subset_idx, ]
+
+    # Remove rows with missing value for success_var
+    data <- data[!is.na(data[[success_var]]), ]
+
+    # If after removing rows with missing data and we end up with 0 cases, return nothing
+    if (nrow(data)==0) {
+      return(NULL)
+    }
     
     if (!(reference_group %in% c('overall', 'hpg'))) {
       reference_val <- sapply(sort(unique(data[[cohort_var]]), na.last=TRUE), function(cohort) mean(data[[success_var]][data[[group_var]] %in% reference_group & data[[cohort_var]] %in% cohort])) # one for each non-NA cohort
@@ -335,7 +369,7 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
     # CRAN: no visible binding for global variable
     success_variable <- disaggregation <- NULL
 
-    di_ppg(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], reference=reference_val, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1) %>%
+    di_ppg(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], weight=data[[weight_var]], reference=reference_val, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1) %>%
       mutate(
         success_variable=success_var
       , disaggregation=group_var
@@ -361,6 +395,6 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
                                      )
     dRepeatScenarios %>%
       select(-want_indices) %>%
-      unnest
+      unnest(results)
   }
 }
