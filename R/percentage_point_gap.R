@@ -384,7 +384,7 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
     pmap(dScenarios %>% mutate(subset_idx=list(subset_idx)), iterate) %>%
       bind_rows
   } else {
-    dRepeatScenarios$results <- lapply(1:nrow(dRepeatScenarios)
+    dRepeatScenarios$df_results <- lapply(1:nrow(dRepeatScenarios)
                                      , FUN=function(i) {
                                        # data <- data %>% slice(dRepeatScenarios[i, ] %>% select(want_indices) %>% unlist)
                                        # subset_idx <- dRepeatScenarios[i, ] %>% select(want_indices) %>% unlist
@@ -393,8 +393,11 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
                                          bind_rows
                                      }
                                      )
+    # CRAN: no visible binding for global variable
+    df_results <- NULL
+    
     dRepeatScenarios %>%
       select(-want_indices) %>%
-      unnest(results)
+      unnest(df_results)
   }
 }
