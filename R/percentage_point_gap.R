@@ -232,7 +232,7 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
     # Create summarized data set for faster computations down the line
     data <- data %>%
       mutate_at(vars(one_of(success_vars)), .funs=list('NA_FLAG'= ~ is.na(.))) %>% # sum up successes
-      group_by_at(vars(one_of(group_vars, cohort_vars, repeat_by_vars, paste0(success_vars, '_NA_FLAG')))) %>% # Break out by missingness in the success variables in order to sum separately for valid weights
+      group_by_at(vars(one_of(group_vars, cohort_vars, repeat_by_vars, if (length(success_vars)==1) {'NA_FLAG'} else {paste0(success_vars, '_NA_FLAG')}))) %>% # Break out by missingness in the success variables in order to sum separately for valid weights
       mutate(`- Weight`=1) %>%
       summarize_at(vars(success_vars, '- Weight'), .funs=sum) %>%  # sum of success variables and cases (weight)
       ungroup
