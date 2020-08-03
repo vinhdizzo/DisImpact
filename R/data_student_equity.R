@@ -27,7 +27,11 @@
 ##                  , Transfer=c(lapply(1:nGroups, function(i) sample(0:1, size=nPerGroup[i], replace=TRUE, prob=c(1-true.p[i], true.p[i]))) %>% unlist
 ##                               , lapply(1:nGroups, function(i) sample(0:1, size=nPerGroup[i], replace=TRUE, prob=c(1-true.p[i]*1.05, true.p[i]*1.05))) %>% unlist
 ##                               )
+##                  , Math=ifelse(Transfer==1, 1, sample(0:1, size=length(Transfer), replace=TRUE, prob=c(0.5, 0.5)))
+##                  , English=ifelse(Transfer==1, 1, sample(0:1, size=length(Transfer), replace=TRUE, prob=c(0.6, 0.4)))
 ##                  , Gender=sample(x=c('Female', 'Male'), size=nCohorts*sum(nPerGroup), replace=TRUE)
+##                  , Ed_Goal=sample(x=c('Deg/Transfer', 'Other'), size=nCohorts*sum(nPerGroup), replace=TRUE, prob=c(0.7, 0.3))
+##                  , College_Status=sample(x=c('First-time College', 'Other'), size=nCohorts*sum(nPerGroup), replace=TRUE, prob=c(0.8, 0.2))
 ##                  )
 
 ## # Export data set to ./data
