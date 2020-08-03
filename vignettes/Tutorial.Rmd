@@ -12,8 +12,8 @@ vignette: >
 The `DisImpact` R package contains functions that help in determining disproportionate impact (DI) based on the following methodologies:
 
 1. [percentage point gap](https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Research/Files/PercentagePointGapMethod2017.ashx) (PPG) method,
-2. [proportionality index](https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Network-Operations/Accountability/Files/GUIDELINES-FOR-MEASURING-DISPROPORTIONATE-IMPACT-IN-EQUITY-PLANS.ashx) method (method #1 in reference), and
-3. [80% index](https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Network-Operations/Accountability/Files/GUIDELINES-FOR-MEASURING-DISPROPORTIONATE-IMPACT-IN-EQUITY-PLANS.ashx) method (method #2 in reference).
+2. [proportionality index](https://www.cccco.edu/-/media/CCCCO-Website/Files/DII/guidelines-for-measuring-disproportionate-impact-in-equity-plans-tfa-ada.pdf) method (method #1 in reference), and
+3. [80% index](https://www.cccco.edu/-/media/CCCCO-Website/Files/DII/guidelines-for-measuring-disproportionate-impact-in-equity-plans-tfa-ada.pdf) method (method #2 in reference).
 
 ## Install Package
 ```{r}
@@ -70,6 +70,24 @@ di_ppg(success=Transfer_Rate*n, group=Ethnicity, cohort=Cohort, weight=n, data=d
   as.data.frame
 ```
 
+By default, `di_ppg` uses the overall success rate as the reference rate for comparison (default: `reference='overall'`).  The `reference` argument also accepts `'hpg'` (highest performing group success rate as the reference rate), `'all but current'` (success rate of all groups combined excluding the comparison group), or a group value from `group`.
+
+```{r}
+# Reference: Highest performing group
+di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, reference='hpg', data=student_equity) %>%
+  as.data.frame
+
+# Reference: All but current (PPG minus 1)
+di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, reference='all but current', data=student_equity) %>%
+  as.data.frame
+
+# Reference: custom group
+di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, reference='White', data=student_equity) %>%
+  as.data.frame
+di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, reference='Asian', data=student_equity) %>%
+  as.data.frame
+```
+
 The user could also pass in custom reference points for comparison (eg, a state-wide rate).  `di_ppg` accepts either a single reference point to be used or a vector of reference points, one for each cohort.  For the latter, the vector of reference points will be taken to correspond to the `cohort` variable, alphabetically ordered.
 ```{r}
 # With custom reference (single)
@@ -96,7 +114,7 @@ di_ppg(success=Transfer, group=Ethnicity, data=student_equity, min_moe=0.02, use
   as.data.frame
 ```
 
-In cases where the proportion is used in calculating MOE, a proportion of 0 or 1 would lead to a zero MOE.  To account for these scenarios, the user could leverage the `prop_sub_0` and `prop_sub_1` parameters in `di_ppg` and `ppg_moe`  as substitutes.  These parameters default to `0.5`.
+In cases where the proportion is used in calculating MOE, an observed proportion of 0 or 1 would lead to a zero MOE.  To account for these scenarios, the user could leverage the `prop_sub_0` and `prop_sub_1` parameters in `di_ppg` and `ppg_moe` as substitutes.  These parameters default to `0.5`, which maximizes the MOE (making it more difficult to declare disproportionate impact).
 
 ```{r}
 # Set Native American to have have zero transfers and see what the results
@@ -124,6 +142,13 @@ di_prop_index(success=Transfer, group=Ethnicity, cohort=Cohort, data=student_equ
   as.data.frame
 ```
 
+Note that the referenced document describing this method does not recommend a threshold on the proportionality index for declaring disproportionate impact.  The `di_prop_index` function uses `di_prop_index_cutoff=0.8` as the default threshold, which the user could change.
+
+```{r}
+# Changing threshold for DI
+di_prop_index(success=student_equity$Transfer, group=student_equity$Ethnicity, cohort=student_equity$Cohort, di_prop_index_cutoff=0.5) %>% as.data.frame
+```
+
 ## 80% index
 `di_80_index` is the main work function for this method, and it can take on vectors or column names the tidy way:
 
@@ -141,6 +166,21 @@ di_80_index(success=student_equity$Transfer, group=student_equity$Ethnicity, coh
 ## Tidy and column reference
 di_80_index(success=Transfer, group=Ethnicity, cohort=Cohort, data=student_equity) %>%
   as.data.frame
+```
+
+By default, `di_80_index` uses the group with the highest success rate as reference in calculating the index.  One could specify the the comparison group using the `reference_group` argument (a value from `group`).
+
+```{r}
+# Changing reference group
+di_80_index(success=student_equity$Transfer, group=student_equity$Ethnicity, cohort=student_equity$Cohort, reference_group='White') %>% as.data.frame
+```
+
+By default, `di_80_index` uses 80% (`di_80_index_cutoff=0.80`) as the default threshold for declaring disproportionate impact.  One could override this using another threshold via the `di_80_index_cutoff` argument.
+
+
+```{r}
+# Changing threshold for DI
+di_80_index(success=student_equity$Transfer, group=student_equity$Ethnicity, cohort=student_equity$Cohort, di_80_index_cutoff=0.50) %>% as.data.frame
 ```
 
 ## When we have a non-success variable like drop-out
@@ -164,14 +204,16 @@ di_ppg(success=Transfer, group=ifelse(Ethnicity %in% c('Black', 'Hispanic'), 'Bl
 ```
 
 ## Calculate DI for many variables and groups
-It is often the case that the user desires to calculate disproportionate impact across many outcome variables and many disaggregation/group variables.  The function `di_ppg_iterate` allows the user to specify a data set and the various variables to iterate across:
+It is often the case that the user desires to calculate disproportionate impact across many outcome variables and many disaggregation/group variables.  The function `di_iterate` allows the user to specify a data set and the various variables to iterate across:
 ```{r}
 # Multiple group variables
-di_ppg_iterate(data=student_equity, success_vars=c('Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort'), reference_groups='overall')
+di_iterate(data=student_equity, success_vars=c('Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort'), ppg_reference_groups='overall') %>% as.data.frame
 
 # Multiple group variables and different reference groups
+
 bind_rows(
-  di_ppg_iterate(data=student_equity, success_vars=c('Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort'), reference_groups=c('White', 'Male'))
-  , di_ppg_iterate(data=student_equity, success_vars=c('Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort'), reference_groups='overall')
+  di_iterate(data=student_equity, success_vars=c('Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort'), ppg_reference_groups='overall')
+  , di_iterate(data=student_equity, success_vars=c('Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort'), ppg_reference_groups=c('White', 'Male')) %>%
+    filter(!(disaggregation=='- None')) # Already have this scenario in Overall run
 )
 ```
