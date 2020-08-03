@@ -4,7 +4,8 @@
 \alias{di_prop_index}
 \title{Calculate disproportionate impact per the proportionality index (PI) method.}
 \usage{
-di_prop_index(success, group, cohort, weight, data)
+di_prop_index(success, group, cohort, weight, data,
+  di_prop_index_cutoff = 0.8)
 }
 \arguments{
 \item{success}{A vector of success indicators (\code{1}/\code{0} or \code{TRUE}/\code{FALSE}) or an unquoted reference (name) to a column in \code{data} if it is specified.  It could also be a vector of counts, in which case \code{weight} should also be specified (group size).}
@@ -16,9 +17,11 @@ di_prop_index(success, group, cohort, weight, data)
 \item{weight}{(Optional) A vector of case weights of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  If \code{success} consists of counts instead of success indicators (1/0), then \code{weight} should also be specified to indicate the group size.}
 
 \item{data}{(Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.}
+
+\item{di_prop_index_cutoff}{A numeric value between 0 and 1 that is used to determine disproportionate impact if the proportionality index falls below this threshold; defaults to 0.80.}
 }
 \value{
-A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct_success (proportion of successes attributed to the group within the cohort), pct_group (proportion of sample attributed to the group within the cohort), and di_prop_index (ratio of pct_success to pct_group).  When di_prop_index < 1, then there are signs of disproportionate impact.
+A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct_success (proportion of successes attributed to the group within the cohort), pct_group (proportion of sample attributed to the group within the cohort), di_prop_index (ratio of pct_success to pct_group), and di_indicator (1 if \code{di_prop_index} < \code{di_prop_index_cutoff}).  When di_prop_index < 1, then there are signs of disproportionate impact.
 }
 \description{
 Calculate disproportionate impact per the proportionality index (PI) method.

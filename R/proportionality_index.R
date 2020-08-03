@@ -7,7 +7,8 @@
 ##' @param cohort (Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  disproportionate impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.
 ##' @param weight (Optional) A vector of case weights of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  If \code{success} consists of counts instead of success indicators (1/0), then \code{weight} should also be specified to indicate the group size.
 ##' @param data (Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.
-##' @return A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct_success (proportion of successes attributed to the group within the cohort), pct_group (proportion of sample attributed to the group within the cohort), and di_prop_index (ratio of pct_success to pct_group).  When di_prop_index < 1, then there are signs of disproportionate impact.
+##' @param di_prop_index_cutoff A numeric value between 0 and 1 that is used to determine disproportionate impact if the proportionality index falls below this threshold; defaults to 0.80.
+##' @return A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct_success (proportion of successes attributed to the group within the cohort), pct_group (proportion of sample attributed to the group within the cohort), di_prop_index (ratio of pct_success to pct_group), and di_indicator (1 if \code{di_prop_index} < \code{di_prop_index_cutoff}).  When di_prop_index < 1, then there are signs of disproportionate impact.
 ##' @examples
 ##' library(dplyr)
 ##' data(student_equity)
@@ -17,7 +18,7 @@
 ##' @export
 ##' @import dplyr
 ##' @importFrom rlang !! enquo
-di_prop_index <- function(success, group, cohort, weight, data) {
+di_prop_index <- function(success, group, cohort, weight, data, di_prop_index_cutoff=0.80) {
   if (!missing(data)) {
     eq_success <- enquo(success)
     success <- data %>% ungroup %>% mutate(success=!!eq_success) %>% select(success) %>% unlist
@@ -27,6 +28,7 @@ di_prop_index <- function(success, group, cohort, weight, data) {
   # Check if success is binary or logical and that there are no NA's
   #stopifnot(success %in% c(1, 0))
   stopifnot(!is.na(success), success>=0) # can be counts
+  stopifnot(di_prop_index_cutoff >= 0, di_prop_index_cutoff <= 1)
 
   # Check if cohort is specified
   if (missing(cohort)) {
@@ -58,7 +60,7 @@ di_prop_index <- function(success, group, cohort, weight, data) {
     summarize(n=sum(weight), success=sum(success)) %>%
     ungroup %>%
     group_by(cohort) %>% 
-    mutate(pct_success=success/sum(success), pct_group=n/sum(n), di_prop_index=pct_success/pct_group) %>% 
+    mutate(pct_success=success/sum(success), pct_group=n/sum(n), di_prop_index=pct_success/pct_group, di_indicator=ifelse(di_prop_index < di_prop_index_cutoff, 1, 0)) %>% 
     ungroup %>%
     arrange(cohort, group)
 
