@@ -47,17 +47,19 @@ ppg_moe <- function(n, proportion, min_moe=0.03, prop_sub_0=0.5, prop_sub_1=0.5)
 ##' @param group A vector of group names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.
 ##' @param cohort (Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  Disproportionate impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.
 ##' @param weight (Optional) A vector of case weights of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  If \code{success} consists of counts instead of success indicators (1/0), then \code{weight} should also be specified to indicate the group size.
-##' @param reference Either \code{'overall'} (default), \code{'hpg'} (highest performing group), a single proportion (eg, 0.50), or a vector of proportions.  Reference is used as a point of comparison for disproportionate impact for each group.  When \code{cohort} is specified:
+##' @param reference Either \code{'overall'} (default), \code{'hpg'} (highest performing group), \code{'all but current'} (success rate of everyone excluding the comparison group; also known as 'ppg minus 1'), a value from \code{group} (specifying a reference group), a single proportion (eg, 0.50), or a vector of proportions.  Reference is used as a point of comparison for disproportionate impact for each group.  When \code{cohort} is specified:
 ##'   1. \code{'overall'} will use the overall success rate of each cohort group as the reference;
 ##'   2. \code{'hpg'} will use the highest performing group in each cohort as reference;
-##'   3. the specified proportion will be used for all cohorts;
-##'   4. the specified vector of proportions will refer to the reference point for each cohort in alphabetical order (so the number of proportions should equal to the number of unique cohorts).
+##'   3.  \code{'all but current'} will use the calculated success rate of each cohort group excluding the comparison group
+##'   4. the success rate of the specified reference group from \code{group} in each cohort will be used;
+##'   5. the specified proportion will be used for all cohorts;
+##'   6. the specified vector of proportions will refer to the reference point for each cohort in alphabetical order (so the number of proportions should equal to the number of unique cohorts).
 ##' @param data (Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.
 ##' @param min_moe The minimum margin of error (MOE) to be used in the calculation of disproportionate impact and is passed to \link{ppg_moe}.  Defaults to \code{0.03}.
 ##' @param use_prop_in_moe A logical value indicating whether or not the MOE formula should use the observed success rates (\code{TRUE}).  Defaults to \code{FALSE}, which uses 0.50 as the proportion in the MOE formula.  If \code{TRUE}, the success rates are passed to the \code{proportion} argument of \link{ppg_moe}.
 ##' @param prop_sub_0 For cases where `proportion` is 0, substitute with `prop_sub_0` (defaults to 0.5) to account for the zero MOE.  This is relevant only when `use_prop_in_moe=TRUE`.
 ##' @param prop_sub_1 For cases where `proportion` is 1, substitute with `prop_sub_1` (defaults to 0.5) to account for the zero MOE.  This is relevant only when `use_prop_in_moe=TRUE`.
-##' @return A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference (reference used in DI calculation), moe (margin of error), pct_lo (lower 95\% confidence interval for pct), pct_hi (upper 95\% confidence interval for pct), and di_indicator (1 if there is disproportionate impact, ie, when \code{pct_hi} <= \code{reference}).
+##' @return A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference_group (reference group used in DI calculation), reference (reference value used in DI calculation), moe (margin of error), pct_lo (lower 95\% confidence limit for pct), pct_hi (upper 95\% confidence limit for pct), and di_indicator (1 if there is disproportionate impact, ie, when \code{pct_hi} <= \code{reference}).
 ##' @examples
 ##' library(dplyr)
 ##' data(student_equity)
@@ -92,7 +94,7 @@ ppg_moe <- function(n, proportion, min_moe=0.03, prop_sub_0=0.5, prop_sub_1=0.5)
 ##' @export
 ##' @import dplyr
 ##' @importFrom rlang !! enquo
-di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg'), data, min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5) {
+di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg', 'all but current', unique(group)), data, min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5) {
   ## require(magrittr)
   ## require(dplyr)
   ## require(rlang)
@@ -138,11 +140,12 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg')
     # expecting vector of length 1 or length equal to unique cohort
     #stopifnot(length(reference) == length(unique(cohort)))
     stopifnot(length(reference) == length(sort(unique(cohort), na.last=TRUE))) # remove NA cohort
-    reference_type <- 'custom'
+    reference_type <- 'numeric'
     reference_numeric <- reference
     if (length(reference) > 1) {
       dReference <- tibble(cohort=sort(unique(cohort), na.last=TRUE)
-                             , reference
+                         , reference
+                         , reference_group=reference_type
                                )
     }
   }
@@ -160,8 +163,12 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg')
       mutate(reference=case_when(
                reference_type=='overall' ~ sum(success) / sum(n)
              , reference_type=='hpg' ~ max(pct)
-             , reference_type=='custom' ~ reference_numeric
-             )) %>%
+             , reference_type=='all but current' ~ (sum(success) - success) / (sum(n) - n)
+             , reference_type!='numeric' ~ if(sum(group==reference_type, na.rm=TRUE) > 0) {success[group==reference_type] / n[group==reference_type]} else {NA_real_}
+             , reference_type=='numeric' ~ reference_numeric
+             )
+             , reference_group=reference_type
+             ) %>%
       ungroup
   } else {
     dResults <- dResults %>%
@@ -177,6 +184,7 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg')
          , pct_hi=pct + moe
          , di_indicator=ifelse(pct_hi <= reference, 1, 0)
            ) %>%
+    mutate(di_indicator=ifelse(reference_group=='all but current' & is.na(di_indicator), 0, di_indicator)) %>% # When 'all but current' is used and there is only a single group, there is no comparison group, so di_indicator is NA; set this to 0
     arrange(cohort, group)
   
   if (remove_cohort) {
@@ -215,9 +223,11 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg')
 ##' @importFrom tidyr unnest
 ##' @export
 di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, reference_groups, repeat_by_vars=NULL, weight_var=NULL, min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5) {
+  .Deprecated(msg = "'di_ppg_iterate' is no longer supported.  Please use 'di_iterate' instead.")
+  
   stopifnot(length(group_vars) == length(reference_groups) | length(reference_groups) == 1)
   if (length(unique(sapply(data[, group_vars], class))) > 1) {
-    stop("All variables specified in `group_vars` should be of the same class.  Suggestion: set them all as character data.")
+    stop("All variables specified in `group_vars` should be of the same class.  Suggestion: set them all as character data using `as.character`.")
   }
   if (!is.null(repeat_by_vars)) {
     if (length(unique(sapply(data[, repeat_by_vars], class))) > 1) {
@@ -360,10 +370,11 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
       return(NULL)
     }
     
-    if (!(reference_group %in% c('overall', 'hpg'))) {
-      reference_val <- sapply(sort(unique(data[[cohort_var]]), na.last=TRUE), function(cohort) mean(data[[success_var]][data[[group_var]] %in% reference_group & data[[cohort_var]] %in% cohort])) # one for each non-NA cohort
+    if (!(reference_group %in% c('overall', 'hpg', 'all but current'))) {
+      # reference_val <- sapply(sort(unique(data[[cohort_var]]), na.last=TRUE), function(cohort) mean(data[[success_var]][data[[group_var]] %in% reference_group & data[[cohort_var]] %in% cohort])) # one for each non-NA cohort; this is for before incorporating weights
+      reference_val <- sapply(sort(unique(data[[cohort_var]]), na.last=TRUE), function(cohort) sum(data[[success_var]][data[[group_var]] %in% reference_group & data[[cohort_var]] %in% cohort]) / sum(data[[weight_var]][data[[group_var]] %in% reference_group & data[[cohort_var]] %in% cohort]))
     } else {
-      reference_val <- reference_group # overall or hpg
+      reference_val <- reference_group # overall or hpg or all but current
     }
 
     # CRAN: no visible binding for global variable
