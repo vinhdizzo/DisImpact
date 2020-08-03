@@ -7,7 +7,9 @@
 ##' @param cohort (Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  disproportionate impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.
 ##' @param weight (Optional) A vector of case weights of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  If \code{success} consists of counts instead of success indicators (1/0), then \code{weight} should also be specified to indicate the group size.
 ##' @param data (Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.
-##' @return A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), di_80_index (ratio of pct to the max pct for each cohort), and di_indicator (1 if \code{di_80_index} < 0.80).
+##' @param di_80_index_cutoff A numeric value between 0 and 1 that is used to determine disproportionate impact if the index comparing the success rate of the current group to the reference group falls below this threshold; defaults to 0.80.
+##' @param reference_group The reference group value in \code{group} that each group should be compared to in order to determine disproportionate impact.  By default (\code{=NA}), the group with the highest success rate is used as reference.
+##' @return A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference_group (the reference group used to compare and determine disproportionate impact),  reference (the reference rate used for comparison, corresponding to reference_group), di_80_index (ratio of pct to the reference), and di_indicator (1 if \code{di_80_index < di_80_index_cutoff}).
 ##' @examples
 ##' library(dplyr)
 ##' data(student_equity)
@@ -17,7 +19,7 @@
 ##' @export
 ##' @import dplyr
 ##' @importFrom rlang !! enquo
-di_80_index <- function(success, group, cohort, weight, data) {
+di_80_index <- function(success, group, cohort, weight, data, di_80_index_cutoff=0.80, reference_group=NA) {
   if (!missing(data)) {
     eq_success <- enquo(success)
     success <- data %>% ungroup %>% mutate(success=!!eq_success) %>% select(success) %>% unlist
@@ -27,7 +29,10 @@ di_80_index <- function(success, group, cohort, weight, data) {
   # Check if success is binary or logical and that there are no NA's
   #stopifnot(success %in% c(1, 0))
   stopifnot(!is.na(success), success>=0) # can be counts
-
+  stopifnot(di_80_index_cutoff >= 0, di_80_index_cutoff <= 1)
+  #missing_reference_group <- missing(reference_group)
+  missing_reference_group <- is.na(reference_group) # default to NA instead of not specified for use in di_iterate function
+  
   # Check if cohort is specified
   if (missing(cohort)) {
     cohort <- 1
@@ -58,7 +63,7 @@ di_80_index <- function(success, group, cohort, weight, data) {
     summarize(n=sum(weight), success=sum(success), pct=success/n) %>%
     ungroup %>%
     group_by(cohort) %>% 
-    mutate(reference=max(pct), di_80_index=pct/reference, di_indicator=ifelse(di_80_index < 0.80, 1, 0)) %>% 
+    mutate(reference_group=ifelse(missing_reference_group, group[pct==max(pct)], reference_group), reference=ifelse(missing_reference_group, max(pct), pct[group == reference_group]), di_80_index=pct/reference, di_indicator=ifelse(di_80_index < di_80_index_cutoff, 1, 0)) %>% 
     ungroup %>%
     arrange(cohort, group)
 
