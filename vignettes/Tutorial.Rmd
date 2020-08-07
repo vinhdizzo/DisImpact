@@ -214,6 +214,6 @@ di_iterate(data=student_equity, success_vars=c('Transfer'), group_vars=c('Ethnic
 
 bind_rows(
   di_iterate(data=student_equity, success_vars=c('Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort'), ppg_reference_groups='overall')
-  , di_iterate(data=student_equity, success_vars=c('Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort'), ppg_reference_groups=c('White', 'Male'), include_non_disagg_results=FALSE) %>% # include_non_disagg_results = FALSE: Already have this scenario in Overall run
+  , di_iterate(data=student_equity, success_vars=c('Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort'), ppg_reference_groups=c('White', 'Male'), include_non_disagg_results=FALSE) # include_non_disagg_results = FALSE: Already have this scenario in Overall run
 )
 ```
