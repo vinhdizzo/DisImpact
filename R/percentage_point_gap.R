@@ -12,8 +12,8 @@
 ##' @param n Sample size for the group of interest.
 ##' @param proportion (Optional) The proportion of successes for the group of interest.  If specified, then the proportion is used in the MOE formula.  Otherwise, a default proportion of 0.50 is used (conservative and yields the maximum MOE).
 ##' @param min_moe The minimum MOE returned even if the sample size is large.  Defaults to 0.03.  This equates to a minimum threshold gap for declaring disproportionate impact.
-##' @param prop_sub_0 For cases where `proportion` is 0, substitute with `prop_sub_0` (defaults to 0.5) to account for the zero MOE.
-##' @param prop_sub_1 For cases where `proportion` is 1, substitute with `prop_sub_1` (defaults to 0.5) to account for the zero MOE.
+##' @param prop_sub_0 For cases where `proportion` is 0, substitute with \code{prop_sub_0} (defaults to 0.5) to account for the zero MOE.
+##' @param prop_sub_1 For cases where `proportion` is 1, substitute with \code{prop_sub_1} (defaults to 0.5) to account for the zero MOE.
 ##' @return The margin of error for the PPG given the specified sample size.
 ##' @examples
 ##' ppg_moe(n=800)
@@ -41,25 +41,40 @@ ppg_moe <- function(n, proportion, min_moe=0.03, prop_sub_0=0.5, prop_sub_1=0.5)
 }
 ##' Calculate disproportionate impact per the percentage point gap (PPG) method.
 ##'
-##' This function determines disproportionate impact based on the percentage point gap (PPG) method, as described in \href{https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Research/Files/PercentagePointGapMethod2017.ashx}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.  Note that the margin of error (MOE) is calculated using using 1.96*sqrt(0.25^2/n), with a \code{min_moe} used as the minimum by default.
+##' This function determines disproportionate impact based on the percentage point gap (PPG) method, as described in \href{https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Research/Files/PercentagePointGapMethod2017.ashx}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.  Note that the margin of error (MOE) is calculated using using \code{1.96*sqrt(0.25^2/n)}, with a \code{min_moe} used as the minimum by default.
 ##' @title Calculate disproportionate impact per the percentage point gap (PPG) method.
 ##' @param success A vector of success indicators (\code{1}/\code{0} or \code{TRUE}/\code{FALSE}) or an unquoted reference (name) to a column in \code{data} if it is specified.  It could also be a vector of counts, in which case \code{weight} (group size) should also be specified.
 ##' @param group A vector of group names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.
-##' @param cohort (Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  Disproportionate impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.
-##' @param weight (Optional) A vector of case weights of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  If \code{success} consists of counts instead of success indicators (1/0), then \code{weight} should also be specified to indicate the group size.
-##' @param reference Either \code{'overall'} (default), \code{'hpg'} (highest performing group), \code{'all but current'} (success rate of everyone excluding the comparison group; also known as 'ppg minus 1'), a value from \code{group} (specifying a reference group), a single proportion (eg, 0.50), or a vector of proportions.  Reference is used as a point of comparison for disproportionate impact for each group.  When \code{cohort} is specified:
-##'   1. \code{'overall'} will use the overall success rate of each cohort group as the reference;
-##'   2. \code{'hpg'} will use the highest performing group in each cohort as reference;
-##'   3.  \code{'all but current'} will use the calculated success rate of each cohort group excluding the comparison group
-##'   4. the success rate of the specified reference group from \code{group} in each cohort will be used;
-##'   5. the specified proportion will be used for all cohorts;
-##'   6. the specified vector of proportions will refer to the reference point for each cohort in alphabetical order (so the number of proportions should equal to the number of unique cohorts).
+##' @param cohort (Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.  Disproportionate impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.
+##' @param weight (Optional) A vector of case weights of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.  If \code{success} consists of counts instead of success indicators (1/0), then \code{weight} should also be specified to indicate the group size.
+##' @param reference Either \code{'overall'} (default), \code{'hpg'} (highest performing group), \code{'all but current'} (success rate of everyone excluding the comparison group; also known as 'ppg minus 1'), a value from \code{group} (specifying a reference group), a single proportion (eg, 0.50), or a vector of proportions (one for each cohort).  Reference is used as a point of comparison for disproportionate impact for each group.  When \code{cohort} is specified:
+##' \itemize{
+##'   \item \code{'overall'} will use the overall success rate of each cohort group as the reference;
+##'   \item \code{'hpg'} will use the highest performing group in each cohort as reference;
+##'   \item  \code{'all but current'} will use the calculated success rate of each cohort group excluding the comparison group
+##'   \item the success rate of the specified reference group from \code{group} in each cohort will be used;
+##'   \item the specified proportion will be used for all cohorts;
+##'   \item the specified vector of proportions will refer to the reference point for each cohort in alphabetical order (so the number of proportions should equal to the number of unique cohorts).
+##' }
 ##' @param data (Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.
 ##' @param min_moe The minimum margin of error (MOE) to be used in the calculation of disproportionate impact and is passed to \link{ppg_moe}.  Defaults to \code{0.03}.
 ##' @param use_prop_in_moe A logical value indicating whether or not the MOE formula should use the observed success rates (\code{TRUE}).  Defaults to \code{FALSE}, which uses 0.50 as the proportion in the MOE formula.  If \code{TRUE}, the success rates are passed to the \code{proportion} argument of \link{ppg_moe}.
-##' @param prop_sub_0 For cases where `proportion` is 0, substitute with `prop_sub_0` (defaults to 0.5) to account for the zero MOE.  This is relevant only when `use_prop_in_moe=TRUE`.
-##' @param prop_sub_1 For cases where `proportion` is 1, substitute with `prop_sub_1` (defaults to 0.5) to account for the zero MOE.  This is relevant only when `use_prop_in_moe=TRUE`.
-##' @return A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference_group (reference group used in DI calculation), reference (reference value used in DI calculation), moe (margin of error), pct_lo (lower 95\% confidence limit for pct), pct_hi (upper 95\% confidence limit for pct), and di_indicator (1 if there is disproportionate impact, ie, when \code{pct_hi} <= \code{reference}).
+##' @param prop_sub_0 For cases where \code{proportion} is 0, substitute with \code{prop_sub_0} (defaults to 0.5) to account for the zero MOE.  This is relevant only when \code{use_prop_in_moe=TRUE}.
+##' @param prop_sub_1 For cases where \code{proportion} is 1, substitute with \code{prop_sub_1} (defaults to 0.5) to account for the zero MOE.  This is relevant only when \code{use_prop_in_moe=TRUE}.
+##' @return A data frame consisting of:
+##' \itemize{
+##'   \item \code{cohort} (if used),
+##'   \item \code{group},
+##'   \item \code{n} (sample size),
+##'   \item \code{success} (number of successes for the cohort-group),
+##'   \item \code{pct} (proportion of successes for the cohort-group),
+##'   \item \code{reference_group} (reference group used in DI calculation),
+##'   \item \code{reference} (reference value used in DI calculation),
+##'   \item \code{moe} (margin of error),
+##'   \item \code{pct_lo} (lower 95\% confidence limit for pct),
+##'   \item \code{pct_hi} (upper 95\% confidence limit for pct), and
+##'   \item \code{di_indicator} (1 if there is disproportionate impact, ie, when \code{pct_hi <= reference}).
+##' }
 ##' @examples
 ##' library(dplyr)
 ##' data(student_equity)

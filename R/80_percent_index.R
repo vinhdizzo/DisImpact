@@ -1,15 +1,26 @@
 ##' Calculate disproportionate impact per the 80\% index method.
 ##'
-##' This function determines disproportionate impact based on the 80\% index method, as described in \href{https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Network-Operations/Accountability/Files/GUIDELINES-FOR-MEASURING-DISPROPORTIONATE-IMPACT-IN-EQUITY-PLANS.ashx}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.
+##' This function determines disproportionate impact based on the 80\% index method, as described in \href{https://www.cccco.edu/-/media/CCCCO-Website/Files/DII/guidelines-for-measuring-disproportionate-impact-in-equity-plans-tfa-ada.pdf}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.
 ##' @title Calculate disproportionate impact per the 80\% index
 ##' @param success A vector of success indicators (\code{1}/\code{0} or \code{TRUE}/\code{FALSE}) or an unquoted reference (name) to a column in \code{data} if it is specified.  It could also be a vector of counts, in which case \code{weight} should also be specified (group size).
 ##' @param group A vector of group names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.
-##' @param cohort (Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  disproportionate impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.
-##' @param weight (Optional) A vector of case weights of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  If \code{success} consists of counts instead of success indicators (1/0), then \code{weight} should also be specified to indicate the group size.
+##' @param cohort (Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.  disproportionate impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.
+##' @param weight (Optional) A vector of case weights of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.  If \code{success} consists of counts instead of success indicators (1/0), then \code{weight} should also be specified to indicate the group size.
 ##' @param data (Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.
 ##' @param di_80_index_cutoff A numeric value between 0 and 1 that is used to determine disproportionate impact if the index comparing the success rate of the current group to the reference group falls below this threshold; defaults to 0.80.
 ##' @param reference_group The reference group value in \code{group} that each group should be compared to in order to determine disproportionate impact.  By default (\code{=NA}), the group with the highest success rate is used as reference.
-##' @return A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference_group (the reference group used to compare and determine disproportionate impact),  reference (the reference rate used for comparison, corresponding to reference_group), di_80_index (ratio of pct to the reference), and di_indicator (1 if \code{di_80_index < di_80_index_cutoff}).
+##' @return A data frame consisting of:
+##' \itemize{
+##'   \item \code{cohort} (if used),
+##'   \item \code{group},
+##'   \item \code{n} (sample size),
+##'   \item \code{success} (number of successes for the cohort-group),
+##'   \item \code{pct} (proportion of successes for the cohort-group),
+##'   \item \code{reference_group} (the reference group used to compare and determine disproportionate impact),
+##'   \item \code{reference} (the reference rate used for comparison, corresponding to reference_group),
+##'   \item \code{di_80_index} (ratio of pct to the reference), and
+##'   \item \code{di_indicator} (1 if \code{di_80_index < di_80_index_cutoff}).
+##' }
 ##' @examples
 ##' library(dplyr)
 ##' data(student_equity)

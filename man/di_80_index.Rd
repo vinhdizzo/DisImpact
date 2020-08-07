@@ -4,17 +4,24 @@
 \alias{di_80_index}
 \title{Calculate disproportionate impact per the 80\% index}
 \usage{
-di_80_index(success, group, cohort, weight, data,
-  di_80_index_cutoff = 0.8, reference_group = NA)
+di_80_index(
+  success,
+  group,
+  cohort,
+  weight,
+  data,
+  di_80_index_cutoff = 0.8,
+  reference_group = NA
+)
 }
 \arguments{
 \item{success}{A vector of success indicators (\code{1}/\code{0} or \code{TRUE}/\code{FALSE}) or an unquoted reference (name) to a column in \code{data} if it is specified.  It could also be a vector of counts, in which case \code{weight} should also be specified (group size).}
 
 \item{group}{A vector of group names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.}
 
-\item{cohort}{(Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  disproportionate impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.}
+\item{cohort}{(Optional) A vector of cohort names of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.  disproportionate impact is calculated for every group within each cohort.  When \code{cohort} is not specified, then the analysis assumes a single cohort.}
 
-\item{weight}{(Optional) A vector of case weights of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it specified.  If \code{success} consists of counts instead of success indicators (1/0), then \code{weight} should also be specified to indicate the group size.}
+\item{weight}{(Optional) A vector of case weights of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.  If \code{success} consists of counts instead of success indicators (1/0), then \code{weight} should also be specified to indicate the group size.}
 
 \item{data}{(Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.}
 
@@ -23,13 +30,24 @@ di_80_index(success, group, cohort, weight, data,
 \item{reference_group}{The reference group value in \code{group} that each group should be compared to in order to determine disproportionate impact.  By default (\code{=NA}), the group with the highest success rate is used as reference.}
 }
 \value{
-A data frame consisting of: cohort (if used), group, n (sample size), success (number of successes for the cohort-group), pct (proportion of successes for the cohort-group), reference_group (the reference group used to compare and determine disproportionate impact),  reference (the reference rate used for comparison, corresponding to reference_group), di_80_index (ratio of pct to the reference), and di_indicator (1 if \code{di_80_index < di_80_index_cutoff}).
+A data frame consisting of:
+\itemize{
+  \item \code{cohort} (if used),
+  \item \code{group},
+  \item \code{n} (sample size),
+  \item \code{success} (number of successes for the cohort-group),
+  \item \code{pct} (proportion of successes for the cohort-group),
+  \item \code{reference_group} (the reference group used to compare and determine disproportionate impact),
+  \item \code{reference} (the reference rate used for comparison, corresponding to reference_group),
+  \item \code{di_80_index} (ratio of pct to the reference), and
+  \item \code{di_indicator} (1 if \code{di_80_index < di_80_index_cutoff}).
+}
 }
 \description{
 Calculate disproportionate impact per the 80\% index method.
 }
 \details{
-This function determines disproportionate impact based on the 80\% index method, as described in \href{https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Network-Operations/Accountability/Files/GUIDELINES-FOR-MEASURING-DISPROPORTIONATE-IMPACT-IN-EQUITY-PLANS.ashx}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.
+This function determines disproportionate impact based on the 80\% index method, as described in \href{https://www.cccco.edu/-/media/CCCCO-Website/Files/DII/guidelines-for-measuring-disproportionate-impact-in-equity-plans-tfa-ada.pdf}{this} reference from the California Community Colleges Chancellor's Office.  It assumes that a higher rate is good ("success").  For rates that are deemed negative (eg, rate of drop-outs, high is bad), then consider looking at the converse of the non-success (eg, non drop-outs, high is good) instead in order to leverage this function properly.
 }
 \examples{
 library(dplyr)

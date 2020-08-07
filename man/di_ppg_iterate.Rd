@@ -4,10 +4,19 @@
 \alias{di_ppg_iterate}
 \title{Iteratively calculate disproportionate impact via the percentage point gap (PPG) method for many variables.}
 \usage{
-di_ppg_iterate(data, success_vars, group_vars, cohort_vars,
-  reference_groups, repeat_by_vars = NULL, weight_var = NULL,
-  min_moe = 0.03, use_prop_in_moe = FALSE, prop_sub_0 = 0.5,
-  prop_sub_1 = 0.5)
+di_ppg_iterate(
+  data,
+  success_vars,
+  group_vars,
+  cohort_vars,
+  reference_groups,
+  repeat_by_vars = NULL,
+  weight_var = NULL,
+  min_moe = 0.03,
+  use_prop_in_moe = FALSE,
+  prop_sub_0 = 0.5,
+  prop_sub_1 = 0.5
+)
 }
 \arguments{
 \item{data}{A data frame for which to iterate DI calculation for a set of variables.}
