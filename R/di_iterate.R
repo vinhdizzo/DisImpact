@@ -242,7 +242,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
     success_variable <- disaggregation <- cohort_variable <- NULL
 
     di_ppg(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], weight=data[[weight_var]], reference=reference_val, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1) %>%
-      rename(ppg_reference=reference, di_indicator_ppg=di_indicator) %>%
+      rename(ppg_reference_group=reference_group, ppg_reference=reference, di_indicator_ppg=di_indicator) %>%
       left_join(
         di_prop_index(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], weight=data[[weight_var]], di_prop_index_cutoff=di_prop_index_cutoff) %>%
         select(cohort, group, n, success, di_prop_index, di_indicator) %>% 
@@ -259,7 +259,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
         success_variable=success_var
       , disaggregation=group_var
       , cohort_variable=cohort_var
-      , ppg_reference_group=ppg_reference_group
+      # , ppg_reference_group=ppg_reference_group
              ) %>%
       select(success_variable, cohort_variable, cohort, disaggregation, everything())
   }
