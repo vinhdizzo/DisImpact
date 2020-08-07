@@ -44,7 +44,7 @@ Each combination of these variables (eg, full time, first time college students 
 
 \item{weight_var}{(Optional) A character variable specifying the weight variable if the input data set is summarized (ie,  the the success variables specified in \code{success_vars} contain count of successes).  Weight here corresponds to the denominator when calculating the success rate.  Defaults to \code{NULL} for an input data set where each row describes each individual.}
 
-\item{include_non_disagg_results}{A logical variable specifying whether or not the non-disaggregated results should be returned; defaults to \code{TRUE}.  When \code{TRUE}, a new variable \code{`- None`} is added to the data set with a single data value \code{'- All'}, and this variable is added `group_vars` as a disaggregation/group variable.}
+\item{include_non_disagg_results}{A logical variable specifying whether or not the non-disaggregated results should be returned; defaults to \code{TRUE}.  When \code{TRUE}, a new variable \code{`- None`} is added to the data set with a single data value \code{'- All'}, and this variable is added \code{group_vars} as a disaggregation/group variable.  The user would want these results returned to review non-disaggregated results.}
 
 \item{ppg_reference_groups}{Either \code{'overall'}, \code{'hpg'}, \code{'all but current'}, or a character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the percentage point gap method.}
 
