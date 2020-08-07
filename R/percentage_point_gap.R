@@ -187,7 +187,7 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg',
       ungroup
   } else {
     dResults <- dResults %>%
-      left_join(dReference)
+      left_join(dReference, by='cohort')
   }
   pct <- moe <- pct_lo <- pct_hi <- NULL # to resolve CRAN NOTE: no visible binding for global variable
   dResults <- dResults %>% 
