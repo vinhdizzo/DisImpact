@@ -3,6 +3,7 @@ title: "DisImpact Tutorial"
 author: "Vinh Nguyen"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+toc_float: true
 vignette: >
   %\VignetteIndexEntry{DisImpact Tutorial}
   %\VignetteEngine{knitr::rmarkdown}
