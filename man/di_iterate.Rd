@@ -2,52 +2,83 @@
 % Please edit documentation in R/di_iterate.R
 \name{di_iterate}
 \alias{di_iterate}
-\title{Iteratively calculate disproportionate impact via the percentage point gap (PPG) method for many variables.}
+\title{Iteratively calculate disproportionate impact using multiple method for many variables.}
 \usage{
-di_iterate(data, success_vars, group_vars, cohort_vars = NULL,
-  scenario_repeat_by_vars = NULL, exclude_scenario_df = NULL,
-  weight_var = NULL, ppg_reference_groups = "overall",
-  min_moe = 0.03, use_prop_in_moe = FALSE, prop_sub_0 = 0.5,
-  prop_sub_1 = 0.5, di_prop_index_cutoff = 0.8,
-  di_80_index_cutoff = 0.8, di_80_index_reference_groups = NA)
+di_iterate(
+  data,
+  success_vars,
+  group_vars,
+  cohort_vars = NULL,
+  scenario_repeat_by_vars = NULL,
+  exclude_scenario_df = NULL,
+  weight_var = NULL,
+  include_non_disagg_results = TRUE,
+  ppg_reference_groups = "overall",
+  min_moe = 0.03,
+  use_prop_in_moe = FALSE,
+  prop_sub_0 = 0.5,
+  prop_sub_1 = 0.5,
+  di_prop_index_cutoff = 0.8,
+  di_80_index_cutoff = 0.8,
+  di_80_index_reference_groups = NA
+)
 }
 \arguments{
-\item{data}{A data frame for which to iterate DI calculation for a set of variables.}
+\item{data}{A data frame for which to iterate DI calculations for a set of variables.}
 
 \item{success_vars}{A character vector of success variable names to iterate across.}
 
 \item{group_vars}{A character vector of group (disaggregation) variable names to iterate across.}
 
-\item{cohort_vars}{(Optional) A character vector of the same length as \code{success_vars} to indicate the cohort variable to be used for each variable specified in \code{success_vars}.  A vector of length 1 could be specified, in which case the same cohort variable is used for each success variable.  If not specified, then a single cohort is assumed.}
+\item{cohort_vars}{(Optional) A character vector of the same length as \code{success_vars} to indicate the cohort variable to be used for each variable specified in \code{success_vars}.  A vector of length 1 could be specified, in which case the same cohort variable is used for each success variable.  If not specified, then a single cohort is assumed for all success variables.}
 
-\item{scenario_repeat_by_vars}{(Optional) A character vector of variables to repeat DI calculations for across all combination of these variables, including '- All' as a group for each variable.  The reference rate used for DI comparison differs for every combination of the variables listed here.}
+\item{scenario_repeat_by_vars}{(Optional) A character vector of variables to repeat DI calculations for across all combination of these variables.  For example, the following variables could be specified:
+\itemize{
+  \item Ed Goal: Degree/Transfer, Shot-term Career, Non-credit
+  \item First time college student: Yes, No
+  \item Full-time status: Yes, No
+}
+Each combination of these variables (eg, full time, first time college students with an ed goal of degree/transfer as one combination) would constitute an iteration / sample for which to calculate disproportionate impact for outcomes listed in \code{success_vars} and for the disaggregation variables listed in \code{group_vars}. The overall rate of success for full time, first time college students with an ed goal of degree/transfer would just include these students and not others.  Each variable specified is also collapsed to an '- All' group so that the combinations also reflect all students of a particular category.  The total number of combinations for the previous example would be (+1 representing the all category): (3 + 1) x (2 + 1) x (2 + 1) = 36.}
 
-\item{weight_var}{(Optional) A character scalar specifying the weight variable if the input data set is summarized (ie,  the the success variables specified in `success_vars` contain count of successes).  Weight here corresponds to the denominator when calculating the success rate.  Defaults to `NULL` for an input data set where each row describes each individual.}
+\item{exclude_scenario_df}{(Optional) A data frame with variables that match \code{scenario_repeat_by_vars} for specifying the combinations to exclude from DI calculations.  Following the example specified above, one could choose to exclude part-time non-credit students from consideration.}
 
-\item{ppg_reference_groups}{Either 'overall', 'hpg', 'all but current', or a character vector of the same length as `group_vars` that indicates the reference group value for each group variable in `group_vars` when determining disproportionate impact using the percentage point gap method.}
+\item{weight_var}{(Optional) A character variable specifying the weight variable if the input data set is summarized (ie,  the the success variables specified in \code{success_vars} contain count of successes).  Weight here corresponds to the denominator when calculating the success rate.  Defaults to \code{NULL} for an input data set where each row describes each individual.}
 
-\item{min_moe}{The minimum margin of error to be used in the PPG calculation, passed to `di_ppg`.}
+\item{include_non_disagg_results}{A logical variable specifying whether or not the non-disaggregated results should be returned; defaults to \code{TRUE}.  When \code{TRUE}, a new variable \code{`- None`} is added to the data set with a single data value \code{'- All'}, and this variable is added `group_vars` as a disaggregation/group variable.}
 
-\item{use_prop_in_moe}{Whether the estimated proportions should be used in the margin of error calculation by the PPG, passed to `di_ppg`.}
+\item{ppg_reference_groups}{Either \code{'overall'}, \code{'hpg'}, \code{'all but current'}, or a character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the percentage point gap method.}
 
-\item{prop_sub_0}{Passed to `di_ppg`; defaults to 0.50.}
+\item{min_moe}{The minimum margin of error to be used in the PPG calculation, passed to \link[DisImpact]{di_ppg}.}
 
-\item{prop_sub_1}{Passed to `di_ppg`; defaults to 0.50.}
+\item{use_prop_in_moe}{Whether the estimated proportions should be used in the margin of error calculation by the PPG, passed to \link[DisImpact]{di_ppg}.}
 
-\item{di_prop_index_cutoff}{Threshold used for determining disproportionate impact using the proportionality index; passed to `di_prop_index`; defaults to 0.80.}
+\item{prop_sub_0}{passed to \link[DisImpact]{di_ppg}; defaults to 0.50.}
 
-\item{di_80_index_cutoff}{Threshold used for determining disproportionate impact using the 80\% index; passed to `di_80_index`; defaults to 0.80.}
+\item{prop_sub_1}{passed to \link[DisImpact]{di_ppg}; defaults to 0.50.}
 
-\item{di_80_reference_groups}{A character vector of the same length as `group_vars` that indicates the reference group value for each group variable in `group_vars` when determining disproportionate impact using the 80\% index; defaults to \code{NA} (highest performing group as reference).}
+\item{di_prop_index_cutoff}{Threshold used for determining disproportionate impact using the proportionality index; passed to \link[DisImpact]{di_prop_index}; defaults to 0.80.}
+
+\item{di_80_index_cutoff}{Threshold used for determining disproportionate impact using the 80\% index; passed to \link[DisImpact]{di_80_index}; defaults to 0.80.}
+
+\item{di_80_reference_groups}{A character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the 80\% index; defaults to \code{NA} (highest performing group as reference).}
 }
 \value{
-A summarized data set (data frame) consisting of: success_variable (elements of `success_vars`), disaggregation (elemeents of `group_vars`), cohort (values corresponding to the variables specified in `cohort_vars`, di_indicator_ppg (1 if there is disproportionate impact per the percentage point gap method, 0 otherwise), di_indicator_prop_index (1 if there is disproportionate impact per the proportionality index, 0 otherwise), di_indicator_80_index (1 if there is disproportionate impact per the 80\% index, 0 otherwise), and other relevant fields returned from `di_ppg`, `di_prop_index`,  and `di_80_index`.
+A summarized data set (data frame) consisting of:
+\itemize{
+  \item \code{success_variable} (elements of \code{success_vars}),
+  \item \code{disaggregation} (elements of \code{group_vars}),
+  \item \code{cohort} (values corresponding to the variables specified in \code{cohort_vars},
+  \item \code{di_indicator_ppg} (1 if there is disproportionate impact per the percentage point gap method, 0 otherwise),
+  \item \code{di_indicator_prop_index} (1 if there is disproportionate impact per the proportionality index, 0 otherwise),
+  \item \code{di_indicator_80_index} (1 if there is disproportionate impact per the 80\% index, 0 otherwise), and
+  \item other relevant fields returned from \link[DisImpact]{di_ppg}, \link[DisImpact]{di_prop_index},  and \link[DisImpact]{di_80_index}.
+}
 }
 \description{
-Iteratively calculate disproportionate impact via the percentage point gap (PPG) method for many disaggregation variables.
+Iteratively calculate disproportionate impact via the percentage point gap (PPG), proportionality index, and 80\% index methods for many success variables, disaggregation variables, and scenarios.
 }
 \details{
-Iteratively calculate disproportionate impact via the percentage point gap (PPG) method for all combinations of `success_vars`, `group_vars`, and `cohort_vars`, for each combination of subgroups specified by `scenario_repeat_by_vars`.
+Iteratively calculate disproportionate impact via the percentage point gap (PPG), proportionality index, and 80\% index methods for all combinations of \code{success_vars}, \code{group_vars}, and \code{cohort_vars}, for each combination of subgroups specified by \code{scenario_repeat_by_vars}.
 }
 \examples{
 library(dplyr)
