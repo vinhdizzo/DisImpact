@@ -230,14 +230,14 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
       return(NULL)
     }
     
-    if (!(ppg_reference_group %in% c('overall', 'hpg', 'all but current'))) {
-      # browser()
-      # reference_val <- sapply(sort(unique(data[[cohort_var]]), na.last=TRUE), function(cohort) mean(data[[success_var]][data[[group_var]] %in% ppg_reference_group & data[[cohort_var]] %in% cohort])) # one for each non-NA cohort
-      reference_val <- sapply(sort(unique(data[[cohort_var]]), na.last=TRUE), function(cohort) sum(data[[success_var]][data[[group_var]] %in% ppg_reference_group & data[[cohort_var]] %in% cohort]) / sum(data[[weight_var]][data[[group_var]] %in% ppg_reference_group & data[[cohort_var]] %in% cohort]))
-    } else {
-      reference_val <- ppg_reference_group # overall or hpg or all but current
-    }
-
+    ## if (!(ppg_reference_group %in% c('overall', 'hpg', 'all but current'))) {
+    ##   # reference_val <- sapply(sort(unique(data[[cohort_var]]), na.last=TRUE), function(cohort) mean(data[[success_var]][data[[group_var]] %in% ppg_reference_group & data[[cohort_var]] %in% cohort])) # one for each non-NA cohort
+    ##   reference_val <- sapply(sort(unique(data[[cohort_var]]), na.last=TRUE), function(cohort) sum(data[[success_var]][data[[group_var]] %in% ppg_reference_group & data[[cohort_var]] %in% cohort]) / sum(data[[weight_var]][data[[group_var]] %in% ppg_reference_group & data[[cohort_var]] %in% cohort]))
+    ## } else {
+    ##   reference_val <- ppg_reference_group # overall or hpg or all but current
+    ## }
+    reference_val <- ppg_reference_group # Can specify actual group value since di_ppg has been updated
+    
     # CRAN: no visible binding for global variable
     success_variable <- disaggregation <- cohort_variable <- NULL
 
@@ -261,7 +261,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
       , cohort_variable=cohort_var
       , ppg_reference_group=ppg_reference_group
              ) %>%
-      select(success_variable, cohort_variable, cohort, disaggregation, ppg_reference_group, ppg_reference, everything())
+      select(success_variable, cohort_variable, cohort, disaggregation, everything())
   }
 
   # Iterate for all scenarios
