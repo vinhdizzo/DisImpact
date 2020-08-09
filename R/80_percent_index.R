@@ -9,6 +9,7 @@
 ##' @param data (Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.
 ##' @param di_80_index_cutoff A numeric value between 0 and 1 that is used to determine disproportionate impact if the index comparing the success rate of the current group to the reference group falls below this threshold; defaults to 0.80.
 ##' @param reference_group The reference group value in \code{group} that each group should be compared to in order to determine disproportionate impact.  By default (\code{=NA}), the group with the highest success rate is used as reference.
+##'  @param check_valid_reference Check whether \code{reference_group} is a valid value; defaults to \code{TRUE}.  This argument exists to be used in \link{di_iterate} as when iterating DI calculations, there may be some scenarios where a specified reference group does not contain any students.
 ##' @return A data frame consisting of:
 ##' \itemize{
 ##'   \item \code{cohort} (if used),
@@ -30,7 +31,7 @@
 ##' @export
 ##' @import dplyr
 ##' @importFrom rlang !! enquo
-di_80_index <- function(success, group, cohort, weight, data, di_80_index_cutoff=0.80, reference_group=NA) {
+di_80_index <- function(success, group, cohort, weight, data, di_80_index_cutoff=0.80, reference_group=NA, check_valid_reference=TRUE) {
   if (!missing(data)) {
     eq_success <- enquo(success)
     success <- data %>% ungroup %>% mutate(success=!!eq_success) %>% select(success) %>% unlist
@@ -64,6 +65,13 @@ di_80_index <- function(success, group, cohort, weight, data, di_80_index_cutoff
       eq_weight <- enquo(weight)
       weight <- data %>% ungroup %>% mutate(weight=!!eq_weight) %>% select(weight) %>% unlist
     } # else: weight should be defined
+  }
+
+  # Check if reference_group is valid
+  if (check_valid_reference) {
+    if (!is.na(reference_group)) {
+      stopifnot(reference_group %in% unique(group))
+    }
   }
   
   # Calculate
