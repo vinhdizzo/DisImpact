@@ -61,6 +61,7 @@ ppg_moe <- function(n, proportion, min_moe=0.03, prop_sub_0=0.5, prop_sub_1=0.5)
 ##' @param use_prop_in_moe A logical value indicating whether or not the MOE formula should use the observed success rates (\code{TRUE}).  Defaults to \code{FALSE}, which uses 0.50 as the proportion in the MOE formula.  If \code{TRUE}, the success rates are passed to the \code{proportion} argument of \link{ppg_moe}.
 ##' @param prop_sub_0 For cases where \code{proportion} is 0, substitute with \code{prop_sub_0} (defaults to 0.5) to account for the zero MOE.  This is relevant only when \code{use_prop_in_moe=TRUE}.
 ##' @param prop_sub_1 For cases where \code{proportion} is 1, substitute with \code{prop_sub_1} (defaults to 0.5) to account for the zero MOE.  This is relevant only when \code{use_prop_in_moe=TRUE}.
+##' @param check_valid_reference Check whether \code{reference} is a valid value; defaults to \code{TRUE}.  This argument exists to be used in \link{di_iterate} as when iterating DI calculations, there may be some scenarios where a specified reference group does not contain any students.
 ##' @return A data frame consisting of:
 ##' \itemize{
 ##'   \item \code{cohort} (if used),
@@ -109,7 +110,7 @@ ppg_moe <- function(n, proportion, min_moe=0.03, prop_sub_0=0.5, prop_sub_1=0.5)
 ##' @export
 ##' @import dplyr
 ##' @importFrom rlang !! enquo
-di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg', 'all but current', unique(group)), data, min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5) {
+di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg', 'all but current', unique(group)), data, min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5, check_valid_reference=TRUE) {
   ## require(magrittr)
   ## require(dplyr)
   ## require(rlang)
@@ -148,9 +149,11 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg',
   
   # Check if reference is specified: overall, hpg, or user-defined references
   if (!is.numeric(reference)) {
-    reference <- match.arg(reference)
+    if (check_valid_reference) { # Add this for di_iterate with scenario_by_vars: sometimes a named reference group does not have any students, so will error out because this group doesn't exist
+      reference <- match.arg(reference)
+    }
     reference_type <- reference
-    reference_numeric <- 1
+    reference_numeric <- 0
   } else {
     # expecting vector of length 1 or length equal to unique cohort
     #stopifnot(length(reference) == length(unique(cohort)))

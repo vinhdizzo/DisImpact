@@ -14,7 +14,8 @@ di_ppg(
   min_moe = 0.03,
   use_prop_in_moe = FALSE,
   prop_sub_0 = 0.5,
-  prop_sub_1 = 0.5
+  prop_sub_1 = 0.5,
+  check_valid_reference = TRUE
 )
 }
 \arguments{
@@ -45,6 +46,8 @@ di_ppg(
 \item{prop_sub_0}{For cases where \code{proportion} is 0, substitute with \code{prop_sub_0} (defaults to 0.5) to account for the zero MOE.  This is relevant only when \code{use_prop_in_moe=TRUE}.}
 
 \item{prop_sub_1}{For cases where \code{proportion} is 1, substitute with \code{prop_sub_1} (defaults to 0.5) to account for the zero MOE.  This is relevant only when \code{use_prop_in_moe=TRUE}.}
+
+\item{check_valid_reference}{Check whether \code{reference} is a valid value; defaults to \code{TRUE}.  This argument exists to be used in \link{di_iterate} as when iterating DI calculations, there may be some scenarios where a specified reference group does not contain any students.}
 }
 \value{
 A data frame consisting of:
