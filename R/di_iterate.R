@@ -49,7 +49,7 @@
 di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenario_repeat_by_vars=NULL, exclude_scenario_df=NULL, weight_var=NULL, include_non_disagg_results=TRUE, ppg_reference_groups='overall', min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5, di_prop_index_cutoff=0.80, di_80_index_cutoff=0.80, di_80_index_reference_groups=NA) {
   stopifnot(length(group_vars) == length(ppg_reference_groups) | length(ppg_reference_groups) == 1)
   stopifnot(length(group_vars) == length(di_80_index_reference_groups) | is.na(di_80_index_reference_groups))
-
+  
   # Add a variable for non-disaggregated results
   if (include_non_disagg_results) {
     data$`- None` <- '- All'
@@ -212,13 +212,13 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
   # Set up scenarios
   dRef <- data.frame(group_var=group_vars, ppg_reference_group=ppg_reference_groups, di_80_index_reference_group=di_80_index_reference_groups, stringsAsFactors=FALSE)
   
-  dScenarios <- expand.grid(success_var=success_vars, group_var=group_vars, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1, di_prop_index_cutoff=di_prop_index_cutoff, di_80_index_cutoff=di_80_index_cutoff, stringsAsFactors=FALSE) %>%
+  dScenarios <- expand.grid(success_var=success_vars, group_var=group_vars, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1, ppg_check_valid_reference=FALSE, di_prop_index_cutoff=di_prop_index_cutoff, di_80_index_cutoff=di_80_index_cutoff, di_80_check_valid_reference=FALSE, stringsAsFactors=FALSE) %>%
     left_join(lu_success_cohort, by=c('success_var')) %>% 
     left_join(dRef, by=c('group_var')) %>%
-    select(success_var, group_var, cohort_var, ppg_reference_group, min_moe, use_prop_in_moe, prop_sub_0, prop_sub_1, di_prop_index_cutoff, di_80_index_cutoff, di_80_index_reference_group)
+    select(success_var, group_var, cohort_var, ppg_reference_group, min_moe, use_prop_in_moe, prop_sub_0, prop_sub_1, ppg_check_valid_reference, di_prop_index_cutoff, di_80_index_cutoff, di_80_index_reference_group, di_80_check_valid_reference)
 
   # Function to iterate for each scenario
-  iterate <- function(success_var, group_var, cohort_var, ppg_reference_group, min_moe, use_prop_in_moe, prop_sub_0, prop_sub_1, di_prop_index_cutoff, di_80_index_cutoff, di_80_index_reference_group, subset_idx) {
+  iterate <- function(success_var, group_var, cohort_var, ppg_reference_group, min_moe, use_prop_in_moe, prop_sub_0, prop_sub_1, ppg_check_valid_reference, di_prop_index_cutoff, di_80_index_cutoff, di_80_index_reference_group, di_80_check_valid_reference, subset_idx) {
     
     data <- data[subset_idx, ]
 
@@ -241,7 +241,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
     # CRAN: no visible binding for global variable
     success_variable <- disaggregation <- cohort_variable <- NULL
 
-    di_ppg(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], weight=data[[weight_var]], reference=reference_val, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1) %>%
+    di_ppg(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], weight=data[[weight_var]], reference=reference_val, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1, check_valid_reference=ppg_check_valid_reference) %>%
       rename(ppg_reference_group=reference_group, ppg_reference=reference, di_indicator_ppg=di_indicator) %>%
       left_join(
         di_prop_index(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], weight=data[[weight_var]], di_prop_index_cutoff=di_prop_index_cutoff) %>%
@@ -250,7 +250,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
       , by=c('cohort', 'group', 'n', 'success')
       ) %>%
       left_join(
-        di_80_index(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], weight=data[[weight_var]], di_80_index_cutoff=di_80_index_cutoff, reference_group=di_80_index_reference_group) %>%
+        di_80_index(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], weight=data[[weight_var]], di_80_index_cutoff=di_80_index_cutoff, reference_group=di_80_index_reference_group, check_valid_reference=di_80_check_valid_reference) %>%
         select(cohort, group, n, success, reference_group, di_80_index, di_indicator) %>% 
         rename(di_indicator_80_index=di_indicator, di_80_index_reference_group=reference_group)
       , by=c('cohort', 'group', 'n', 'success')        
