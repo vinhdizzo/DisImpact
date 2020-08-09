@@ -49,6 +49,18 @@
 di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenario_repeat_by_vars=NULL, exclude_scenario_df=NULL, weight_var=NULL, include_non_disagg_results=TRUE, ppg_reference_groups='overall', min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5, di_prop_index_cutoff=0.80, di_80_index_cutoff=0.80, di_80_index_reference_groups=NA) {
   stopifnot(length(group_vars) == length(ppg_reference_groups) | length(ppg_reference_groups) == 1)
   stopifnot(length(group_vars) == length(di_80_index_reference_groups) | is.na(di_80_index_reference_groups))
+
+  # Check valid group
+  for (i in 1:length(ppg_reference_groups)) {
+    if (!(ppg_reference_groups[i] %in% c(as.character(formals(di_ppg)$reference)[-1], unique(data[[group_vars[i]]])))) {
+      stop(paste0("'", ppg_reference_groups[i], "'", " is not valid for the argument `ppg_reference_groups` as it does not exist in the group variable `", group_vars[i], "`."))
+    }
+  }
+  for (i in 1:length(di_80_index_reference_groups)) {
+    if (!(di_80_index_reference_groups[i] %in% c(unique(data[[group_vars[i]]]))) & !is.na(di_80_index_reference_groups[i])) {
+      stop(paste0("'", di_80_index_reference_groups[i], "'", " is not valid for the argument `di_80_index_reference_groups` as it does not exist in the group variable `", group_vars[i], "`."))
+    }
+  }
   
   # Add a variable for non-disaggregated results
   if (include_non_disagg_results) {
