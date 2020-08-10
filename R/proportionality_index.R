@@ -75,6 +75,7 @@ di_prop_index <- function(success, group, cohort, weight, data, di_prop_index_cu
          , pct_group=n/sum(n)
          , di_prop_index=pct_success/pct_group
          , di_indicator=ifelse(di_prop_index < di_prop_index_cutoff, 1, 0)
+         , di_indicator=ifelse(is.nan(pct_success), 0, di_indicator) # pct_success when there are zero success for everyone; in this case, there is no DI
            ) %>% 
     ungroup %>%
     arrange(cohort, group)
