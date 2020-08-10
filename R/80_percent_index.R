@@ -82,7 +82,12 @@ di_80_index <- function(success, group, cohort, weight, data, di_80_index_cutoff
     summarize(n=sum(weight), success=sum(success), pct=success/n) %>%
     ungroup %>%
     group_by(cohort) %>% 
-    mutate(reference_group=ifelse(missing_reference_group, group[pct==max(pct)], reference_group), reference=ifelse(missing_reference_group, max(pct), pct[group == reference_group]), di_80_index=pct/reference, di_indicator=ifelse(di_80_index < di_80_index_cutoff, 1, 0)) %>% 
+    mutate(reference_group=ifelse(missing_reference_group, group[pct==max(pct)], reference_group)
+         , reference=ifelse(missing_reference_group, max(pct), pct[group == reference_group])
+         , di_80_index=pct/reference
+         , di_indicator=ifelse(di_80_index < di_80_index_cutoff, 1, 0)
+         , di_indicator=ifelse(is.nan(di_80_index), 0, di_indicator) # di_80_index is NaN when the reference rate is zero; in this case, there is no DI
+           ) %>% 
     ungroup %>%
     arrange(cohort, group)
 
