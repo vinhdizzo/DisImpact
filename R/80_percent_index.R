@@ -76,7 +76,7 @@ di_80_index <- function(success, group, cohort, weight, data, di_80_index_cutoff
   
   # Calculate
   df <- tibble(cohort, group, success, weight)
-  pct <- reference <- NULL # to resolve CRAN NOTE: no visible binding for global variable
+  pct <- reference <- di_indicator <- NULL # to resolve CRAN NOTE: no visible binding for global variable
   dResults <- df %>%
     group_by(cohort, group) %>%
     summarize(n=sum(weight), success=sum(success), pct=success/n) %>%
