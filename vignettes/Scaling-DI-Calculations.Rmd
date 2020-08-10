@@ -101,7 +101,7 @@ table(df_di_summary$Ed_Goal)
 table(df_di_summary$College_Status)
 ```
 
-Also note `di_iterate` also returns non-disaggregated results by default (`'- None'` scenario):
+Also note `di_iterate` returns non-disaggregated results by default (`'- None'` scenario):
 ```{r}
 table(df_di_summary$disaggregation)
 ```

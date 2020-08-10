@@ -325,7 +325,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>A suggested workflow is to:</p>
 <ol style="list-style-type: decimal">
 <li>start with a student-level data set;</li>
-<li>call a single function to pre-calculate success rates and disprportionate impact across all levels of disaggregation, cohorts, and scenarios;</li>
+<li>call a single function to pre-calculate success rates and disproportionate impact across all levels of disaggregation, cohorts, and scenarios;</li>
 <li>export the pre-calculated data set;</li>
 <li>import the pre-calculated data set to the dashboard tool of choice for visualization, where every point visualized is a row from the imported data set.</li>
 </ol>
@@ -526,7 +526,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <pre><code>## 
 ##              - All First-time College              Other 
 ##                300                300                298</code></pre>
-<p>Also note <code>di_iterate</code> also returns non-disaggregated results by default (<code>&#39;- None&#39;</code> scenario):</p>
+<p>Also note <code>di_iterate</code> returns non-disaggregated results by default (<code>&#39;- None&#39;</code> scenario):</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="kw">table</span>(df_di_summary<span class="op">$</span>disaggregation)</a></code></pre></div>
 <pre><code>## 
 ##    - None Ethnicity    Gender 
