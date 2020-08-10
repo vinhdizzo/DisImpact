@@ -192,7 +192,7 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg',
     dResults <- dResults %>%
       left_join(dReference, by='cohort')
   }
-  pct <- moe <- pct_lo <- pct_hi <- NULL # to resolve CRAN NOTE: no visible binding for global variable
+  pct <- moe <- pct_lo <- pct_hi <- reference_group <- di_indicator <- NULL # to resolve CRAN NOTE: no visible binding for global variable
   dResults <- dResults %>% 
     mutate(## moe=case_when(use_prop_in_moe ~ ppg_moe(n=n, proportion=pct, min_moe=min_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1)
            ##               , !use_prop_in_moe ~ ppg_moe(n=n, min_moe=min_moe)
