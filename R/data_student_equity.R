@@ -1,9 +1,22 @@
 #' Fake data on student equity
 #'
 #' Data randomly generated to illustrate the use of the package.
-#'
+#' @format A data frame with 20,000 rows:
+#' \describe{
+#'   \item{Ethnicity} ethnicity (one of: \code{Asian}, \code{Black}, \code{Hispanic}, \code{Multi-Ethnicity}, \code{Native American}, \code{White}).
+#'   \item{Gender} gender (one of: \code{Male}, \code{Female}, \code{Other}).
+#'   \item{Cohort} year student first enrolled in any credit course at the institution (one of: \code{2017}, \code{2018}).
+#'   \item{Transfer} 1/0 indicating whether or not a student transferred within 2 years of first enrollment (\code{Cohort}).
+#'   \item{Cohort_Math} year student first enrolled in a math course at the institution; could be \code{NA} if the student have not attempted math.
+#'   \item{Math} 1/0 indicating whether or not a student completed transfer-level math within 1 year of their first math attempt (\code{Cohort_Math}); could be \code{NA} if the student have not attempted math.
+#'   \item{Cohort_English} year student first enrolled in a math course at the institution; could be \code{NA} if the student have not attempted math.
+#'   \item{English} 1/0 indicating whether or not a student completed transfer-level English within 1 year of their first math attempt (\code{Cohort_English}); could be \code{NA} if the student have not attempted English.
+#'   \item{Ed_Goal} student's educational goal (one of: \code{Deg/Transfer},  \code{Other}).
+#'   \item{College_Status} student's educational status (one of: \code{First-time College},  \code{Other}).
+#'   \item{Student_ID} student's unique identifier.
+#' }
 #' @docType data
-#'
+#' 
 #' @usage data(student_equity)
 #'
 #' @keywords datasets
@@ -29,11 +42,21 @@
 ##                               )
 ##                  , Math=ifelse(Transfer==1, 1, sample(0:1, size=length(Transfer), replace=TRUE, prob=c(0.5, 0.5)))
 ##                  , English=ifelse(Transfer==1, 1, sample(0:1, size=length(Transfer), replace=TRUE, prob=c(0.6, 0.4)))
-##                  , Gender=sample(x=c('Female', 'Male'), size=nCohorts*sum(nPerGroup), replace=TRUE)
+##                  , Gender=sample(x=c('Female', 'Male', 'Other'), size=nCohorts*sum(nPerGroup), replace=TRUE, prob=c(0.49, 0.49, 0.02))
 ##                  , Ed_Goal=sample(x=c('Deg/Transfer', 'Other'), size=nCohorts*sum(nPerGroup), replace=TRUE, prob=c(0.7, 0.3))
 ##                  , College_Status=sample(x=c('First-time College', 'Other'), size=nCohorts*sum(nPerGroup), replace=TRUE, prob=c(0.8, 0.2))
-##                  )
+##                  ) %>%
+##   mutate(
+##     Math=ifelse(Math==0, sample(c(NA, 0), size=length(Transfer), replace=TRUE, prob=c(0.3, 0.7)), Math)
+##   , English=ifelse(English==0, sample(c(NA, 0), size=length(Transfer), replace=TRUE, prob=c(0.2, 0.8)), English)
+##   , Cohort_Math=ifelse(is.na(Math), NA, Cohort + sample(c(0, 1, 2), size=length(Transfer), replace=TRUE, prob=c(0.5, 0.3, 0.2)))
+##   , Cohort_English=ifelse(is.na(English), NA, Cohort + sample(c(0, 1, 2), size=length(Transfer), replace=TRUE, prob=c(0.6, 0.3, 0.1)))
+##   , Student_ID=100000 + row_number()
+##   ) %>%
+##   select(Ethnicity, Gender, Cohort, Transfer, Cohort_Math, Math, Cohort_English, English, everything()) %>%
+## as.data.frame
 
 ## # Export data set to ./data
 ## devtools::use_data(student_equity, overwrite=TRUE)
+## openxlsx::write.xlsx(x=student_equity, file='~/Downloads/student_equity.xlsx')
 

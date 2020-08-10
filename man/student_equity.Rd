@@ -5,7 +5,20 @@
 \alias{student_equity}
 \title{Fake data on student equity}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 20000 rows and 8 columns.
+A data frame with 20,000 rows:
+\describe{
+  \item{Ethnicity} ethnicity (one of: \code{Asian}, \code{Black}, \code{Hispanic}, \code{Multi-Ethnicity}, \code{Native American}, \code{White}).
+  \item{Gender} gender (one of: \code{Male}, \code{Female}, \code{Other}).
+  \item{Cohort} year student first enrolled in any credit course at the institution (one of: \code{2017}, \code{2018}).
+  \item{Transfer} 1/0 indicating whether or not a student transferred within 2 years of first enrollment (\code{Cohort}).
+  \item{Cohort_Math} year student first enrolled in a math course at the institution; could be \code{NA} if the student have not attempted math.
+  \item{Math} 1/0 indicating whether or not a student completed transfer-level math within 1 year of their first math attempt (\code{Cohort_Math}); could be \code{NA} if the student have not attempted math.
+  \item{Cohort_English} year student first enrolled in a math course at the institution; could be \code{NA} if the student have not attempted math.
+  \item{English} 1/0 indicating whether or not a student completed transfer-level English within 1 year of their first math attempt (\code{Cohort_English}); could be \code{NA} if the student have not attempted English.
+  \item{Ed_Goal} student's educational goal (one of: \code{Deg/Transfer},  \code{Other}).
+  \item{College_Status} student's educational status (one of: \code{First-time College},  \code{Other}).
+  \item{Student_ID} student's unique identifier.
+}
 }
 \usage{
 data(student_equity)
