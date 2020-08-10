@@ -402,8 +402,10 @@ di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, referenc
       mutate(
         success_variable=success_var
       , disaggregation=group_var
-      , reference_group=reference_group
+      # , reference_group=reference_group # di_ppg returns reference_group, fix below
              ) %>%
+      select(-reference_group) %>%
+      mutate(reference_group=reference_group) %>% 
       select(success_variable, disaggregation, reference_group, everything())
   }
 
