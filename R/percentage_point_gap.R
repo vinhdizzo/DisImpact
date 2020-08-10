@@ -241,7 +241,7 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg',
 ##' @importFrom tidyr unnest
 ##' @export
 di_ppg_iterate <- function(data, success_vars, group_vars, cohort_vars, reference_groups, repeat_by_vars=NULL, weight_var=NULL, min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5) {
-  .Deprecated(msg = "'di_ppg_iterate' is no longer supported.  Please use 'di_iterate' instead.")
+  .Deprecated(msg="`di_ppg_iterate` is no longer supported.  Please use `di_iterate` instead, which calculates DI using all 3 methods.  NOTE: `repeat_by_vars` argument is now `scenario_repeat_by_vars`; by default, non-disaggregated results are also returned; and the returned `di_indicator` is now called `di_indicator_ppg`.")
   
   stopifnot(length(group_vars) == length(reference_groups) | length(reference_groups) == 1)
   if (length(unique(sapply(data[, group_vars], class))) > 1) {
