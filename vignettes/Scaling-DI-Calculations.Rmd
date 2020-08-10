@@ -174,7 +174,7 @@ if (run_plots) {
     theme_bw() +
     scale_color_manual(values=c('#1b9e77'), name='Group') +
                                         # labs(size='Disproportionate Impact') +
-  scale_y_continuous(labels = scales::percent, limits=c(0, 1)) +
+  scale_y_continuous(labels = percent, limits=c(0, 1)) +
     ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = '- All' | College Status = '- All' | Outcome = 'Math' | Disaggregation = '- None'"))
   ggsave('Dashboard_1.png', height=5, width=9)
 }
@@ -204,7 +204,7 @@ if (run_plots) {
     theme_bw() +
     scale_color_manual(values=c('#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02'), name='Ethnicity') +
     labs(size='Disproportionate Impact') +
-    scale_y_continuous(labels = scales::percent, limits=c(0, 1)) +
+    scale_y_continuous(labels = percent, limits=c(0, 1)) +
     ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = '- All' | College Status = '- All' | Outcome = 'Math' | Disaggregation = 'Ethnicity'"))
   ggsave('Dashboard_2.png', height=5, width=9)
 }
@@ -234,7 +234,7 @@ if (run_plots) {
     theme_bw() +
     scale_color_manual(values=c('#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02'), name='Ethnicity') +
     labs(size='Disproportionate Impact') +
-    scale_y_continuous(labels = scales::percent, limits=c(0, 1)) +
+    scale_y_continuous(labels = percent, limits=c(0, 1)) +
     ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = 'Deg/Transfer' | College Status = '- All' | Outcome = 'Math' | Disaggregation = 'Ethnicity'"))
   ggsave('Dashboard_3.png', height=5, width=9)
 }
@@ -263,7 +263,7 @@ if (run_plots) {
     theme_bw() +
     scale_color_manual(values=c('#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02'), name='Gender') +
     labs(size='Disproportionate Impact') +
-    scale_y_continuous(labels = scales::percent, limits=c(0, 1)) +
+    scale_y_continuous(labels = percent, limits=c(0, 1)) +
     ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = 'Deg/Transfer' | College Status = '- All' | Outcome = 'English' | Disaggregation = 'Gender'"))
   ggsave('Dashboard_4.png', height=5, width=9)
 }
