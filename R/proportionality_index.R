@@ -65,7 +65,7 @@ di_prop_index <- function(success, group, cohort, weight, data, di_prop_index_cu
 
   # Calculate
   df <- tibble(cohort, group, success, weight)
-  pct_success <- pct_group <- NULL # to resolve CRAN NOTE: no visible binding for global variable
+  pct_success <- pct_group <- di_indicator <- NULL # to resolve CRAN NOTE: no visible binding for global variable
   dResults <- df %>%
     group_by(cohort, group) %>%
     summarize(n=sum(weight), success=sum(success)) %>%
