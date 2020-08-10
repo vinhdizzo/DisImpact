@@ -1,65 +1,296 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Vinh Nguyen" />
 
-<meta name="date" content="2019-10-22" />
+<meta name="date" content="2020-08-07" />
 
 <title>DisImpact Tutorial</title>
 
 
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
 
-<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
 
 </head>
 
@@ -69,47 +300,58 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 <h1 class="title toc-ignore">DisImpact Tutorial</h1>
-<h4 class="author"><em>Vinh Nguyen</em></h4>
-<h4 class="date"><em>2019-10-22</em></h4>
+<h4 class="author">Vinh Nguyen</h4>
+<h4 class="date">2020-08-07</h4>
 
 
+<div id="TOC">
+<ul>
+<li><a href="#install-package">Install Package</a></li>
+<li><a href="#load-packages">Load Packages</a></li>
+<li><a href="#load-toy-student-equity-data">Load toy student equity data</a></li>
+<li><a href="#percentage-point-gap-ppg-method">Percentage point gap (PPG) method</a></li>
+<li><a href="#proportionality-index">Proportionality index</a></li>
+<li><a href="#index">80% index</a></li>
+<li><a href="#when-we-have-a-non-success-variable-like-drop-out">When we have a non-success variable like drop-out</a></li>
+<li><a href="#transformations-on-the-fly">Transformations on the fly</a></li>
+<li><a href="#calculate-di-for-many-variables-and-groups">Calculate DI for many variables and groups</a></li>
+</ul>
+</div>
 
 <p>The <code>DisImpact</code> R package contains functions that help in determining disproportionate impact (DI) based on the following methodologies:</p>
 <ol style="list-style-type: decimal">
 <li><a href="https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Research/Files/PercentagePointGapMethod2017.ashx">percentage point gap</a> (PPG) method,</li>
-<li><a href="https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Network-Operations/Accountability/Files/GUIDELINES-FOR-MEASURING-DISPROPORTIONATE-IMPACT-IN-EQUITY-PLANS.ashx">proportionality index</a> method (method #1 in reference), and</li>
-<li><a href="https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Network-Operations/Accountability/Files/GUIDELINES-FOR-MEASURING-DISPROPORTIONATE-IMPACT-IN-EQUITY-PLANS.ashx">80% index</a> method (method #2 in reference).</li>
+<li><a href="https://www.cccco.edu/-/media/CCCCO-Website/Files/DII/guidelines-for-measuring-disproportionate-impact-in-equity-plans-tfa-ada.pdf">proportionality index</a> method (method #1 in reference), and</li>
+<li><a href="https://www.cccco.edu/-/media/CCCCO-Website/Files/DII/guidelines-for-measuring-disproportionate-impact-in-equity-plans-tfa-ada.pdf">80% index</a> method (method #2 in reference).</li>
 </ol>
 <div id="install-package" class="section level2">
 <h2>Install Package</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># From CRAN (Official)</span>
-## install.packages('DisImpact')
-
-<span class="co"># From github (Development)</span>
-## devtools::install_github('vinhdizzo/DisImpact')</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># From CRAN (Official)</span></a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="co">## install.packages(&#39;DisImpact&#39;)</span></a>
+<a class="sourceLine" id="cb1-3" title="3"></a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="co"># From github (Development)</span></a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="co">## devtools::install_github(&#39;vinhdizzo/DisImpact&#39;)</span></a></code></pre></div>
 </div>
 <div id="load-packages" class="section level2">
 <h2>Load Packages</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(DisImpact)
-<span class="kw">library</span>(dplyr) <span class="co"># Ease in manipulations with data frames</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">library</span>(DisImpact)</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="kw">library</span>(dplyr) <span class="co"># Ease in manipulations with data frames</span></a></code></pre></div>
 </div>
 <div id="load-toy-student-equity-data" class="section level2">
 <h2>Load toy student equity data</h2>
 <p>To illustrate the functionality of the package, let’s load a toy data set:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Load fake data set</span>
-<span class="kw">data</span>(student_equity)</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="co"># Load fake data set</span></a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="kw">data</span>(student_equity)</a></code></pre></div>
 <p>The toy data set can be summarized as follows:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Summarize toy data</span>
-<span class="kw">dim</span>(student_equity)</code></pre></div>
-<pre><code>## [1] 20000     4</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dSumm &lt;-<span class="st"> </span>student_equity <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">group_by</span>(Cohort, Ethnicity) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">n=</span><span class="kw">n</span>(), <span class="dt">Transfer_Rate=</span><span class="kw">mean</span>(Transfer))</code></pre></div>
-<pre><code>## Warning: The `printer` argument is deprecated as of rlang 0.3.0.
-## This warning is displayed once per session.</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dSumm</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="co"># Summarize toy data</span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="kw">dim</span>(student_equity)</a></code></pre></div>
+<pre><code>## [1] 20000     8</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">dSumm &lt;-<span class="st"> </span>student_equity <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="st">  </span><span class="kw">group_by</span>(Cohort, Ethnicity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">n=</span><span class="kw">n</span>(), <span class="dt">Transfer_Rate=</span><span class="kw">mean</span>(Transfer))</a>
+<a class="sourceLine" id="cb6-4" title="4">dSumm</a></code></pre></div>
 <pre><code>## # A tibble: 12 x 4
-## # Groups:   Cohort [?]
+## # Groups:   Cohort [2]
 ##    Cohort Ethnicity           n Transfer_Rate
 ##     &lt;int&gt; &lt;chr&gt;           &lt;int&gt;         &lt;dbl&gt;
 ##  1   2017 Asian            3000         0.687
@@ -128,239 +370,364 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="percentage-point-gap-ppg-method" class="section level2">
 <h2>Percentage point gap (PPG) method</h2>
 <p><code>di_ppg</code> is the main work function, and it can take on vectors or column names the tidy way:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Vector</span>
-<span class="kw">di_ppg</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
-<pre><code>## Warning: `list_len()` is deprecated as of rlang 0.2.0.
-## Please use `new_list()` instead.
-## This warning is displayed once per session.</code></pre>
-<pre><code>##             group    n success       pct reference        moe    pct_lo
-## 1           Asian 6000    4292 0.7153333    0.5264 0.03000000 0.6853333
-## 2           Black 2000     607 0.3035000    0.5264 0.03000000 0.2735000
-## 3        Hispanic 4000     847 0.2117500    0.5264 0.03000000 0.1817500
-## 4 Multi-Ethnicity 1000     504 0.5040000    0.5264 0.03099032 0.4730097
-## 5 Native American  200      78 0.3900000    0.5264 0.06929646 0.3207035
-## 6           White 6800    4200 0.6176471    0.5264 0.03000000 0.5876471
-##      pct_hi di_indicator
-## 1 0.7453333            0
-## 2 0.3335000            1
-## 3 0.2417500            1
-## 4 0.5349903            0
-## 5 0.4592965            1
-## 6 0.6476471            0</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Tidy and column reference</span>
-<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
-<span class="st">  </span>as.data.frame</code></pre></div>
-<pre><code>##             group    n success       pct reference        moe    pct_lo
-## 1           Asian 6000    4292 0.7153333    0.5264 0.03000000 0.6853333
-## 2           Black 2000     607 0.3035000    0.5264 0.03000000 0.2735000
-## 3        Hispanic 4000     847 0.2117500    0.5264 0.03000000 0.1817500
-## 4 Multi-Ethnicity 1000     504 0.5040000    0.5264 0.03099032 0.4730097
-## 5 Native American  200      78 0.3900000    0.5264 0.06929646 0.3207035
-## 6           White 6800    4200 0.6176471    0.5264 0.03000000 0.5876471
-##      pct_hi di_indicator
-## 1 0.7453333            0
-## 2 0.3335000            1
-## 3 0.2417500            1
-## 4 0.5349903            0
-## 5 0.4592965            1
-## 6 0.6476471            0</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># Vector</span></a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="kw">di_ppg</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</a></code></pre></div>
+<pre><code>##             group    n success       pct reference reference_group
+## 1           Asian 6000    4292 0.7153333    0.5264         overall
+## 2           Black 2000     607 0.3035000    0.5264         overall
+## 3        Hispanic 4000     847 0.2117500    0.5264         overall
+## 4 Multi-Ethnicity 1000     504 0.5040000    0.5264         overall
+## 5 Native American  200      78 0.3900000    0.5264         overall
+## 6           White 6800    4200 0.6176471    0.5264         overall
+##          moe    pct_lo    pct_hi di_indicator
+## 1 0.03000000 0.6853333 0.7453333            0
+## 2 0.03000000 0.2735000 0.3335000            1
+## 3 0.03000000 0.1817500 0.2417500            1
+## 4 0.03099032 0.4730097 0.5349903            0
+## 5 0.06929646 0.3207035 0.4592965            1
+## 6 0.03000000 0.5876471 0.6476471            0</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="co"># Tidy and column reference</span></a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="st">  </span>as.data.frame</a></code></pre></div>
+<pre><code>##             group    n success       pct reference reference_group
+## 1           Asian 6000    4292 0.7153333    0.5264         overall
+## 2           Black 2000     607 0.3035000    0.5264         overall
+## 3        Hispanic 4000     847 0.2117500    0.5264         overall
+## 4 Multi-Ethnicity 1000     504 0.5040000    0.5264         overall
+## 5 Native American  200      78 0.3900000    0.5264         overall
+## 6           White 6800    4200 0.6176471    0.5264         overall
+##          moe    pct_lo    pct_hi di_indicator
+## 1 0.03000000 0.6853333 0.7453333            0
+## 2 0.03000000 0.2735000 0.3335000            1
+## 3 0.03000000 0.1817500 0.2417500            1
+## 4 0.03099032 0.4730097 0.5349903            0
+## 5 0.06929646 0.3207035 0.4592965            1
+## 6 0.03000000 0.5876471 0.6476471            0</code></pre>
 <p>Sometimes, one might want to break out the DI calculation by cohort:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Cohort</span>
-<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
-<span class="st">  </span>as.data.frame</code></pre></div>
-<pre><code>##    cohort           group    n success       pct reference        moe
-## 1    2017           Asian 3000    2062 0.6873333    0.5140 0.03000000
-## 2    2017           Black 1000     310 0.3100000    0.5140 0.03099032
-## 3    2017        Hispanic 2000     410 0.2050000    0.5140 0.03000000
-## 4    2017 Multi-Ethnicity  500     262 0.5240000    0.5140 0.04382693
-## 5    2017 Native American  100      43 0.4300000    0.5140 0.09800000
-## 6    2017           White 3400    2053 0.6038235    0.5140 0.03000000
-## 7    2018           Asian 3000    2230 0.7433333    0.5388 0.03000000
-## 8    2018           Black 1000     297 0.2970000    0.5388 0.03099032
-## 9    2018        Hispanic 2000     437 0.2185000    0.5388 0.03000000
-## 10   2018 Multi-Ethnicity  500     242 0.4840000    0.5388 0.04382693
-## 11   2018 Native American  100      35 0.3500000    0.5388 0.09800000
-## 12   2018           White 3400    2147 0.6314706    0.5388 0.03000000
-##       pct_lo    pct_hi di_indicator
-## 1  0.6573333 0.7173333            0
-## 2  0.2790097 0.3409903            1
-## 3  0.1750000 0.2350000            1
-## 4  0.4801731 0.5678269            0
-## 5  0.3320000 0.5280000            0
-## 6  0.5738235 0.6338235            0
-## 7  0.7133333 0.7733333            0
-## 8  0.2660097 0.3279903            1
-## 9  0.1885000 0.2485000            1
-## 10 0.4401731 0.5278269            1
-## 11 0.2520000 0.4480000            1
-## 12 0.6014706 0.6614706            0</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="co"># Cohort</span></a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-3" title="3"><span class="st">  </span>as.data.frame</a></code></pre></div>
+<pre><code>##    cohort           group    n success       pct reference reference_group
+## 1    2017           Asian 3000    2062 0.6873333    0.5140         overall
+## 2    2017           Black 1000     310 0.3100000    0.5140         overall
+## 3    2017        Hispanic 2000     410 0.2050000    0.5140         overall
+## 4    2017 Multi-Ethnicity  500     262 0.5240000    0.5140         overall
+## 5    2017 Native American  100      43 0.4300000    0.5140         overall
+## 6    2017           White 3400    2053 0.6038235    0.5140         overall
+## 7    2018           Asian 3000    2230 0.7433333    0.5388         overall
+## 8    2018           Black 1000     297 0.2970000    0.5388         overall
+## 9    2018        Hispanic 2000     437 0.2185000    0.5388         overall
+## 10   2018 Multi-Ethnicity  500     242 0.4840000    0.5388         overall
+## 11   2018 Native American  100      35 0.3500000    0.5388         overall
+## 12   2018           White 3400    2147 0.6314706    0.5388         overall
+##           moe    pct_lo    pct_hi di_indicator
+## 1  0.03000000 0.6573333 0.7173333            0
+## 2  0.03099032 0.2790097 0.3409903            1
+## 3  0.03000000 0.1750000 0.2350000            1
+## 4  0.04382693 0.4801731 0.5678269            0
+## 5  0.09800000 0.3320000 0.5280000            0
+## 6  0.03000000 0.5738235 0.6338235            0
+## 7  0.03000000 0.7133333 0.7733333            0
+## 8  0.03099032 0.2660097 0.3279903            1
+## 9  0.03000000 0.1885000 0.2485000            1
+## 10 0.04382693 0.4401731 0.5278269            1
+## 11 0.09800000 0.2520000 0.4480000            1
+## 12 0.03000000 0.6014706 0.6614706            0</code></pre>
 <p><code>di_ppg</code> is also applicable to summarized data; just pass the counts to <code>success</code> and group size to <code>weight</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer_Rate<span class="op">*</span>n, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">weight=</span>n, <span class="dt">data=</span>dSumm) <span class="op">%&gt;%</span>
-<span class="st">  </span>as.data.frame</code></pre></div>
-<pre><code>##    cohort           group    n success       pct reference        moe
-## 1    2017           Asian 3000    2062 0.6873333    0.5140 0.03000000
-## 2    2017           Black 1000     310 0.3100000    0.5140 0.03099032
-## 3    2017        Hispanic 2000     410 0.2050000    0.5140 0.03000000
-## 4    2017 Multi-Ethnicity  500     262 0.5240000    0.5140 0.04382693
-## 5    2017 Native American  100      43 0.4300000    0.5140 0.09800000
-## 6    2017           White 3400    2053 0.6038235    0.5140 0.03000000
-## 7    2018           Asian 3000    2230 0.7433333    0.5388 0.03000000
-## 8    2018           Black 1000     297 0.2970000    0.5388 0.03099032
-## 9    2018        Hispanic 2000     437 0.2185000    0.5388 0.03000000
-## 10   2018 Multi-Ethnicity  500     242 0.4840000    0.5388 0.04382693
-## 11   2018 Native American  100      35 0.3500000    0.5388 0.09800000
-## 12   2018           White 3400    2147 0.6314706    0.5388 0.03000000
-##       pct_lo    pct_hi di_indicator
-## 1  0.6573333 0.7173333            0
-## 2  0.2790097 0.3409903            1
-## 3  0.1750000 0.2350000            1
-## 4  0.4801731 0.5678269            0
-## 5  0.3320000 0.5280000            0
-## 6  0.5738235 0.6338235            0
-## 7  0.7133333 0.7733333            0
-## 8  0.2660097 0.3279903            1
-## 9  0.1885000 0.2485000            1
-## 10 0.4401731 0.5278269            1
-## 11 0.2520000 0.4480000            1
-## 12 0.6014706 0.6614706            0</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer_Rate<span class="op">*</span>n, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">weight=</span>n, <span class="dt">data=</span>dSumm) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb14-2" title="2"><span class="st">  </span>as.data.frame</a></code></pre></div>
+<pre><code>##    cohort           group    n success       pct reference reference_group
+## 1    2017           Asian 3000    2062 0.6873333    0.5140         overall
+## 2    2017           Black 1000     310 0.3100000    0.5140         overall
+## 3    2017        Hispanic 2000     410 0.2050000    0.5140         overall
+## 4    2017 Multi-Ethnicity  500     262 0.5240000    0.5140         overall
+## 5    2017 Native American  100      43 0.4300000    0.5140         overall
+## 6    2017           White 3400    2053 0.6038235    0.5140         overall
+## 7    2018           Asian 3000    2230 0.7433333    0.5388         overall
+## 8    2018           Black 1000     297 0.2970000    0.5388         overall
+## 9    2018        Hispanic 2000     437 0.2185000    0.5388         overall
+## 10   2018 Multi-Ethnicity  500     242 0.4840000    0.5388         overall
+## 11   2018 Native American  100      35 0.3500000    0.5388         overall
+## 12   2018           White 3400    2147 0.6314706    0.5388         overall
+##           moe    pct_lo    pct_hi di_indicator
+## 1  0.03000000 0.6573333 0.7173333            0
+## 2  0.03099032 0.2790097 0.3409903            1
+## 3  0.03000000 0.1750000 0.2350000            1
+## 4  0.04382693 0.4801731 0.5678269            0
+## 5  0.09800000 0.3320000 0.5280000            0
+## 6  0.03000000 0.5738235 0.6338235            0
+## 7  0.03000000 0.7133333 0.7733333            0
+## 8  0.03099032 0.2660097 0.3279903            1
+## 9  0.03000000 0.1885000 0.2485000            1
+## 10 0.04382693 0.4401731 0.5278269            1
+## 11 0.09800000 0.2520000 0.4480000            1
+## 12 0.03000000 0.6014706 0.6614706            0</code></pre>
+<p>By default, <code>di_ppg</code> uses the overall success rate as the reference rate for comparison (default: <code>reference=&#39;overall&#39;</code>). The <code>reference</code> argument also accepts <code>&#39;hpg&#39;</code> (highest performing group success rate as the reference rate), <code>&#39;all but current&#39;</code> (success rate of all groups combined excluding the comparison group), or a group value from <code>group</code>.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="co"># Reference: Highest performing group</span></a>
+<a class="sourceLine" id="cb16-2" title="2"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">reference=</span><span class="st">&#39;hpg&#39;</span>, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb16-3" title="3"><span class="st">  </span>as.data.frame</a></code></pre></div>
+<pre><code>##    cohort           group    n success       pct reference reference_group
+## 1    2017           Asian 3000    2062 0.6873333 0.6873333             hpg
+## 2    2017           Black 1000     310 0.3100000 0.6873333             hpg
+## 3    2017        Hispanic 2000     410 0.2050000 0.6873333             hpg
+## 4    2017 Multi-Ethnicity  500     262 0.5240000 0.6873333             hpg
+## 5    2017 Native American  100      43 0.4300000 0.6873333             hpg
+## 6    2017           White 3400    2053 0.6038235 0.6873333             hpg
+## 7    2018           Asian 3000    2230 0.7433333 0.7433333             hpg
+## 8    2018           Black 1000     297 0.2970000 0.7433333             hpg
+## 9    2018        Hispanic 2000     437 0.2185000 0.7433333             hpg
+## 10   2018 Multi-Ethnicity  500     242 0.4840000 0.7433333             hpg
+## 11   2018 Native American  100      35 0.3500000 0.7433333             hpg
+## 12   2018           White 3400    2147 0.6314706 0.7433333             hpg
+##           moe    pct_lo    pct_hi di_indicator
+## 1  0.03000000 0.6573333 0.7173333            0
+## 2  0.03099032 0.2790097 0.3409903            1
+## 3  0.03000000 0.1750000 0.2350000            1
+## 4  0.04382693 0.4801731 0.5678269            1
+## 5  0.09800000 0.3320000 0.5280000            1
+## 6  0.03000000 0.5738235 0.6338235            1
+## 7  0.03000000 0.7133333 0.7733333            0
+## 8  0.03099032 0.2660097 0.3279903            1
+## 9  0.03000000 0.1885000 0.2485000            1
+## 10 0.04382693 0.4401731 0.5278269            1
+## 11 0.09800000 0.2520000 0.4480000            1
+## 12 0.03000000 0.6014706 0.6614706            1</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1"><span class="co"># Reference: All but current (PPG minus 1)</span></a>
+<a class="sourceLine" id="cb18-2" title="2"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">reference=</span><span class="st">&#39;all but current&#39;</span>, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="st">  </span>as.data.frame</a></code></pre></div>
+<pre><code>##    cohort           group    n success       pct reference reference_group
+## 1    2017           Asian 3000    2062 0.6873333 0.4397143 all but current
+## 2    2017           Black 1000     310 0.3100000 0.5366667 all but current
+## 3    2017        Hispanic 2000     410 0.2050000 0.5912500 all but current
+## 4    2017 Multi-Ethnicity  500     262 0.5240000 0.5134737 all but current
+## 5    2017 Native American  100      43 0.4300000 0.5148485 all but current
+## 6    2017           White 3400    2053 0.6038235 0.4677273 all but current
+## 7    2018           Asian 3000    2230 0.7433333 0.4511429 all but current
+## 8    2018           Black 1000     297 0.2970000 0.5656667 all but current
+## 9    2018        Hispanic 2000     437 0.2185000 0.6188750 all but current
+## 10   2018 Multi-Ethnicity  500     242 0.4840000 0.5416842 all but current
+## 11   2018 Native American  100      35 0.3500000 0.5407071 all but current
+## 12   2018           White 3400    2147 0.6314706 0.4910606 all but current
+##           moe    pct_lo    pct_hi di_indicator
+## 1  0.03000000 0.6573333 0.7173333            0
+## 2  0.03099032 0.2790097 0.3409903            1
+## 3  0.03000000 0.1750000 0.2350000            1
+## 4  0.04382693 0.4801731 0.5678269            0
+## 5  0.09800000 0.3320000 0.5280000            0
+## 6  0.03000000 0.5738235 0.6338235            0
+## 7  0.03000000 0.7133333 0.7733333            0
+## 8  0.03099032 0.2660097 0.3279903            1
+## 9  0.03000000 0.1885000 0.2485000            1
+## 10 0.04382693 0.4401731 0.5278269            1
+## 11 0.09800000 0.2520000 0.4480000            1
+## 12 0.03000000 0.6014706 0.6614706            0</code></pre>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="co"># Reference: custom group</span></a>
+<a class="sourceLine" id="cb20-2" title="2"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">reference=</span><span class="st">&#39;White&#39;</span>, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb20-3" title="3"><span class="st">  </span>as.data.frame</a></code></pre></div>
+<pre><code>##    cohort           group    n success       pct reference reference_group
+## 1    2017           Asian 3000    2062 0.6873333 0.6038235           White
+## 2    2017           Black 1000     310 0.3100000 0.6038235           White
+## 3    2017        Hispanic 2000     410 0.2050000 0.6038235           White
+## 4    2017 Multi-Ethnicity  500     262 0.5240000 0.6038235           White
+## 5    2017 Native American  100      43 0.4300000 0.6038235           White
+## 6    2017           White 3400    2053 0.6038235 0.6038235           White
+## 7    2018           Asian 3000    2230 0.7433333 0.6314706           White
+## 8    2018           Black 1000     297 0.2970000 0.6314706           White
+## 9    2018        Hispanic 2000     437 0.2185000 0.6314706           White
+## 10   2018 Multi-Ethnicity  500     242 0.4840000 0.6314706           White
+## 11   2018 Native American  100      35 0.3500000 0.6314706           White
+## 12   2018           White 3400    2147 0.6314706 0.6314706           White
+##           moe    pct_lo    pct_hi di_indicator
+## 1  0.03000000 0.6573333 0.7173333            0
+## 2  0.03099032 0.2790097 0.3409903            1
+## 3  0.03000000 0.1750000 0.2350000            1
+## 4  0.04382693 0.4801731 0.5678269            1
+## 5  0.09800000 0.3320000 0.5280000            1
+## 6  0.03000000 0.5738235 0.6338235            0
+## 7  0.03000000 0.7133333 0.7733333            0
+## 8  0.03099032 0.2660097 0.3279903            1
+## 9  0.03000000 0.1885000 0.2485000            1
+## 10 0.04382693 0.4401731 0.5278269            1
+## 11 0.09800000 0.2520000 0.4480000            1
+## 12 0.03000000 0.6014706 0.6614706            0</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">reference=</span><span class="st">&#39;Asian&#39;</span>, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb22-2" title="2"><span class="st">  </span>as.data.frame</a></code></pre></div>
+<pre><code>##    cohort           group    n success       pct reference reference_group
+## 1    2017           Asian 3000    2062 0.6873333 0.6873333           Asian
+## 2    2017           Black 1000     310 0.3100000 0.6873333           Asian
+## 3    2017        Hispanic 2000     410 0.2050000 0.6873333           Asian
+## 4    2017 Multi-Ethnicity  500     262 0.5240000 0.6873333           Asian
+## 5    2017 Native American  100      43 0.4300000 0.6873333           Asian
+## 6    2017           White 3400    2053 0.6038235 0.6873333           Asian
+## 7    2018           Asian 3000    2230 0.7433333 0.7433333           Asian
+## 8    2018           Black 1000     297 0.2970000 0.7433333           Asian
+## 9    2018        Hispanic 2000     437 0.2185000 0.7433333           Asian
+## 10   2018 Multi-Ethnicity  500     242 0.4840000 0.7433333           Asian
+## 11   2018 Native American  100      35 0.3500000 0.7433333           Asian
+## 12   2018           White 3400    2147 0.6314706 0.7433333           Asian
+##           moe    pct_lo    pct_hi di_indicator
+## 1  0.03000000 0.6573333 0.7173333            0
+## 2  0.03099032 0.2790097 0.3409903            1
+## 3  0.03000000 0.1750000 0.2350000            1
+## 4  0.04382693 0.4801731 0.5678269            1
+## 5  0.09800000 0.3320000 0.5280000            1
+## 6  0.03000000 0.5738235 0.6338235            1
+## 7  0.03000000 0.7133333 0.7733333            0
+## 8  0.03099032 0.2660097 0.3279903            1
+## 9  0.03000000 0.1885000 0.2485000            1
+## 10 0.04382693 0.4401731 0.5278269            1
+## 11 0.09800000 0.2520000 0.4480000            1
+## 12 0.03000000 0.6014706 0.6614706            1</code></pre>
 <p>The user could also pass in custom reference points for comparison (eg, a state-wide rate). <code>di_ppg</code> accepts either a single reference point to be used or a vector of reference points, one for each cohort. For the latter, the vector of reference points will be taken to correspond to the <code>cohort</code> variable, alphabetically ordered.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># With custom reference (single)</span>
-<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">reference=</span><span class="fl">0.54</span>, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
-<span class="st">  </span>as.data.frame</code></pre></div>
-<pre><code>##             group    n success       pct reference        moe    pct_lo
-## 1           Asian 6000    4292 0.7153333      0.54 0.03000000 0.6853333
-## 2           Black 2000     607 0.3035000      0.54 0.03000000 0.2735000
-## 3        Hispanic 4000     847 0.2117500      0.54 0.03000000 0.1817500
-## 4 Multi-Ethnicity 1000     504 0.5040000      0.54 0.03099032 0.4730097
-## 5 Native American  200      78 0.3900000      0.54 0.06929646 0.3207035
-## 6           White 6800    4200 0.6176471      0.54 0.03000000 0.5876471
-##      pct_hi di_indicator
-## 1 0.7453333            0
-## 2 0.3335000            1
-## 3 0.2417500            1
-## 4 0.5349903            1
-## 5 0.4592965            1
-## 6 0.6476471            0</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># With custom reference (multiple)</span>
-<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">reference=</span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.55</span>), <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
-<span class="st">  </span>as.data.frame</code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1"><span class="co"># With custom reference (single)</span></a>
+<a class="sourceLine" id="cb24-2" title="2"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">reference=</span><span class="fl">0.54</span>, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb24-3" title="3"><span class="st">  </span>as.data.frame</a></code></pre></div>
+<pre><code>##             group    n success       pct reference reference_group
+## 1           Asian 6000    4292 0.7153333      0.54         numeric
+## 2           Black 2000     607 0.3035000      0.54         numeric
+## 3        Hispanic 4000     847 0.2117500      0.54         numeric
+## 4 Multi-Ethnicity 1000     504 0.5040000      0.54         numeric
+## 5 Native American  200      78 0.3900000      0.54         numeric
+## 6           White 6800    4200 0.6176471      0.54         numeric
+##          moe    pct_lo    pct_hi di_indicator
+## 1 0.03000000 0.6853333 0.7453333            0
+## 2 0.03000000 0.2735000 0.3335000            1
+## 3 0.03000000 0.1817500 0.2417500            1
+## 4 0.03099032 0.4730097 0.5349903            1
+## 5 0.06929646 0.3207035 0.4592965            1
+## 6 0.03000000 0.5876471 0.6476471            0</code></pre>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1"><span class="co"># With custom reference (multiple)</span></a>
+<a class="sourceLine" id="cb26-2" title="2"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">reference=</span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.55</span>), <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb26-3" title="3"><span class="st">  </span>as.data.frame</a></code></pre></div>
 <pre><code>## Joining, by = &quot;cohort&quot;</code></pre>
-<pre><code>## Warning: `chr_along()` is deprecated as of rlang 0.2.0.
-## This warning is displayed once per session.</code></pre>
-<pre><code>##    cohort           group    n success       pct reference        moe
-## 1    2017           Asian 3000    2062 0.6873333      0.50 0.03000000
-## 2    2017           Black 1000     310 0.3100000      0.50 0.03099032
-## 3    2017        Hispanic 2000     410 0.2050000      0.50 0.03000000
-## 4    2017 Multi-Ethnicity  500     262 0.5240000      0.50 0.04382693
-## 5    2017 Native American  100      43 0.4300000      0.50 0.09800000
-## 6    2017           White 3400    2053 0.6038235      0.50 0.03000000
-## 7    2018           Asian 3000    2230 0.7433333      0.55 0.03000000
-## 8    2018           Black 1000     297 0.2970000      0.55 0.03099032
-## 9    2018        Hispanic 2000     437 0.2185000      0.55 0.03000000
-## 10   2018 Multi-Ethnicity  500     242 0.4840000      0.55 0.04382693
-## 11   2018 Native American  100      35 0.3500000      0.55 0.09800000
-## 12   2018           White 3400    2147 0.6314706      0.55 0.03000000
-##       pct_lo    pct_hi di_indicator
-## 1  0.6573333 0.7173333            0
-## 2  0.2790097 0.3409903            1
-## 3  0.1750000 0.2350000            1
-## 4  0.4801731 0.5678269            0
-## 5  0.3320000 0.5280000            0
-## 6  0.5738235 0.6338235            0
-## 7  0.7133333 0.7733333            0
-## 8  0.2660097 0.3279903            1
-## 9  0.1885000 0.2485000            1
-## 10 0.4401731 0.5278269            1
-## 11 0.2520000 0.4480000            1
-## 12 0.6014706 0.6614706            0</code></pre>
+<pre><code>##    cohort           group    n success       pct reference reference_group
+## 1    2017           Asian 3000    2062 0.6873333      0.50         numeric
+## 2    2017           Black 1000     310 0.3100000      0.50         numeric
+## 3    2017        Hispanic 2000     410 0.2050000      0.50         numeric
+## 4    2017 Multi-Ethnicity  500     262 0.5240000      0.50         numeric
+## 5    2017 Native American  100      43 0.4300000      0.50         numeric
+## 6    2017           White 3400    2053 0.6038235      0.50         numeric
+## 7    2018           Asian 3000    2230 0.7433333      0.55         numeric
+## 8    2018           Black 1000     297 0.2970000      0.55         numeric
+## 9    2018        Hispanic 2000     437 0.2185000      0.55         numeric
+## 10   2018 Multi-Ethnicity  500     242 0.4840000      0.55         numeric
+## 11   2018 Native American  100      35 0.3500000      0.55         numeric
+## 12   2018           White 3400    2147 0.6314706      0.55         numeric
+##           moe    pct_lo    pct_hi di_indicator
+## 1  0.03000000 0.6573333 0.7173333            0
+## 2  0.03099032 0.2790097 0.3409903            1
+## 3  0.03000000 0.1750000 0.2350000            1
+## 4  0.04382693 0.4801731 0.5678269            0
+## 5  0.09800000 0.3320000 0.5280000            0
+## 6  0.03000000 0.5738235 0.6338235            0
+## 7  0.03000000 0.7133333 0.7733333            0
+## 8  0.03099032 0.2660097 0.3279903            1
+## 9  0.03000000 0.1885000 0.2485000            1
+## 10 0.04382693 0.4401731 0.5278269            1
+## 11 0.09800000 0.2520000 0.4480000            1
+## 12 0.03000000 0.6014706 0.6614706            0</code></pre>
 <p>The margin of error (MOE) in <code>di_ppg</code> has 2 underlying assumptions (defaults):</p>
 <ol style="list-style-type: decimal">
 <li>the minimum MOE returned is 0.03, and</li>
 <li>using 0.50 as the proportion in the margin of error formula, <span class="math inline">\(1.96 \times \sqrt{\hat{p} (1-\hat{p}) / n}\)</span>.</li>
 </ol>
 <p>To override 1, the user could specify <code>min_moe</code> in <code>di_ppg</code>. To override 2, the user could specify <code>use_prop_in_moe=TRUE</code> in <code>di_ppg</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># min_moe</span>
-<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity, <span class="dt">min_moe=</span><span class="fl">0.02</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span>as.data.frame</code></pre></div>
-<pre><code>##             group    n success       pct reference        moe    pct_lo
-## 1           Asian 6000    4292 0.7153333    0.5264 0.02000000 0.6953333
-## 2           Black 2000     607 0.3035000    0.5264 0.02191347 0.2815865
-## 3        Hispanic 4000     847 0.2117500    0.5264 0.02000000 0.1917500
-## 4 Multi-Ethnicity 1000     504 0.5040000    0.5264 0.03099032 0.4730097
-## 5 Native American  200      78 0.3900000    0.5264 0.06929646 0.3207035
-## 6           White 6800    4200 0.6176471    0.5264 0.02000000 0.5976471
-##      pct_hi di_indicator
-## 1 0.7353333            0
-## 2 0.3254135            1
-## 3 0.2317500            1
-## 4 0.5349903            0
-## 5 0.4592965            1
-## 6 0.6376471            0</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># use_prop_in_moe</span>
-<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity, <span class="dt">min_moe=</span><span class="fl">0.02</span>, <span class="dt">use_prop_in_moe=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span>as.data.frame</code></pre></div>
-<pre><code>##             group    n success       pct reference        moe    pct_lo
-## 1           Asian 6000    4292 0.7153333    0.5264 0.02000000 0.6953333
-## 2           Black 2000     607 0.3035000    0.5264 0.02015028 0.2833497
-## 3        Hispanic 4000     847 0.2117500    0.5264 0.02000000 0.1917500
-## 4 Multi-Ethnicity 1000     504 0.5040000    0.5264 0.03098933 0.4730107
-## 5 Native American  200      78 0.3900000    0.5264 0.06759869 0.3224013
-## 6           White 6800    4200 0.6176471    0.5264 0.02000000 0.5976471
-##      pct_hi di_indicator
-## 1 0.7353333            0
-## 2 0.3236503            1
-## 3 0.2317500            1
-## 4 0.5349893            0
-## 5 0.4575987            1
-## 6 0.6376471            0</code></pre>
-<p>In cases where the proportion is used in calculating MOE, a proportion of 0 or 1 would lead to a zero MOE. To account for these scenarios, the user could leverage the <code>prop_sub_0</code> and <code>prop_sub_1</code> parameters in <code>di_ppg</code> and <code>ppg_moe</code> as substitutes. These parameters default to <code>0.5</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Set Native American to have have zero transfers and see what the results</span>
-<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">Transfer=</span><span class="kw">ifelse</span>(Ethnicity<span class="op">==</span><span class="st">'Native American'</span>, <span class="dv">0</span>, Transfer)), <span class="dt">use_prop_in_moe=</span><span class="ot">TRUE</span>, <span class="dt">prop_sub_0=</span><span class="fl">0.1</span>, <span class="dt">prop_sub_1=</span><span class="fl">0.9</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span>as.data.frame</code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1"><span class="co"># min_moe</span></a>
+<a class="sourceLine" id="cb29-2" title="2"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity, <span class="dt">min_moe=</span><span class="fl">0.02</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb29-3" title="3"><span class="st">  </span>as.data.frame</a></code></pre></div>
+<pre><code>##             group    n success       pct reference reference_group
+## 1           Asian 6000    4292 0.7153333    0.5264         overall
+## 2           Black 2000     607 0.3035000    0.5264         overall
+## 3        Hispanic 4000     847 0.2117500    0.5264         overall
+## 4 Multi-Ethnicity 1000     504 0.5040000    0.5264         overall
+## 5 Native American  200      78 0.3900000    0.5264         overall
+## 6           White 6800    4200 0.6176471    0.5264         overall
+##          moe    pct_lo    pct_hi di_indicator
+## 1 0.02000000 0.6953333 0.7353333            0
+## 2 0.02191347 0.2815865 0.3254135            1
+## 3 0.02000000 0.1917500 0.2317500            1
+## 4 0.03099032 0.4730097 0.5349903            0
+## 5 0.06929646 0.3207035 0.4592965            1
+## 6 0.02000000 0.5976471 0.6376471            0</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1"><span class="co"># use_prop_in_moe</span></a>
+<a class="sourceLine" id="cb31-2" title="2"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity, <span class="dt">min_moe=</span><span class="fl">0.02</span>, <span class="dt">use_prop_in_moe=</span><span class="ot">TRUE</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb31-3" title="3"><span class="st">  </span>as.data.frame</a></code></pre></div>
+<pre><code>##             group    n success       pct reference reference_group
+## 1           Asian 6000    4292 0.7153333    0.5264         overall
+## 2           Black 2000     607 0.3035000    0.5264         overall
+## 3        Hispanic 4000     847 0.2117500    0.5264         overall
+## 4 Multi-Ethnicity 1000     504 0.5040000    0.5264         overall
+## 5 Native American  200      78 0.3900000    0.5264         overall
+## 6           White 6800    4200 0.6176471    0.5264         overall
+##          moe    pct_lo    pct_hi di_indicator
+## 1 0.02000000 0.6953333 0.7353333            0
+## 2 0.02015028 0.2833497 0.3236503            1
+## 3 0.02000000 0.1917500 0.2317500            1
+## 4 0.03098933 0.4730107 0.5349893            0
+## 5 0.06759869 0.3224013 0.4575987            1
+## 6 0.02000000 0.5976471 0.6376471            0</code></pre>
+<p>In cases where the proportion is used in calculating MOE, an observed proportion of 0 or 1 would lead to a zero MOE. To account for these scenarios, the user could leverage the <code>prop_sub_0</code> and <code>prop_sub_1</code> parameters in <code>di_ppg</code> and <code>ppg_moe</code> as substitutes. These parameters default to <code>0.5</code>, which maximizes the MOE (making it more difficult to declare disproportionate impact).</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1"><span class="co"># Set Native American to have have zero transfers and see what the results</span></a>
+<a class="sourceLine" id="cb33-2" title="2"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">Transfer=</span><span class="kw">ifelse</span>(Ethnicity<span class="op">==</span><span class="st">&#39;Native American&#39;</span>, <span class="dv">0</span>, Transfer)), <span class="dt">use_prop_in_moe=</span><span class="ot">TRUE</span>, <span class="dt">prop_sub_0=</span><span class="fl">0.1</span>, <span class="dt">prop_sub_1=</span><span class="fl">0.9</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb33-3" title="3"><span class="st">  </span>as.data.frame</a></code></pre></div>
 <pre><code>## Warning in ppg_moe(n = n, proportion = pct, min_moe = min_moe, prop_sub_0 =
 ## prop_sub_0, : The vector `proportion` contains 0. This will lead to a zero
 ## MOE. `prop_sub_0=0.1` will be used in calculating the MOE for these cases.</code></pre>
-<pre><code>##             group    n success       pct reference        moe      pct_lo
-## 1           Asian 6000    4292 0.7153333    0.5225 0.03000000  0.68533333
-## 2           Black 2000     607 0.3035000    0.5225 0.03000000  0.27350000
-## 3        Hispanic 4000     847 0.2117500    0.5225 0.03000000  0.18175000
-## 4 Multi-Ethnicity 1000     504 0.5040000    0.5225 0.03098933  0.47301067
-## 5 Native American  200       0 0.0000000    0.5225 0.04157788 -0.04157788
-## 6           White 6800    4200 0.6176471    0.5225 0.03000000  0.58764706
-##       pct_hi di_indicator
-## 1 0.74533333            0
-## 2 0.33350000            1
-## 3 0.24175000            1
-## 4 0.53498933            0
-## 5 0.04157788            1
-## 6 0.64764706            0</code></pre>
+<pre><code>##             group    n success       pct reference reference_group
+## 1           Asian 6000    4292 0.7153333    0.5225         overall
+## 2           Black 2000     607 0.3035000    0.5225         overall
+## 3        Hispanic 4000     847 0.2117500    0.5225         overall
+## 4 Multi-Ethnicity 1000     504 0.5040000    0.5225         overall
+## 5 Native American  200       0 0.0000000    0.5225         overall
+## 6           White 6800    4200 0.6176471    0.5225         overall
+##          moe      pct_lo     pct_hi di_indicator
+## 1 0.03000000  0.68533333 0.74533333            0
+## 2 0.03000000  0.27350000 0.33350000            1
+## 3 0.03000000  0.18175000 0.24175000            1
+## 4 0.03098933  0.47301067 0.53498933            0
+## 5 0.04157788 -0.04157788 0.04157788            1
+## 6 0.03000000  0.58764706 0.64764706            0</code></pre>
 </div>
 <div id="proportionality-index" class="section level2">
 <h2>Proportionality index</h2>
 <p><code>di_prop_index</code> is the main work function for this method, and it can take on vectors or column names the tidy way:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Without cohort</span>
-## Vector
-<span class="kw">di_prop_index</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" title="1"><span class="co"># Without cohort</span></a>
+<a class="sourceLine" id="cb36-2" title="2"><span class="co">## Vector</span></a>
+<a class="sourceLine" id="cb36-3" title="3"><span class="kw">di_prop_index</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</a></code></pre></div>
 <pre><code>##             group    n success pct_success pct_group di_prop_index
 ## 1           Asian 6000    4292 0.407674772      0.30     1.3589159
 ## 2           Black 2000     607 0.057655775      0.10     0.5765578
 ## 3        Hispanic 4000     847 0.080452128      0.20     0.4022606
 ## 4 Multi-Ethnicity 1000     504 0.047872340      0.05     0.9574468
 ## 5 Native American  200      78 0.007408815      0.01     0.7408815
-## 6           White 6800    4200 0.398936170      0.34     1.1733417</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Tidy and column reference
-<span class="kw">di_prop_index</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
-<span class="st">  </span>as.data.frame</code></pre></div>
+## 6           White 6800    4200 0.398936170      0.34     1.1733417
+##   di_indicator
+## 1            0
+## 2            1
+## 3            1
+## 4            0
+## 5            1
+## 6            0</code></pre>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" title="1"><span class="co">## Tidy and column reference</span></a>
+<a class="sourceLine" id="cb38-2" title="2"><span class="kw">di_prop_index</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb38-3" title="3"><span class="st">  </span>as.data.frame</a></code></pre></div>
 <pre><code>##             group    n success pct_success pct_group di_prop_index
 ## 1           Asian 6000    4292 0.407674772      0.30     1.3589159
 ## 2           Black 2000     607 0.057655775      0.10     0.5765578
 ## 3        Hispanic 4000     847 0.080452128      0.20     0.4022606
 ## 4 Multi-Ethnicity 1000     504 0.047872340      0.05     0.9574468
 ## 5 Native American  200      78 0.007408815      0.01     0.7408815
-## 6           White 6800    4200 0.398936170      0.34     1.1733417</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># With cohort</span>
-## Vector
-<span class="kw">di_prop_index</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity, <span class="dt">cohort=</span>student_equity<span class="op">$</span>Cohort) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
+## 6           White 6800    4200 0.398936170      0.34     1.1733417
+##   di_indicator
+## 1            0
+## 2            1
+## 3            1
+## 4            0
+## 5            1
+## 6            0</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1"><span class="co"># With cohort</span></a>
+<a class="sourceLine" id="cb40-2" title="2"><span class="co">## Vector</span></a>
+<a class="sourceLine" id="cb40-3" title="3"><span class="kw">di_prop_index</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity, <span class="dt">cohort=</span>student_equity<span class="op">$</span>Cohort) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</a></code></pre></div>
 <pre><code>##    cohort           group    n success pct_success pct_group di_prop_index
 ## 1    2017           Asian 3000    2062 0.401167315      0.30     1.3372244
 ## 2    2017           Black 1000     310 0.060311284      0.10     0.6031128
@@ -373,10 +740,23 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## 9    2018        Hispanic 2000     437 0.081106162      0.20     0.4055308
 ## 10   2018 Multi-Ethnicity  500     242 0.044914625      0.05     0.8982925
 ## 11   2018 Native American  100      35 0.006495917      0.01     0.6495917
-## 12   2018           White 3400    2147 0.398478099      0.34     1.1719944</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Tidy and column reference
-<span class="kw">di_prop_index</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
-<span class="st">  </span>as.data.frame</code></pre></div>
+## 12   2018           White 3400    2147 0.398478099      0.34     1.1719944
+##    di_indicator
+## 1             0
+## 2             1
+## 3             1
+## 4             0
+## 5             0
+## 6             0
+## 7             0
+## 8             1
+## 9             1
+## 10            0
+## 11            1
+## 12            0</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" title="1"><span class="co">## Tidy and column reference</span></a>
+<a class="sourceLine" id="cb42-2" title="2"><span class="kw">di_prop_index</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb42-3" title="3"><span class="st">  </span>as.data.frame</a></code></pre></div>
 <pre><code>##    cohort           group    n success pct_success pct_group di_prop_index
 ## 1    2017           Asian 3000    2062 0.401167315      0.30     1.3372244
 ## 2    2017           Black 1000     310 0.060311284      0.10     0.6031128
@@ -389,216 +769,394 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## 9    2018        Hispanic 2000     437 0.081106162      0.20     0.4055308
 ## 10   2018 Multi-Ethnicity  500     242 0.044914625      0.05     0.8982925
 ## 11   2018 Native American  100      35 0.006495917      0.01     0.6495917
-## 12   2018           White 3400    2147 0.398478099      0.34     1.1719944</code></pre>
+## 12   2018           White 3400    2147 0.398478099      0.34     1.1719944
+##    di_indicator
+## 1             0
+## 2             1
+## 3             1
+## 4             0
+## 5             0
+## 6             0
+## 7             0
+## 8             1
+## 9             1
+## 10            0
+## 11            1
+## 12            0</code></pre>
+<p>Note that the referenced document describing this method does not recommend a threshold on the proportionality index for declaring disproportionate impact. The <code>di_prop_index</code> function uses <code>di_prop_index_cutoff=0.8</code> as the default threshold, which the user could change.</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" title="1"><span class="co"># Changing threshold for DI</span></a>
+<a class="sourceLine" id="cb44-2" title="2"><span class="kw">di_prop_index</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity, <span class="dt">cohort=</span>student_equity<span class="op">$</span>Cohort, <span class="dt">di_prop_index_cutoff=</span><span class="fl">0.5</span>) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</a></code></pre></div>
+<pre><code>##    cohort           group    n success pct_success pct_group di_prop_index
+## 1    2017           Asian 3000    2062 0.401167315      0.30     1.3372244
+## 2    2017           Black 1000     310 0.060311284      0.10     0.6031128
+## 3    2017        Hispanic 2000     410 0.079766537      0.20     0.3988327
+## 4    2017 Multi-Ethnicity  500     262 0.050972763      0.05     1.0194553
+## 5    2017 Native American  100      43 0.008365759      0.01     0.8365759
+## 6    2017           White 3400    2053 0.399416342      0.34     1.1747539
+## 7    2018           Asian 3000    2230 0.413882702      0.30     1.3796090
+## 8    2018           Black 1000     297 0.055122494      0.10     0.5512249
+## 9    2018        Hispanic 2000     437 0.081106162      0.20     0.4055308
+## 10   2018 Multi-Ethnicity  500     242 0.044914625      0.05     0.8982925
+## 11   2018 Native American  100      35 0.006495917      0.01     0.6495917
+## 12   2018           White 3400    2147 0.398478099      0.34     1.1719944
+##    di_indicator
+## 1             0
+## 2             0
+## 3             1
+## 4             0
+## 5             0
+## 6             0
+## 7             0
+## 8             0
+## 9             1
+## 10            0
+## 11            0
+## 12            0</code></pre>
 </div>
 <div id="index" class="section level2">
 <h2>80% index</h2>
 <p><code>di_80_index</code> is the main work function for this method, and it can take on vectors or column names the tidy way:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Without cohort</span>
-## Vector
-<span class="kw">di_80_index</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
-<pre><code>##             group    n success       pct reference di_80_index
-## 1           Asian 6000    4292 0.7153333 0.7153333   1.0000000
-## 2           Black 2000     607 0.3035000 0.7153333   0.4242777
-## 3        Hispanic 4000     847 0.2117500 0.7153333   0.2960158
-## 4 Multi-Ethnicity 1000     504 0.5040000 0.7153333   0.7045666
-## 5 Native American  200      78 0.3900000 0.7153333   0.5452004
-## 6           White 6800    4200 0.6176471 0.7153333   0.8634395
-##   di_indicator
-## 1            0
-## 2            1
-## 3            1
-## 4            1
-## 5            1
-## 6            0</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Tidy and column reference
-<span class="kw">di_80_index</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
-<span class="st">  </span>as.data.frame</code></pre></div>
-<pre><code>##             group    n success       pct reference di_80_index
-## 1           Asian 6000    4292 0.7153333 0.7153333   1.0000000
-## 2           Black 2000     607 0.3035000 0.7153333   0.4242777
-## 3        Hispanic 4000     847 0.2117500 0.7153333   0.2960158
-## 4 Multi-Ethnicity 1000     504 0.5040000 0.7153333   0.7045666
-## 5 Native American  200      78 0.3900000 0.7153333   0.5452004
-## 6           White 6800    4200 0.6176471 0.7153333   0.8634395
-##   di_indicator
-## 1            0
-## 2            1
-## 3            1
-## 4            1
-## 5            1
-## 6            0</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># With cohort</span>
-## Vector
-<span class="kw">di_80_index</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity, <span class="dt">cohort=</span>student_equity<span class="op">$</span>Cohort) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
-<pre><code>##    cohort           group    n success       pct reference di_80_index
-## 1    2017           Asian 3000    2062 0.6873333 0.6873333   1.0000000
-## 2    2017           Black 1000     310 0.3100000 0.6873333   0.4510184
-## 3    2017        Hispanic 2000     410 0.2050000 0.6873333   0.2982541
-## 4    2017 Multi-Ethnicity  500     262 0.5240000 0.6873333   0.7623666
-## 5    2017 Native American  100      43 0.4300000 0.6873333   0.6256062
-## 6    2017           White 3400    2053 0.6038235 0.6873333   0.8785017
-## 7    2018           Asian 3000    2230 0.7433333 0.7433333   1.0000000
-## 8    2018           Black 1000     297 0.2970000 0.7433333   0.3995516
-## 9    2018        Hispanic 2000     437 0.2185000 0.7433333   0.2939462
-## 10   2018 Multi-Ethnicity  500     242 0.4840000 0.7433333   0.6511211
-## 11   2018 Native American  100      35 0.3500000 0.7433333   0.4708520
-## 12   2018           White 3400    2147 0.6314706 0.7433333   0.8495120
-##    di_indicator
-## 1             0
-## 2             1
-## 3             1
-## 4             1
-## 5             1
-## 6             0
-## 7             0
-## 8             1
-## 9             1
-## 10            1
-## 11            1
-## 12            0</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Tidy and column reference
-<span class="kw">di_80_index</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
-<span class="st">  </span>as.data.frame</code></pre></div>
-<pre><code>##    cohort           group    n success       pct reference di_80_index
-## 1    2017           Asian 3000    2062 0.6873333 0.6873333   1.0000000
-## 2    2017           Black 1000     310 0.3100000 0.6873333   0.4510184
-## 3    2017        Hispanic 2000     410 0.2050000 0.6873333   0.2982541
-## 4    2017 Multi-Ethnicity  500     262 0.5240000 0.6873333   0.7623666
-## 5    2017 Native American  100      43 0.4300000 0.6873333   0.6256062
-## 6    2017           White 3400    2053 0.6038235 0.6873333   0.8785017
-## 7    2018           Asian 3000    2230 0.7433333 0.7433333   1.0000000
-## 8    2018           Black 1000     297 0.2970000 0.7433333   0.3995516
-## 9    2018        Hispanic 2000     437 0.2185000 0.7433333   0.2939462
-## 10   2018 Multi-Ethnicity  500     242 0.4840000 0.7433333   0.6511211
-## 11   2018 Native American  100      35 0.3500000 0.7433333   0.4708520
-## 12   2018           White 3400    2147 0.6314706 0.7433333   0.8495120
-##    di_indicator
-## 1             0
-## 2             1
-## 3             1
-## 4             1
-## 5             1
-## 6             0
-## 7             0
-## 8             1
-## 9             1
-## 10            1
-## 11            1
-## 12            0</code></pre>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" title="1"><span class="co"># Without cohort</span></a>
+<a class="sourceLine" id="cb46-2" title="2"><span class="co">## Vector</span></a>
+<a class="sourceLine" id="cb46-3" title="3"><span class="kw">di_80_index</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</a></code></pre></div>
+<pre><code>##             group    n success       pct reference_group reference
+## 1           Asian 6000    4292 0.7153333           Asian 0.7153333
+## 2           Black 2000     607 0.3035000           Asian 0.7153333
+## 3        Hispanic 4000     847 0.2117500           Asian 0.7153333
+## 4 Multi-Ethnicity 1000     504 0.5040000           Asian 0.7153333
+## 5 Native American  200      78 0.3900000           Asian 0.7153333
+## 6           White 6800    4200 0.6176471           Asian 0.7153333
+##   di_80_index di_indicator
+## 1   1.0000000            0
+## 2   0.4242777            1
+## 3   0.2960158            1
+## 4   0.7045666            1
+## 5   0.5452004            1
+## 6   0.8634395            0</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" title="1"><span class="co">## Tidy and column reference</span></a>
+<a class="sourceLine" id="cb48-2" title="2"><span class="kw">di_80_index</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb48-3" title="3"><span class="st">  </span>as.data.frame</a></code></pre></div>
+<pre><code>##             group    n success       pct reference_group reference
+## 1           Asian 6000    4292 0.7153333           Asian 0.7153333
+## 2           Black 2000     607 0.3035000           Asian 0.7153333
+## 3        Hispanic 4000     847 0.2117500           Asian 0.7153333
+## 4 Multi-Ethnicity 1000     504 0.5040000           Asian 0.7153333
+## 5 Native American  200      78 0.3900000           Asian 0.7153333
+## 6           White 6800    4200 0.6176471           Asian 0.7153333
+##   di_80_index di_indicator
+## 1   1.0000000            0
+## 2   0.4242777            1
+## 3   0.2960158            1
+## 4   0.7045666            1
+## 5   0.5452004            1
+## 6   0.8634395            0</code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" title="1"><span class="co"># With cohort</span></a>
+<a class="sourceLine" id="cb50-2" title="2"><span class="co">## Vector</span></a>
+<a class="sourceLine" id="cb50-3" title="3"><span class="kw">di_80_index</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity, <span class="dt">cohort=</span>student_equity<span class="op">$</span>Cohort) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</a></code></pre></div>
+<pre><code>##    cohort           group    n success       pct reference_group reference
+## 1    2017           Asian 3000    2062 0.6873333           Asian 0.6873333
+## 2    2017           Black 1000     310 0.3100000           Asian 0.6873333
+## 3    2017        Hispanic 2000     410 0.2050000           Asian 0.6873333
+## 4    2017 Multi-Ethnicity  500     262 0.5240000           Asian 0.6873333
+## 5    2017 Native American  100      43 0.4300000           Asian 0.6873333
+## 6    2017           White 3400    2053 0.6038235           Asian 0.6873333
+## 7    2018           Asian 3000    2230 0.7433333           Asian 0.7433333
+## 8    2018           Black 1000     297 0.2970000           Asian 0.7433333
+## 9    2018        Hispanic 2000     437 0.2185000           Asian 0.7433333
+## 10   2018 Multi-Ethnicity  500     242 0.4840000           Asian 0.7433333
+## 11   2018 Native American  100      35 0.3500000           Asian 0.7433333
+## 12   2018           White 3400    2147 0.6314706           Asian 0.7433333
+##    di_80_index di_indicator
+## 1    1.0000000            0
+## 2    0.4510184            1
+## 3    0.2982541            1
+## 4    0.7623666            1
+## 5    0.6256062            1
+## 6    0.8785017            0
+## 7    1.0000000            0
+## 8    0.3995516            1
+## 9    0.2939462            1
+## 10   0.6511211            1
+## 11   0.4708520            1
+## 12   0.8495120            0</code></pre>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" title="1"><span class="co">## Tidy and column reference</span></a>
+<a class="sourceLine" id="cb52-2" title="2"><span class="kw">di_80_index</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb52-3" title="3"><span class="st">  </span>as.data.frame</a></code></pre></div>
+<pre><code>##    cohort           group    n success       pct reference_group reference
+## 1    2017           Asian 3000    2062 0.6873333           Asian 0.6873333
+## 2    2017           Black 1000     310 0.3100000           Asian 0.6873333
+## 3    2017        Hispanic 2000     410 0.2050000           Asian 0.6873333
+## 4    2017 Multi-Ethnicity  500     262 0.5240000           Asian 0.6873333
+## 5    2017 Native American  100      43 0.4300000           Asian 0.6873333
+## 6    2017           White 3400    2053 0.6038235           Asian 0.6873333
+## 7    2018           Asian 3000    2230 0.7433333           Asian 0.7433333
+## 8    2018           Black 1000     297 0.2970000           Asian 0.7433333
+## 9    2018        Hispanic 2000     437 0.2185000           Asian 0.7433333
+## 10   2018 Multi-Ethnicity  500     242 0.4840000           Asian 0.7433333
+## 11   2018 Native American  100      35 0.3500000           Asian 0.7433333
+## 12   2018           White 3400    2147 0.6314706           Asian 0.7433333
+##    di_80_index di_indicator
+## 1    1.0000000            0
+## 2    0.4510184            1
+## 3    0.2982541            1
+## 4    0.7623666            1
+## 5    0.6256062            1
+## 6    0.8785017            0
+## 7    1.0000000            0
+## 8    0.3995516            1
+## 9    0.2939462            1
+## 10   0.6511211            1
+## 11   0.4708520            1
+## 12   0.8495120            0</code></pre>
+<p>By default, <code>di_80_index</code> uses the group with the highest success rate as reference in calculating the index. One could specify the the comparison group using the <code>reference_group</code> argument (a value from <code>group</code>).</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" title="1"><span class="co"># Changing reference group</span></a>
+<a class="sourceLine" id="cb54-2" title="2"><span class="kw">di_80_index</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity, <span class="dt">cohort=</span>student_equity<span class="op">$</span>Cohort, <span class="dt">reference_group=</span><span class="st">&#39;White&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</a></code></pre></div>
+<pre><code>##    cohort           group    n success       pct reference_group reference
+## 1    2017           Asian 3000    2062 0.6873333           White 0.6038235
+## 2    2017           Black 1000     310 0.3100000           White 0.6038235
+## 3    2017        Hispanic 2000     410 0.2050000           White 0.6038235
+## 4    2017 Multi-Ethnicity  500     262 0.5240000           White 0.6038235
+## 5    2017 Native American  100      43 0.4300000           White 0.6038235
+## 6    2017           White 3400    2053 0.6038235           White 0.6038235
+## 7    2018           Asian 3000    2230 0.7433333           White 0.6314706
+## 8    2018           Black 1000     297 0.2970000           White 0.6314706
+## 9    2018        Hispanic 2000     437 0.2185000           White 0.6314706
+## 10   2018 Multi-Ethnicity  500     242 0.4840000           White 0.6314706
+## 11   2018 Native American  100      35 0.3500000           White 0.6314706
+## 12   2018           White 3400    2147 0.6314706           White 0.6314706
+##    di_80_index di_indicator
+## 1    1.1383017            0
+## 2    0.5133950            1
+## 3    0.3395032            1
+## 4    0.8678032            0
+## 5    0.7121286            1
+## 6    1.0000000            0
+## 7    1.1771464            0
+## 8    0.4703307            1
+## 9    0.3460177            1
+## 10   0.7664648            1
+## 11   0.5542618            1
+## 12   1.0000000            0</code></pre>
+<p>By default, <code>di_80_index</code> uses 80% (<code>di_80_index_cutoff=0.80</code>) as the default threshold for declaring disproportionate impact. One could override this using another threshold via the <code>di_80_index_cutoff</code> argument.</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" title="1"><span class="co"># Changing threshold for DI</span></a>
+<a class="sourceLine" id="cb56-2" title="2"><span class="kw">di_80_index</span>(<span class="dt">success=</span>student_equity<span class="op">$</span>Transfer, <span class="dt">group=</span>student_equity<span class="op">$</span>Ethnicity, <span class="dt">cohort=</span>student_equity<span class="op">$</span>Cohort, <span class="dt">di_80_index_cutoff=</span><span class="fl">0.50</span>) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</a></code></pre></div>
+<pre><code>##    cohort           group    n success       pct reference_group reference
+## 1    2017           Asian 3000    2062 0.6873333           Asian 0.6873333
+## 2    2017           Black 1000     310 0.3100000           Asian 0.6873333
+## 3    2017        Hispanic 2000     410 0.2050000           Asian 0.6873333
+## 4    2017 Multi-Ethnicity  500     262 0.5240000           Asian 0.6873333
+## 5    2017 Native American  100      43 0.4300000           Asian 0.6873333
+## 6    2017           White 3400    2053 0.6038235           Asian 0.6873333
+## 7    2018           Asian 3000    2230 0.7433333           Asian 0.7433333
+## 8    2018           Black 1000     297 0.2970000           Asian 0.7433333
+## 9    2018        Hispanic 2000     437 0.2185000           Asian 0.7433333
+## 10   2018 Multi-Ethnicity  500     242 0.4840000           Asian 0.7433333
+## 11   2018 Native American  100      35 0.3500000           Asian 0.7433333
+## 12   2018           White 3400    2147 0.6314706           Asian 0.7433333
+##    di_80_index di_indicator
+## 1    1.0000000            0
+## 2    0.4510184            1
+## 3    0.2982541            1
+## 4    0.7623666            0
+## 5    0.6256062            0
+## 6    0.8785017            0
+## 7    1.0000000            0
+## 8    0.3995516            1
+## 9    0.2939462            1
+## 10   0.6511211            0
+## 11   0.4708520            1
+## 12   0.8495120            0</code></pre>
 </div>
 <div id="when-we-have-a-non-success-variable-like-drop-out" class="section level2">
 <h2>When we have a non-success variable like drop-out</h2>
 <p>Suppose we have a variable that indicates something negative. We could calculate DI on the converse of it:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">di_ppg</span>(<span class="dt">success=</span><span class="op">!</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
-<span class="st">  </span>as.data.frame</code></pre></div>
-<pre><code>##             group    n success       pct reference        moe    pct_lo
-## 1           Asian 6000    1708 0.2846667    0.4736 0.03000000 0.2546667
-## 2           Black 2000    1393 0.6965000    0.4736 0.03000000 0.6665000
-## 3        Hispanic 4000    3153 0.7882500    0.4736 0.03000000 0.7582500
-## 4 Multi-Ethnicity 1000     496 0.4960000    0.4736 0.03099032 0.4650097
-## 5 Native American  200     122 0.6100000    0.4736 0.06929646 0.5407035
-## 6           White 6800    2600 0.3823529    0.4736 0.03000000 0.3523529
-##      pct_hi di_indicator
-## 1 0.3146667            1
-## 2 0.7265000            0
-## 3 0.8182500            0
-## 4 0.5269903            0
-## 5 0.6792965            0
-## 6 0.4123529            1</code></pre>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" title="1"><span class="kw">di_ppg</span>(<span class="dt">success=</span><span class="op">!</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb58-2" title="2"><span class="st">  </span>as.data.frame</a></code></pre></div>
+<pre><code>##             group    n success       pct reference reference_group
+## 1           Asian 6000    1708 0.2846667    0.4736         overall
+## 2           Black 2000    1393 0.6965000    0.4736         overall
+## 3        Hispanic 4000    3153 0.7882500    0.4736         overall
+## 4 Multi-Ethnicity 1000     496 0.4960000    0.4736         overall
+## 5 Native American  200     122 0.6100000    0.4736         overall
+## 6           White 6800    2600 0.3823529    0.4736         overall
+##          moe    pct_lo    pct_hi di_indicator
+## 1 0.03000000 0.2546667 0.3146667            1
+## 2 0.03000000 0.6665000 0.7265000            0
+## 3 0.03000000 0.7582500 0.8182500            0
+## 4 0.03099032 0.4650097 0.5269903            0
+## 5 0.06929646 0.5407035 0.6792965            0
+## 6 0.03000000 0.3523529 0.4123529            1</code></pre>
 </div>
 <div id="transformations-on-the-fly" class="section level2">
 <h2>Transformations on the fly</h2>
 <p>We can compute the success, group, and cohort variables on the fly:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Transform success</span>
-a &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">1</span>, <span class="dt">size=</span><span class="kw">nrow</span>(student_equity), <span class="dt">replace=</span><span class="ot">TRUE</span>, <span class="dt">prob=</span><span class="kw">c</span>(<span class="fl">0.95</span>, <span class="fl">0.05</span>))
-<span class="kw">mean</span>(a)</code></pre></div>
-<pre><code>## [1] 0.0515</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">di_ppg</span>(<span class="dt">success=</span><span class="kw">pmax</span>(Transfer, a), <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span>
-<span class="st">  </span>as.data.frame</code></pre></div>
-<pre><code>##             group    n success       pct reference        moe    pct_lo
-## 1           Asian 6000    4369 0.7281667   0.55085 0.03000000 0.6981667
-## 2           Black 2000     686 0.3430000   0.55085 0.03000000 0.3130000
-## 3        Hispanic 4000    1027 0.2567500   0.55085 0.03000000 0.2267500
-## 4 Multi-Ethnicity 1000     524 0.5240000   0.55085 0.03099032 0.4930097
-## 5 Native American  200      83 0.4150000   0.55085 0.06929646 0.3457035
-## 6           White 6800    4328 0.6364706   0.55085 0.03000000 0.6064706
-##      pct_hi di_indicator
-## 1 0.7581667            0
-## 2 0.3730000            1
-## 3 0.2867500            1
-## 4 0.5549903            0
-## 5 0.4842965            1
-## 6 0.6664706            0</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Collapse Black and Hispanic</span>
-<span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span><span class="kw">ifelse</span>(Ethnicity <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">'Black'</span>, <span class="st">'Hispanic'</span>), <span class="st">'Black/Hispanic'</span>, Ethnicity), <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</code></pre></div>
-<pre><code>##             group    n success       pct reference        moe    pct_lo
-## 1           Asian 6000    4292 0.7153333    0.5264 0.03000000 0.6853333
-## 2  Black/Hispanic 6000    1454 0.2423333    0.5264 0.03000000 0.2123333
-## 3 Multi-Ethnicity 1000     504 0.5040000    0.5264 0.03099032 0.4730097
-## 4 Native American  200      78 0.3900000    0.5264 0.06929646 0.3207035
-## 5           White 6800    4200 0.6176471    0.5264 0.03000000 0.5876471
-##      pct_hi di_indicator
-## 1 0.7453333            0
-## 2 0.2723333            1
-## 3 0.5349903            0
-## 4 0.4592965            1
-## 5 0.6476471            0</code></pre>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" title="1"><span class="co"># Transform success</span></a>
+<a class="sourceLine" id="cb60-2" title="2">a &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">1</span>, <span class="dt">size=</span><span class="kw">nrow</span>(student_equity), <span class="dt">replace=</span><span class="ot">TRUE</span>, <span class="dt">prob=</span><span class="kw">c</span>(<span class="fl">0.95</span>, <span class="fl">0.05</span>))</a>
+<a class="sourceLine" id="cb60-3" title="3"><span class="kw">mean</span>(a)</a></code></pre></div>
+<pre><code>## [1] 0.05085</code></pre>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" title="1"><span class="kw">di_ppg</span>(<span class="dt">success=</span><span class="kw">pmax</span>(Transfer, a), <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb62-2" title="2"><span class="st">  </span>as.data.frame</a></code></pre></div>
+<pre><code>##             group    n success       pct reference reference_group
+## 1           Asian 6000    4391 0.7318333    0.5512         overall
+## 2           Black 2000     673 0.3365000    0.5512         overall
+## 3        Hispanic 4000    1011 0.2527500    0.5512         overall
+## 4 Multi-Ethnicity 1000     523 0.5230000    0.5512         overall
+## 5 Native American  200      82 0.4100000    0.5512         overall
+## 6           White 6800    4344 0.6388235    0.5512         overall
+##          moe    pct_lo    pct_hi di_indicator
+## 1 0.03000000 0.7018333 0.7618333            0
+## 2 0.03000000 0.3065000 0.3665000            1
+## 3 0.03000000 0.2227500 0.2827500            1
+## 4 0.03099032 0.4920097 0.5539903            0
+## 5 0.06929646 0.3407035 0.4792965            1
+## 6 0.03000000 0.6088235 0.6688235            0</code></pre>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" title="1"><span class="co"># Collapse Black and Hispanic</span></a>
+<a class="sourceLine" id="cb64-2" title="2"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span><span class="kw">ifelse</span>(Ethnicity <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Black&#39;</span>, <span class="st">&#39;Hispanic&#39;</span>), <span class="st">&#39;Black/Hispanic&#39;</span>, Ethnicity), <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</a></code></pre></div>
+<pre><code>##             group    n success       pct reference reference_group
+## 1           Asian 6000    4292 0.7153333    0.5264         overall
+## 2  Black/Hispanic 6000    1454 0.2423333    0.5264         overall
+## 3 Multi-Ethnicity 1000     504 0.5040000    0.5264         overall
+## 4 Native American  200      78 0.3900000    0.5264         overall
+## 5           White 6800    4200 0.6176471    0.5264         overall
+##          moe    pct_lo    pct_hi di_indicator
+## 1 0.03000000 0.6853333 0.7453333            0
+## 2 0.03000000 0.2123333 0.2723333            1
+## 3 0.03099032 0.4730097 0.5349903            0
+## 4 0.06929646 0.3207035 0.4592965            1
+## 5 0.03000000 0.5876471 0.6476471            0</code></pre>
 </div>
 <div id="calculate-di-for-many-variables-and-groups" class="section level2">
 <h2>Calculate DI for many variables and groups</h2>
-<p>It is often the case that the user desires to calculate disproportionate impact across many outcome variables and many disaggregation/group variables. The function <code>di_ppg_iterate</code> allows the user to specify a data set and the various variables to iterate across:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Multiple group variables</span>
-<span class="kw">di_ppg_iterate</span>(<span class="dt">data=</span>student_equity, <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">'Transfer'</span>), <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">'Ethnicity'</span>, <span class="st">'Gender'</span>), <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">'Cohort'</span>), <span class="dt">reference_groups=</span><span class="st">'overall'</span>)</code></pre></div>
-<pre><code>## Joining, by = &quot;group_var&quot;</code></pre>
-<pre><code>## # A tibble: 16 x 13
-##    success_variable disaggregation reference_group cohort group          n
-##    &lt;chr&gt;            &lt;chr&gt;          &lt;chr&gt;            &lt;int&gt; &lt;chr&gt;      &lt;dbl&gt;
-##  1 Transfer         Ethnicity      overall           2017 Asian       3000
-##  2 Transfer         Ethnicity      overall           2017 Black       1000
-##  3 Transfer         Ethnicity      overall           2017 Hispanic    2000
-##  4 Transfer         Ethnicity      overall           2017 Multi-Eth~   500
-##  5 Transfer         Ethnicity      overall           2017 Native Am~   100
-##  6 Transfer         Ethnicity      overall           2017 White       3400
-##  7 Transfer         Ethnicity      overall           2018 Asian       3000
-##  8 Transfer         Ethnicity      overall           2018 Black       1000
-##  9 Transfer         Ethnicity      overall           2018 Hispanic    2000
-## 10 Transfer         Ethnicity      overall           2018 Multi-Eth~   500
-## 11 Transfer         Ethnicity      overall           2018 Native Am~   100
-## 12 Transfer         Ethnicity      overall           2018 White       3400
-## 13 Transfer         Gender         overall           2017 Female      5080
-## 14 Transfer         Gender         overall           2017 Male        4920
-## 15 Transfer         Gender         overall           2018 Female      4965
-## 16 Transfer         Gender         overall           2018 Male        5035
-## # ... with 7 more variables: success &lt;int&gt;, pct &lt;dbl&gt;, reference &lt;dbl&gt;,
-## #   moe &lt;dbl&gt;, pct_lo &lt;dbl&gt;, pct_hi &lt;dbl&gt;, di_indicator &lt;dbl&gt;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Multiple group variables and different reference groups</span>
-<span class="kw">bind_rows</span>(
-  <span class="kw">di_ppg_iterate</span>(<span class="dt">data=</span>student_equity, <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">'Transfer'</span>), <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">'Ethnicity'</span>, <span class="st">'Gender'</span>), <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">'Cohort'</span>), <span class="dt">reference_groups=</span><span class="kw">c</span>(<span class="st">'White'</span>, <span class="st">'Male'</span>))
-  , <span class="kw">di_ppg_iterate</span>(<span class="dt">data=</span>student_equity, <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">'Transfer'</span>), <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">'Ethnicity'</span>, <span class="st">'Gender'</span>), <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">'Cohort'</span>), <span class="dt">reference_groups=</span><span class="st">'overall'</span>)
-)</code></pre></div>
-<pre><code>## Joining, by = &quot;group_var&quot;</code></pre>
+<p>It is often the case that the user desires to calculate disproportionate impact across many outcome variables and many disaggregation/group variables. The function <code>di_iterate</code> allows the user to specify a data set and the various variables to iterate across:</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb66-1" title="1"><span class="co"># Multiple group variables</span></a>
+<a class="sourceLine" id="cb66-2" title="2"><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity, <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Transfer&#39;</span>), <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>), <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort&#39;</span>), <span class="dt">ppg_reference_groups=</span><span class="st">&#39;overall&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</a></code></pre></div>
+<pre><code>##    success_variable cohort_variable cohort disaggregation
+## 1          Transfer          Cohort   2017      Ethnicity
+## 2          Transfer          Cohort   2017      Ethnicity
+## 3          Transfer          Cohort   2017      Ethnicity
+## 4          Transfer          Cohort   2017      Ethnicity
+## 5          Transfer          Cohort   2017      Ethnicity
+## 6          Transfer          Cohort   2017      Ethnicity
+## 7          Transfer          Cohort   2018      Ethnicity
+## 8          Transfer          Cohort   2018      Ethnicity
+## 9          Transfer          Cohort   2018      Ethnicity
+## 10         Transfer          Cohort   2018      Ethnicity
+## 11         Transfer          Cohort   2018      Ethnicity
+## 12         Transfer          Cohort   2018      Ethnicity
+## 13         Transfer          Cohort   2017         Gender
+## 14         Transfer          Cohort   2017         Gender
+## 15         Transfer          Cohort   2018         Gender
+## 16         Transfer          Cohort   2018         Gender
+## 17         Transfer          Cohort   2017         - None
+## 18         Transfer          Cohort   2018         - None
+##    ppg_reference_group ppg_reference           group     n success
+## 1              overall        0.5140           Asian  3000    2062
+## 2              overall        0.5140           Black  1000     310
+## 3              overall        0.5140        Hispanic  2000     410
+## 4              overall        0.5140 Multi-Ethnicity   500     262
+## 5              overall        0.5140 Native American   100      43
+## 6              overall        0.5140           White  3400    2053
+## 7              overall        0.5388           Asian  3000    2230
+## 8              overall        0.5388           Black  1000     297
+## 9              overall        0.5388        Hispanic  2000     437
+## 10             overall        0.5388 Multi-Ethnicity   500     242
+## 11             overall        0.5388 Native American   100      35
+## 12             overall        0.5388           White  3400    2147
+## 13             overall        0.5140          Female  4968    2592
+## 14             overall        0.5140            Male  5032    2548
+## 15             overall        0.5388          Female  4965    2686
+## 16             overall        0.5388            Male  5035    2702
+## 17             overall        0.5140           - All 10000    5140
+## 18             overall        0.5388           - All 10000    5388
+##          pct reference_group        moe    pct_lo    pct_hi
+## 1  0.6873333         overall 0.03000000 0.6573333 0.7173333
+## 2  0.3100000         overall 0.03099032 0.2790097 0.3409903
+## 3  0.2050000         overall 0.03000000 0.1750000 0.2350000
+## 4  0.5240000         overall 0.04382693 0.4801731 0.5678269
+## 5  0.4300000         overall 0.09800000 0.3320000 0.5280000
+## 6  0.6038235         overall 0.03000000 0.5738235 0.6338235
+## 7  0.7433333         overall 0.03000000 0.7133333 0.7733333
+## 8  0.2970000         overall 0.03099032 0.2660097 0.3279903
+## 9  0.2185000         overall 0.03000000 0.1885000 0.2485000
+## 10 0.4840000         overall 0.04382693 0.4401731 0.5278269
+## 11 0.3500000         overall 0.09800000 0.2520000 0.4480000
+## 12 0.6314706         overall 0.03000000 0.6014706 0.6614706
+## 13 0.5217391         overall 0.03000000 0.4917391 0.5517391
+## 14 0.5063593         overall 0.03000000 0.4763593 0.5363593
+## 15 0.5409869         overall 0.03000000 0.5109869 0.5709869
+## 16 0.5366435         overall 0.03000000 0.5066435 0.5666435
+## 17 0.5140000         overall 0.03000000 0.4840000 0.5440000
+## 18 0.5388000         overall 0.03000000 0.5088000 0.5688000
+##    di_indicator_ppg di_prop_index di_indicator_prop_index
+## 1                 0     1.3372244                       0
+## 2                 1     0.6031128                       1
+## 3                 1     0.3988327                       1
+## 4                 0     1.0194553                       0
+## 5                 0     0.8365759                       0
+## 6                 0     1.1747539                       0
+## 7                 0     1.3796090                       0
+## 8                 1     0.5512249                       1
+## 9                 1     0.4055308                       1
+## 10                1     0.8982925                       0
+## 11                1     0.6495917                       1
+## 12                0     1.1719944                       0
+## 13                0     1.0150567                       0
+## 14                0     0.9851348                       0
+## 15                0     1.0040588                       0
+## 16                0     0.9959976                       0
+## 17                0     1.0000000                       0
+## 18                0     1.0000000                       0
+##    di_80_index_reference_group di_80_index di_indicator_80_index
+## 1                        Asian   1.0000000                     0
+## 2                        Asian   0.4510184                     1
+## 3                        Asian   0.2982541                     1
+## 4                        Asian   0.7623666                     1
+## 5                        Asian   0.6256062                     1
+## 6                        Asian   0.8785017                     0
+## 7                        Asian   1.0000000                     0
+## 8                        Asian   0.3995516                     1
+## 9                        Asian   0.2939462                     1
+## 10                       Asian   0.6511211                     1
+## 11                       Asian   0.4708520                     1
+## 12                       Asian   0.8495120                     0
+## 13                      Female   1.0000000                     0
+## 14                      Female   0.9705220                     0
+## 15                      Female   1.0000000                     0
+## 16                      Female   0.9919713                     0
+## 17                       - All   1.0000000                     0
+## 18                       - All   1.0000000                     0</code></pre>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb68-1" title="1"><span class="co"># Multiple group variables and different reference groups</span></a>
+<a class="sourceLine" id="cb68-2" title="2"></a>
+<a class="sourceLine" id="cb68-3" title="3"><span class="kw">bind_rows</span>(</a>
+<a class="sourceLine" id="cb68-4" title="4">  <span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity, <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Transfer&#39;</span>), <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>), <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort&#39;</span>), <span class="dt">ppg_reference_groups=</span><span class="st">&#39;overall&#39;</span>)</a>
+<a class="sourceLine" id="cb68-5" title="5">  , <span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity, <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Transfer&#39;</span>), <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>), <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort&#39;</span>), <span class="dt">ppg_reference_groups=</span><span class="kw">c</span>(<span class="st">&#39;White&#39;</span>, <span class="st">&#39;Male&#39;</span>), <span class="dt">include_non_disagg_results=</span><span class="ot">FALSE</span>) <span class="co"># include_non_disagg_results = FALSE: Already have this scenario in Overall run</span></a>
+<a class="sourceLine" id="cb68-6" title="6">)</a></code></pre></div>
 <pre><code>## Joining, by = &quot;cohort&quot;
 ## Joining, by = &quot;cohort&quot;</code></pre>
-<pre><code>## Joining, by = &quot;group_var&quot;</code></pre>
-<pre><code>## # A tibble: 32 x 13
-##    success_variable disaggregation reference_group cohort group          n
-##    &lt;chr&gt;            &lt;chr&gt;          &lt;chr&gt;            &lt;int&gt; &lt;chr&gt;      &lt;dbl&gt;
-##  1 Transfer         Ethnicity      White             2017 Asian       3000
-##  2 Transfer         Ethnicity      White             2017 Black       1000
-##  3 Transfer         Ethnicity      White             2017 Hispanic    2000
-##  4 Transfer         Ethnicity      White             2017 Multi-Eth~   500
-##  5 Transfer         Ethnicity      White             2017 Native Am~   100
-##  6 Transfer         Ethnicity      White             2017 White       3400
-##  7 Transfer         Ethnicity      White             2018 Asian       3000
-##  8 Transfer         Ethnicity      White             2018 Black       1000
-##  9 Transfer         Ethnicity      White             2018 Hispanic    2000
-## 10 Transfer         Ethnicity      White             2018 Multi-Eth~   500
-## # ... with 22 more rows, and 7 more variables: success &lt;int&gt;, pct &lt;dbl&gt;,
-## #   reference &lt;dbl&gt;, moe &lt;dbl&gt;, pct_lo &lt;dbl&gt;, pct_hi &lt;dbl&gt;,
-## #   di_indicator &lt;dbl&gt;</code></pre>
+<pre><code>## # A tibble: 34 x 20
+##    success_variable cohort_variable cohort disaggregation ppg_reference_g~
+##    &lt;chr&gt;            &lt;chr&gt;            &lt;int&gt; &lt;chr&gt;          &lt;chr&gt;           
+##  1 Transfer         Cohort            2017 Ethnicity      overall         
+##  2 Transfer         Cohort            2017 Ethnicity      overall         
+##  3 Transfer         Cohort            2017 Ethnicity      overall         
+##  4 Transfer         Cohort            2017 Ethnicity      overall         
+##  5 Transfer         Cohort            2017 Ethnicity      overall         
+##  6 Transfer         Cohort            2017 Ethnicity      overall         
+##  7 Transfer         Cohort            2018 Ethnicity      overall         
+##  8 Transfer         Cohort            2018 Ethnicity      overall         
+##  9 Transfer         Cohort            2018 Ethnicity      overall         
+## 10 Transfer         Cohort            2018 Ethnicity      overall         
+## # ... with 24 more rows, and 15 more variables: ppg_reference &lt;dbl&gt;,
+## #   group &lt;chr&gt;, n &lt;dbl&gt;, success &lt;int&gt;, pct &lt;dbl&gt;, reference_group &lt;chr&gt;,
+## #   moe &lt;dbl&gt;, pct_lo &lt;dbl&gt;, pct_hi &lt;dbl&gt;, di_indicator_ppg &lt;dbl&gt;,
+## #   di_prop_index &lt;dbl&gt;, di_indicator_prop_index &lt;dbl&gt;,
+## #   di_80_index_reference_group &lt;chr&gt;, di_80_index &lt;dbl&gt;,
+## #   di_indicator_80_index &lt;dbl&gt;</code></pre>
 </div>
 
+
+
+<!-- code folding -->
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
