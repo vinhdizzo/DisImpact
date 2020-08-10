@@ -23,7 +23,7 @@
 ##' @param prop_sub_1 passed to \link[DisImpact]{di_ppg}; defaults to 0.50.
 ##' @param di_prop_index_cutoff Threshold used for determining disproportionate impact using the proportionality index; passed to \link[DisImpact]{di_prop_index}; defaults to 0.80.
 ##' @param di_80_index_cutoff Threshold used for determining disproportionate impact using the 80\% index; passed to \link[DisImpact]{di_80_index}; defaults to 0.80.
-##' @param di_80_reference_groups A character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the 80\% index; defaults to \code{NA} (highest performing group as reference).
+##' @param di_80_index_reference_groups A character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the 80\% index; defaults to \code{NA} (highest performing group as reference).
 ##' @return A summarized data set (data frame) consisting of:
 ##' \itemize{
 ##'   \item \code{success_variable} (elements of \code{success_vars}),

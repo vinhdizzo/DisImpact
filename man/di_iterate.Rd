@@ -60,7 +60,7 @@ Each combination of these variables (eg, full time, first time college students 
 
 \item{di_80_index_cutoff}{Threshold used for determining disproportionate impact using the 80\% index; passed to \link[DisImpact]{di_80_index}; defaults to 0.80.}
 
-\item{di_80_reference_groups}{A character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the 80\% index; defaults to \code{NA} (highest performing group as reference).}
+\item{di_80_index_reference_groups}{A character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the 80\% index; defaults to \code{NA} (highest performing group as reference).}
 }
 \value{
 A summarized data set (data frame) consisting of:
