@@ -11,6 +11,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+## Introduction
+
 The `DisImpact` R package contains functions that help in determining disproportionate impact (DI) based on the following methodologies:
 
 1. [percentage point gap](https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Research/Files/PercentagePointGapMethod2017.ashx) (PPG) method,
@@ -218,3 +220,5 @@ bind_rows(
   , di_iterate(data=student_equity, success_vars=c('Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort'), ppg_reference_groups=c('White', 'Male'), include_non_disagg_results=FALSE) # include_non_disagg_results = FALSE: Already have this scenario in Overall run
 )
 ```
+
+There is a separate vignette that explains how one might leverage `di_iterate` for rapid dashboard development and deployment.
