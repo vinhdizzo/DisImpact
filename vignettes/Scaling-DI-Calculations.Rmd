@@ -1,0 +1,271 @@
+---
+title: "Scaling Disproportionate Impact (DI) Calculations for Interactive Visualizations"
+author: "Vinh Nguyen"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Scaling Disproportionate Impact (DI) Calculations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Introduction
+
+It is often desirable to visualize student success data with the ability to disaggregate by multiple group variables to highlight equity gaps and disproportionate impact (DI) in an interactive dashboard (eg, Tableau or Power BI).  It is certainly feasible to calculate disproportionate impact on the fly in standard dashboard tools, but doing so:
+
+1. increases development time,
+2. increases the likelihood for error in calculations as the code has to be "re-written" for each dashboard, and
+3. is more difficult to maintain and support, especially when transitioning projects between analysts.
+
+A suggested workflow is to:
+
+1. start with a student-level data set;
+2. call a single function to pre-calculate success rates and disprportionate impact across all levels of disaggregation, cohorts, and scenarios;
+3. export the pre-calculated data set;
+4. import the pre-calculated data set to the dashboard tool of choice for visualization, where every point visualized is a row from the imported data set.
+
+Using this workflow, one could scale up DI calculations and rapidly develop dashboards with the ability to disaggregate and highlight equity gaps / disproportionate impact for many disaggregation variables, many outcomes, and many scenarios / student populations.
+
+The `DisImpact` package offers the `di_iterate` function that allows one to accomplish step 2 in the suggested workflow.
+
+## Load DisImpact and toy data set
+
+First, load the necessary packages.
+
+```{r, message=FALSE, warning=FALSE}
+library(DisImpact)
+library(dplyr) # Ease in manipulations with data frames
+```
+
+Second, load a toy data set.
+
+```{r}
+data(student_equity) # provided from DisImpact
+dim(student_equity)
+# head(student_equity)
+```
+
+```{r echo=FALSE, results='asis'}
+library(knitr)
+kable(student_equity[1:6, ], caption='A few rows from the `student_equity` data set.')
+```
+
+To get a description of each variable, type `?student_equity` in the R console.
+
+## Execute `di_iterate` on a data set
+
+Let's illustrate the `di_iterate` function with some key arguments:
+
+* `data`: a data frame of unitary (student level) or summarized data.
+* `success_vars`: all outcomes of interest.
+* `group_vars`: all variables to disaggregate by (for calculating equity gaps and disproportionate impact).
+* `cohort_vars` (optional): variables defining cohorts, corresponding to those in `success_vars`.
+* `scenario_repeat_by_vars` (optional): variables to repeat DI calculations for across all combination of these variables.  Each combination of these variables (eg, full time, first time college students with an ed goal of degree/transfer as one combination) would constitute an iteration / sample for which to calculate disproportionate impact for outcomes listed in `success_vars` and for the disaggregation variables listed in `group_vars`.
+
+To see the details of these and other arguments, type `?di_iterate` in the R console.
+
+```{r warning=FALSE}
+df_di_summary <- di_iterate(data=student_equity
+                          , success_vars=c('Math', 'English', 'Transfer')
+                          , group_vars=c('Ethnicity', 'Gender')
+                          , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                          , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                            )
+
+## df_di_summary <- di_iterate(data=student_equity, success_vars=c('Math', 'English', 'Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort', 'Cohort', 'Cohort'), scenario_repeat_by_vars=c('Ed_Goal', 'College_Status'))
+
+## df_di_summary <- di_iterate(data=student_equity, success_vars=c('Math', 'English', 'Transfer'), group_vars=c('Ethnicity', 'Gender'), scenario_repeat_by_vars=c('Ed_Goal', 'College_Status'))
+
+## df_di_summary <- di_iterate(data=student_equity, success_vars=c('Math', 'English', 'Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort'), scenario_repeat_by_vars=c('Ed_Goal', 'College_Status'), ppg_reference_groups=c('White', 'Male'), di_80_index_reference_groups=c('White', 'Male'))
+
+## df_di_summary <- di_iterate(data=student_equity, success_vars=c('Math', 'English', 'Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort'), scenario_repeat_by_vars=c('Ed_Goal', 'College_Status'), ppg_reference_groups=c('all but current'), di_80_index_reference_groups=c('White', 'Male'))
+```
+
+## Explore resulting summary data set
+
+Let's explore the resulting summarized data set:
+
+```{r}
+dim(df_di_summary)
+df_di_summary %>% head %>% as.data.frame # first few rows
+
+```
+
+The variables `di_indicator_ppg`, `di_indicator_prop_index`, and `di_indicator_80_index` are DI flags using the three methods.
+
+Next, note that the scenario `'- All'` is included for all variables passed to `scenario_repeat_by_vars` by default:
+```{r}
+table(df_di_summary$Ed_Goal)
+table(df_di_summary$College_Status)
+```
+
+Also note `di_iterate` also returns non-disaggregated results by default (`'- None'` scenario):
+```{r}
+table(df_di_summary$disaggregation)
+```
+
+Let's inspect the rows corresponding to non-disaggregated results.
+
+```{r results=FALSE}
+# No Disaggregation
+df_di_summary %>%
+  filter(Ed_Goal=='- All', College_Status=='- All', disaggregation=='- None') %>%
+  as.data.frame
+```
+```{r echo=FALSE, results='asis'}
+df_di_summary %>%
+  filter(Ed_Goal=='- All', College_Status=='- All', disaggregation=='- None') %>%
+  as.data.frame %>% 
+  kable
+```
+
+## Visualization (emulating dashboard features)
+
+In this section, we emulate what a dashboard could visualize.
+
+Imagine a dashboard with the following dropdown menus and option values:
+
+- Ed Goal
+  + '- All'
+  + 'Degree/Transfer'
+  + 'Other'
+- College Status
+  + '- All'
+  + 'First-time college'
+  + 'Other'
+- Outcome:
+  + 'Transfer'
+  + 'Math'
+  + 'English'
+- Disaggregation:
+  + '- None'
+  + 'Ethnicity'
+  + 'Gender'
+
+Each combination of this set of dropdown menus could be visualized using a subset of rows in `df_di_summary`.
+
+For example, let's visualize non-disaggregated results for math (the dropdown selections are described at the top of the visualization):
+```{r results=FALSE}
+# No Disaggregation
+df_di_summary %>%
+  filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Math', disaggregation=='- None') %>%
+  as.data.frame
+```
+```{r include=FALSE}
+run_plots <- FALSE
+# run_plots <- TRUE
+if (run_plots) {
+  library(ggplot2)
+  library(forcats)
+  library(scales)
+
+  # No Disaggregation
+  df_di_summary %>%
+    filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Math', disaggregation=='- None') %>%
+    select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
+    mutate(group=factor(group) %>% fct_reorder(desc(pct))) %>% 
+    ggplot(data=., mapping=aes(x=factor(cohort), y=pct, group=group, color=group)) +
+    geom_point() +
+    geom_line() +
+    xlab('Cohort') +
+    ylab('Rate') +
+    theme_bw() +
+    scale_color_manual(values=c('#1b9e77'), name='Group') +
+                                        # labs(size='Disproportionate Impact') +
+  scale_y_continuous(labels = scales::percent, limits=c(0, 1)) +
+    ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = '- All' | College Status = '- All' | Outcome = 'Math' | Disaggregation = '- None'"))
+  ggsave('Dashboard_1.png', height=5, width=9)
+}
+```
+![Dashboard Viz 1: Non-disaggregated results.](./Dashboard_1.png){width=100%}
+
+In this dashboard, one could choose to disaggregate by ethnicity and highlight disproportionate impact (for simplicity, let's use the percentage point gap method, or the `di_indicator_ppg` flag in subsequent visualizations):
+```{r}
+# Disaggregation: Ethnicity
+df_di_summary %>%
+  filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Math', disaggregation=='Ethnicity') %>%
+  select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
+  as.data.frame
+```
+```{r include=FALSE}
+if (run_plots) {
+  # Disaggregation: Ethnicity
+  df_di_summary %>%
+    filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Math', disaggregation=='Ethnicity') %>%
+    select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
+    mutate(group=factor(group) %>% fct_reorder(desc(pct))) %>% 
+    ggplot(data=., mapping=aes(x=factor(cohort), y=pct, group=group, color=group)) +
+    geom_point(aes(size=factor(di_indicator_ppg, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
+    geom_line() +
+    xlab('Cohort') +
+    ylab('Rate') +
+    theme_bw() +
+    scale_color_manual(values=c('#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02'), name='Ethnicity') +
+    labs(size='Disproportionate Impact') +
+    scale_y_continuous(labels = scales::percent, limits=c(0, 1)) +
+    ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = '- All' | College Status = '- All' | Outcome = 'Math' | Disaggregation = 'Ethnicity'"))
+  ggsave('Dashboard_2.png', height=5, width=9)
+}
+```
+![Dashboard Viz 2: Disaggregated by ethnicity.](./Dashboard_2.png){width=100%}
+
+In a dashboard, the user might be interested in focusing on degree/transfer students.  We emulate this by filtering on `Ed_Goal=='Deg/Transer'`:
+```{r}
+# Disaggregation: Ethnicity; Deg/Transfer
+df_di_summary %>%
+  filter(Ed_Goal=='Deg/Transfer', College_Status=='- All', success_variable=='Math', disaggregation=='Ethnicity') %>%
+  select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
+  as.data.frame
+```
+```{r include=FALSE}
+if (run_plots) {
+  # Disaggregation: Ethnicity; Deg/Transfer
+  df_di_summary %>%
+    filter(Ed_Goal=='Deg/Transfer', College_Status=='- All', success_variable=='Math', disaggregation=='Ethnicity') %>%
+    select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
+    mutate(group=factor(group) %>% fct_reorder(desc(pct))) %>% 
+    ggplot(data=., mapping=aes(x=factor(cohort), y=pct, group=group, color=group)) +
+    geom_point(aes(size=factor(di_indicator_ppg, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
+    geom_line() +
+    xlab('Cohort') +
+    ylab('Rate') +
+    theme_bw() +
+    scale_color_manual(values=c('#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02'), name='Ethnicity') +
+    labs(size='Disproportionate Impact') +
+    scale_y_continuous(labels = scales::percent, limits=c(0, 1)) +
+    ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = 'Deg/Transfer' | College Status = '- All' | Outcome = 'Math' | Disaggregation = 'Ethnicity'"))
+  ggsave('Dashboard_3.png', height=5, width=9)
+}
+```
+![Dashboard Viz 3: Focus on degree/transfer students.](./Dashboard_3.png){width=100%}
+
+In a dashboard, the user could switch the outcome to English and disaggregate by Gender:
+```{r}
+# Disaggregation: Gender; Deg/Transfer; English
+df_di_summary %>%
+  filter(Ed_Goal=='Deg/Transfer', College_Status=='- All', success_variable=='English', disaggregation=='Gender') %>%
+  as.data.frame
+```
+```{r include=FALSE}
+if (run_plots) {
+  # Disaggregation: Gender; Deg/Transfer; English
+  df_di_summary %>%
+    filter(Ed_Goal=='Deg/Transfer', College_Status=='- All', success_variable=='English', disaggregation=='Gender') %>%
+    select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
+    mutate(group=factor(group) %>% fct_reorder(desc(pct))) %>% 
+    ggplot(data=., mapping=aes(x=factor(cohort), y=pct, group=group, color=group)) +
+    geom_point(aes(size=factor(di_indicator_ppg, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
+    geom_line() +
+    xlab('Cohort') +
+    ylab('Rate') +
+    theme_bw() +
+    scale_color_manual(values=c('#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02'), name='Gender') +
+    labs(size='Disproportionate Impact') +
+    scale_y_continuous(labels = scales::percent, limits=c(0, 1)) +
+    ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = 'Deg/Transfer' | College Status = '- All' | Outcome = 'English' | Disaggregation = 'Gender'"))
+  ggsave('Dashboard_4.png', height=5, width=9)
+}
+```
+![Dashboard Viz 4: switch outcome to English and disaggregate by Gender.](./Dashboard_4.png){width=100%}
