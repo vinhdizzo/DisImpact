@@ -22,7 +22,7 @@ It is often desirable to visualize student success data with the ability to disa
 A suggested workflow is to:
 
 1. start with a student-level data set;
-2. call a single function to pre-calculate success rates and disprportionate impact across all levels of disaggregation, cohorts, and scenarios;
+2. call a single function to pre-calculate success rates and disproportionate impact across all levels of disaggregation, cohorts, and scenarios;
 3. export the pre-calculated data set;
 4. import the pre-calculated data set to the dashboard tool of choice for visualization, where every point visualized is a row from the imported data set.
 
