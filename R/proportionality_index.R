@@ -71,7 +71,11 @@ di_prop_index <- function(success, group, cohort, weight, data, di_prop_index_cu
     summarize(n=sum(weight), success=sum(success)) %>%
     ungroup %>%
     group_by(cohort) %>% 
-    mutate(pct_success=success/sum(success), pct_group=n/sum(n), di_prop_index=pct_success/pct_group, di_indicator=ifelse(di_prop_index < di_prop_index_cutoff, 1, 0)) %>% 
+    mutate(pct_success=success/sum(success)
+         , pct_group=n/sum(n)
+         , di_prop_index=pct_success/pct_group
+         , di_indicator=ifelse(di_prop_index < di_prop_index_cutoff, 1, 0)
+           ) %>% 
     ungroup %>%
     arrange(cohort, group)
 
