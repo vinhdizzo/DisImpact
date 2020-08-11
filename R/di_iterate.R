@@ -112,6 +112,9 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
       summarize_at(vars(success_vars, '- Weight'), .funs=sum) %>%  # sum of success variables and cases (weight)
       ungroup
   } else {
+    if (!(weight_var %in% names(data))) {
+      stop(paste0('The weight variable `', weight_var, '`', ' is not in `data`.'))
+    }
     if (any(is.na(data[[weight_var]]))) {
       stop(paste0("The specified column corresponding to weight_var='", weight_var, "' contain NA values."))
     }
