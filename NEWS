@@ -1,3 +1,6 @@
+* 0.0.12
+  - Updated Scaling DI vignette
+  - di_iterate: check if weight_var exist when specified
 * 0.0.11
   - Added `check_valid_reference` argument for `di_iterate`.
 * 0.0.10
