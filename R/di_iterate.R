@@ -51,7 +51,21 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
   stopifnot(length(group_vars) == length(ppg_reference_groups) | length(ppg_reference_groups) == 1)
   stopifnot(length(group_vars) == length(di_80_index_reference_groups) | is.na(di_80_index_reference_groups))
 
-  # Check valid group
+  # Check valid success_vars
+  for (i in seq_along(success_vars)) {
+    if (!(success_vars[i] %in% names(data))) {
+      stop(paste0("'", success_vars[i], "' specified in `success_vars` is not found in `data`."))
+    }
+  }
+
+  # Check valid group_vars
+  for (i in seq_along(group_vars)) {
+    if (!(group_vars[i] %in% names(data))) {
+      stop(paste0("'", group_vars[i], "' specified in `group_vars` is not found in `data`."))
+    }
+  }
+
+  # Check valid reference groups
   if (check_valid_reference) {
     for (i in 1:length(ppg_reference_groups)) {
       if (!(ppg_reference_groups[i] %in% c(as.character(formals(di_ppg)$reference)[-1], unique(data[[group_vars[i]]])))) {
@@ -86,14 +100,29 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
   }
   
   if (!is.null(scenario_repeat_by_vars)) {
+    # Check valid scenario_repeat_by_vars
+    for (i in seq_along(scenario_repeat_by_vars)) {
+      if (!(scenario_repeat_by_vars[i] %in% names(data))) {
+        stop(paste0("'", scenario_repeat_by_vars[i], "' specified in `scenario_repeat_by_vars` is not found in `data`."))
+      }
+    }
     if (length(unique(sapply(data[, scenario_repeat_by_vars], class))) > 1) {
       stop("All variables specified in `scenario_repeat_by_vars` should be of the same class.  Suggestion: set them all as character data.")
-    } 
+    }
+
   }
 
   if (is.null(cohort_vars)) {
     cohort_vars <- '_cohort_'
     data[[cohort_vars]] <- '- All'
+  } else {
+    # Check valid cohort_vars
+    for (i in seq_along(cohort_vars)) {
+      if (!(cohort_vars[i] %in% names(data))) {
+        stop(paste0("'", cohort_vars[i], "' specified in `cohort_vars` is not found in `data`."))
+      }
+  }
+
   }
   if (length(cohort_vars) != 1 & length(cohort_vars) != length(success_vars)) {
     stop('`cohort_vars` must be of length 1 or the same length as `success_vars` (each success variable corresponds to a cohort variable).')
@@ -113,7 +142,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
       ungroup
   } else {
     if (!(weight_var %in% names(data))) {
-      stop(paste0('The weight variable `', weight_var, '`', ' is not in `data`.'))
+      stop(paste0("The weight variable '", weight_var, "'", ' is not in `data`.'))
     }
     if (any(is.na(data[[weight_var]]))) {
       stop(paste0("The specified column corresponding to weight_var='", weight_var, "' contain NA values."))
