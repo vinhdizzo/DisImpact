@@ -1,3 +1,5 @@
+* 0.0.13
+  - di_iterate: check if variables specified are in data
 * 0.0.12
   - Updated Scaling DI vignette
   - di_iterate: check if weight_var exist when specified
