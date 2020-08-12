@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vinh Nguyen" />
 
-<meta name="date" content="2020-08-11" />
+<meta name="date" content="2020-08-12" />
 
 <title>Scaling Disproportionate Impact (DI) Calculations for Interactive Visualizations</title>
 
@@ -301,7 +301,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Scaling Disproportionate Impact (DI) Calculations for Interactive Visualizations</h1>
 <h4 class="author">Vinh Nguyen</h4>
-<h4 class="date">2020-08-11</h4>
+<h4 class="date">2020-08-12</h4>
 
 
 <div id="TOC">
@@ -1097,12 +1097,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ##     weight_var = NULL, include_non_disagg_results = TRUE, ppg_reference_groups = &quot;overall&quot;, 
 ##     min_moe = 0.03, use_prop_in_moe = FALSE, prop_sub_0 = 0.5, 
 ##     prop_sub_1 = 0.5, di_prop_index_cutoff = 0.8, di_80_index_cutoff = 0.8, 
-##     di_80_index_reference_groups = NA) 
+##     di_80_index_reference_groups = NA, check_valid_reference = TRUE) 
 ## NULL</code></pre>
 <p>In this section, we illustrate how each argument could be used. Type <code>?di_iterate</code> to read the description of each.</p>
 <div id="passing-a-summarized-data-set-to-data-and-using-weight_var" class="section level3">
 <h3>Passing a summarized data set to <code>data</code> and using <code>weight_var</code></h3>
-<p>Instead of passing in a student level data set, the user could also pass in a summarized data set (reduce data size). To do so, the user should also specify <code>weight_var</code> to indicate the group size. Let’s illustrate with an example:</p>
+<p>Instead of passing in a student level data set, the user could also pass in a summarized data set, which saves space on your disk drive or in memory when imported into R. When passing a summarized data set, the user should also specify <code>weight_var</code> to indicate the group size of each row. Let’s illustrate with an example:</p>
 <div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1"><span class="kw">dim</span>(student_equity)</a></code></pre></div>
 <pre><code>## [1] 20000    11</code></pre>
 <div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1"><span class="co">## Example summarized data set</span></a>
@@ -1148,9 +1148,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <pre><code>## Joining, by = &quot;College_Status&quot;</code></pre>
 <pre><code>## Joining, by = &quot;Ed_Goal&quot;
 ## Joining, by = &quot;Ed_Goal&quot;</code></pre>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" title="1"><span class="kw">dim</span>(df_di_summary)</a></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" title="1"><span class="kw">dim</span>(df_di_summary)  <span class="co">## original results</span></a></code></pre></div>
 <pre><code>## [1] 898  21</code></pre>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" title="1"><span class="kw">dim</span>(df_di_summary_<span class="dv">2</span>) <span class="co"># more rows?  because of NA cohort</span></a></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" title="1"><span class="kw">dim</span>(df_di_summary_<span class="dv">2</span>) <span class="co"># more rows?  because of NA cohort from Cohort_English and Cohort_Math</span></a></code></pre></div>
 <pre><code>## [1] 1075   21</code></pre>
 <div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" title="1"><span class="kw">dim</span>(df_di_summary_<span class="dv">2</span> <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(cohort)))</a></code></pre></div>
 <pre><code>## [1] 898  21</code></pre>
@@ -1186,7 +1186,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <pre><code>## [1] 898  21</code></pre>
 <div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" title="1"><span class="kw">dim</span>(df_di_summary_<span class="dv">2</span>) <span class="co">## less rows because no longer have disaggregated results</span></a></code></pre></div>
 <pre><code>## [1] 808  21</code></pre>
-<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" title="1"><span class="kw">table</span>(df_di_summary_<span class="dv">2</span><span class="op">$</span>disaggregation) <span class="co"># No more &#39;- None&#39;</span></a></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" title="1"><span class="kw">table</span>(df_di_summary<span class="op">$</span>disaggregation)</a></code></pre></div>
+<pre><code>## 
+##    - None Ethnicity    Gender 
+##        90       539       269</code></pre>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb65-1" title="1"><span class="kw">table</span>(df_di_summary_<span class="dv">2</span><span class="op">$</span>disaggregation) <span class="co"># No more &#39;- None&#39;</span></a></code></pre></div>
 <pre><code>## 
 ## Ethnicity    Gender 
 ##       539       269</code></pre>
@@ -1194,15 +1198,48 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="ppg-reference-groups-and-other-parameters" class="section level3">
 <h3>PPG reference groups and other parameters</h3>
 <p>For the percentage point gap (PPG) method, <code>di_iterate</code> defaults to using the overall success rate as the reference for comparison (<code>ppg_reference_groups=&#39;overall&#39;</code>). The user could set <code>ppg_reference_groups=&#39;hpg&#39;</code> for using the highest performing group as the comparison group, or <code>ppg_reference_groups=&#39;all but current&#39;</code> for using the combined success rate of all other groups excluding the group of interest (eg, if studying Hispanic students, then the reference group would be all non-Hispanic students). The latter is sometimes referred to as “PPG minus 1.” The user could also specify specific groups as reference:</p>
-<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb65-1" title="1">df_di_summary_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</a>
-<a class="sourceLine" id="cb65-2" title="2">                            , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</a>
-<a class="sourceLine" id="cb65-3" title="3">                            , <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</a>
-<a class="sourceLine" id="cb65-4" title="4">                            , <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</a>
-<a class="sourceLine" id="cb65-5" title="5">                            , <span class="dt">scenario_repeat_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</a>
-<a class="sourceLine" id="cb65-6" title="6">                            , <span class="dt">ppg_reference_groups=</span><span class="kw">c</span>(<span class="st">&#39;White&#39;</span>, <span class="st">&#39;Male&#39;</span>) <span class="co">## corresponds to each variable in group_vars</span></a>
-<a class="sourceLine" id="cb65-7" title="7">                              )</a></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb67-1" title="1"><span class="co"># Highest performing group as reference</span></a>
+<a class="sourceLine" id="cb67-2" title="2">df_di_summary_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</a>
+<a class="sourceLine" id="cb67-3" title="3">                            , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</a>
+<a class="sourceLine" id="cb67-4" title="4">                            , <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</a>
+<a class="sourceLine" id="cb67-5" title="5">                            , <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</a>
+<a class="sourceLine" id="cb67-6" title="6">                            , <span class="dt">scenario_repeat_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</a>
+<a class="sourceLine" id="cb67-7" title="7">                            , <span class="dt">ppg_reference_groups=</span><span class="st">&#39;hpg&#39;</span> <span class="co">## SET THIS</span></a>
+<a class="sourceLine" id="cb67-8" title="8">                              )</a></code></pre></div>
 <pre><code>## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)
 ## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)</code></pre>
+<pre><code>## Joining, by = &quot;College_Status&quot;</code></pre>
+<pre><code>## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)
+## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)</code></pre>
+<pre><code>## Joining, by = &quot;College_Status&quot;</code></pre>
+<pre><code>## Joining, by = &quot;Ed_Goal&quot;
+## Joining, by = &quot;Ed_Goal&quot;</code></pre>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb73-1" title="1"><span class="co"># Reference: all other groups except group of interest (PPG minus 1)</span></a>
+<a class="sourceLine" id="cb73-2" title="2">df_di_summary_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</a>
+<a class="sourceLine" id="cb73-3" title="3">                            , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</a>
+<a class="sourceLine" id="cb73-4" title="4">                            , <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</a>
+<a class="sourceLine" id="cb73-5" title="5">                            , <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</a>
+<a class="sourceLine" id="cb73-6" title="6">                            , <span class="dt">scenario_repeat_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</a>
+<a class="sourceLine" id="cb73-7" title="7">                            , <span class="dt">ppg_reference_groups=</span><span class="st">&#39;all but current&#39;</span> <span class="co">## SET THIS</span></a>
+<a class="sourceLine" id="cb73-8" title="8">                              )</a></code></pre></div>
+<pre><code>## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)</code></pre>
+<pre><code>## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)</code></pre>
+<pre><code>## Joining, by = &quot;College_Status&quot;</code></pre>
+<pre><code>## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)
+## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)</code></pre>
+<pre><code>## Joining, by = &quot;College_Status&quot;</code></pre>
+<pre><code>## Joining, by = &quot;Ed_Goal&quot;
+## Joining, by = &quot;Ed_Goal&quot;</code></pre>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" title="1"><span class="co"># Reference: custom groups</span></a>
+<a class="sourceLine" id="cb80-2" title="2">df_di_summary_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</a>
+<a class="sourceLine" id="cb80-3" title="3">                            , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</a>
+<a class="sourceLine" id="cb80-4" title="4">                            , <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</a>
+<a class="sourceLine" id="cb80-5" title="5">                            , <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</a>
+<a class="sourceLine" id="cb80-6" title="6">                            , <span class="dt">scenario_repeat_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</a>
+<a class="sourceLine" id="cb80-7" title="7">                            , <span class="dt">ppg_reference_groups=</span><span class="kw">c</span>(<span class="st">&#39;White&#39;</span>, <span class="st">&#39;Male&#39;</span>) <span class="co">## corresponds to each variable in group_vars</span></a>
+<a class="sourceLine" id="cb80-8" title="8">                              )</a></code></pre></div>
+<pre><code>## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)</code></pre>
+<pre><code>## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)</code></pre>
 <pre><code>## Joining, by = &quot;College_Status&quot;</code></pre>
 <pre><code>## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)
 ## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)</code></pre>
@@ -1213,14 +1250,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="proportionality-index-di-threshold" class="section level3">
 <h3>Proportionality index DI threshold</h3>
-<p>For the proportionality index (PI) method, DI is determined using <code>di_prop_index_cutoff=0.8</code> by default. This could be changed:</p>
-<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" title="1">df_di_summary_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</a>
-<a class="sourceLine" id="cb71-2" title="2">                            , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</a>
-<a class="sourceLine" id="cb71-3" title="3">                            , <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</a>
-<a class="sourceLine" id="cb71-4" title="4">                            , <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</a>
-<a class="sourceLine" id="cb71-5" title="5">                            , <span class="dt">scenario_repeat_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</a>
-<a class="sourceLine" id="cb71-6" title="6">                            , <span class="dt">di_prop_index_cutoff=</span><span class="fl">0.9</span> <span class="co"># Easier to declare DI using PI</span></a>
-<a class="sourceLine" id="cb71-7" title="7">                              )</a></code></pre></div>
+<p>For the proportionality index (PI) method, DI is determined using <code>di_prop_index_cutoff=0.8</code> by default. This could be changed using the <code>di_prop_index_cutoff</code> argument.</p>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb87-1" title="1">df_di_summary_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</a>
+<a class="sourceLine" id="cb87-2" title="2">                            , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</a>
+<a class="sourceLine" id="cb87-3" title="3">                            , <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</a>
+<a class="sourceLine" id="cb87-4" title="4">                            , <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</a>
+<a class="sourceLine" id="cb87-5" title="5">                            , <span class="dt">scenario_repeat_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</a>
+<a class="sourceLine" id="cb87-6" title="6">                            , <span class="dt">di_prop_index_cutoff=</span><span class="fl">0.9</span> <span class="co"># Easier to declare DI using PI</span></a>
+<a class="sourceLine" id="cb87-7" title="7">                              )</a></code></pre></div>
 <pre><code>## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)
 ## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)</code></pre>
 <pre><code>## Joining, by = &quot;College_Status&quot;</code></pre>
@@ -1232,14 +1269,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="index-reference-groups-and-di-threshold" class="section level3">
 <h3>80% index reference groups and DI threshold</h3>
-<p>For the 80% index method, the highest performing group is used as reference by default (<code>di_80_index_reference_groups=NA</code>). Similar to the PPG, the user could specify custom reference groups:</p>
-<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" title="1">df_di_summary_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</a>
-<a class="sourceLine" id="cb77-2" title="2">                            , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</a>
-<a class="sourceLine" id="cb77-3" title="3">                            , <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</a>
-<a class="sourceLine" id="cb77-4" title="4">                            , <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</a>
-<a class="sourceLine" id="cb77-5" title="5">                            , <span class="dt">scenario_repeat_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</a>
-<a class="sourceLine" id="cb77-6" title="6">                            , <span class="dt">di_80_index_reference_groups=</span><span class="kw">c</span>(<span class="st">&#39;White&#39;</span>, <span class="st">&#39;Male&#39;</span>) <span class="co">## corresponds to each variable in group_vars</span></a>
-<a class="sourceLine" id="cb77-7" title="7">                              )</a></code></pre></div>
+<p>For the 80% index method, the highest performing group is used as reference by default (<code>di_80_index_reference_groups=NA</code>). Similar to the PPG, the user could specify custom reference groups.</p>
+<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb93-1" title="1"><span class="co"># Custom referene groups</span></a>
+<a class="sourceLine" id="cb93-2" title="2">df_di_summary_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</a>
+<a class="sourceLine" id="cb93-3" title="3">                            , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</a>
+<a class="sourceLine" id="cb93-4" title="4">                            , <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</a>
+<a class="sourceLine" id="cb93-5" title="5">                            , <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</a>
+<a class="sourceLine" id="cb93-6" title="6">                            , <span class="dt">scenario_repeat_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</a>
+<a class="sourceLine" id="cb93-7" title="7">                            , <span class="dt">di_80_index_reference_groups=</span><span class="kw">c</span>(<span class="st">&#39;White&#39;</span>, <span class="st">&#39;Male&#39;</span>) <span class="co">## corresponds to each variable in group_vars</span></a>
+<a class="sourceLine" id="cb93-8" title="8">                              )</a></code></pre></div>
 <pre><code>## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)
 ## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)</code></pre>
 <pre><code>## Joining, by = &quot;College_Status&quot;</code></pre>
@@ -1248,14 +1286,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <pre><code>## Joining, by = &quot;College_Status&quot;</code></pre>
 <pre><code>## Joining, by = &quot;Ed_Goal&quot;
 ## Joining, by = &quot;Ed_Goal&quot;</code></pre>
-<p>The 80% index uses 80% as the default threshold for declaring DI. The user could alter this with the <code>di_80_index_cutoff</code> argument:</p>
-<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb83-1" title="1">df_di_summary_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</a>
-<a class="sourceLine" id="cb83-2" title="2">                            , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</a>
-<a class="sourceLine" id="cb83-3" title="3">                            , <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</a>
-<a class="sourceLine" id="cb83-4" title="4">                            , <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</a>
-<a class="sourceLine" id="cb83-5" title="5">                            , <span class="dt">scenario_repeat_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</a>
-<a class="sourceLine" id="cb83-6" title="6">                            , <span class="dt">di_80_index_cutoff=</span><span class="fl">0.5</span> <span class="co"># Harder to declare DI using 80% index</span></a>
-<a class="sourceLine" id="cb83-7" title="7">                              )</a></code></pre></div>
+<p>The 80% index uses 80% as the default threshold for declaring DI. The user could alter this with the <code>di_80_index_cutoff</code> argument.</p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb99-1" title="1">df_di_summary_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</a>
+<a class="sourceLine" id="cb99-2" title="2">                            , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</a>
+<a class="sourceLine" id="cb99-3" title="3">                            , <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</a>
+<a class="sourceLine" id="cb99-4" title="4">                            , <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</a>
+<a class="sourceLine" id="cb99-5" title="5">                            , <span class="dt">scenario_repeat_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</a>
+<a class="sourceLine" id="cb99-6" title="6">                            , <span class="dt">di_80_index_cutoff=</span><span class="fl">0.5</span> <span class="co"># Harder to declare DI using 80% index</span></a>
+<a class="sourceLine" id="cb99-7" title="7">                              )</a></code></pre></div>
 <pre><code>## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)
 ## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)</code></pre>
 <pre><code>## Joining, by = &quot;College_Status&quot;</code></pre>
@@ -1269,23 +1307,23 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="multiple-ppg-or-di-parameter-scenarios-in-results" class="section level2">
 <h2>Multiple PPG or DI parameter scenarios in results</h2>
 <p>In a single call of <code>di_iterate</code>, the results of all three DI methods are returned in one run. If the user is interested in doing DI calculations using various scenarios of the same method (eg, using the overall rate as reference for PPG, and using a pre-specified list of reference rates), then it is recommended that the user execute <code>di_iterate</code> multiple times and combining the results (stacking). If the user chooses to do this, then it is a good idea to set <code>include_non_disagg_results=FALSE</code> in subsequent <code>di_iterate</code> runs to not duplicate rows of non-disaggregated results.</p>
-<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb89-1" title="1"><span class="co"># Multiple group variables and different reference groups</span></a>
-<a class="sourceLine" id="cb89-2" title="2">df_di_summary_long &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(</a>
-<a class="sourceLine" id="cb89-3" title="3">  <span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</a>
-<a class="sourceLine" id="cb89-4" title="4">           , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</a>
-<a class="sourceLine" id="cb89-5" title="5">           , <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</a>
-<a class="sourceLine" id="cb89-6" title="6">           , <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</a>
-<a class="sourceLine" id="cb89-7" title="7">           , <span class="dt">scenario_repeat_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</a>
-<a class="sourceLine" id="cb89-8" title="8">             )</a>
-<a class="sourceLine" id="cb89-9" title="9">  , <span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</a>
-<a class="sourceLine" id="cb89-10" title="10">           , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</a>
-<a class="sourceLine" id="cb89-11" title="11">           , <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</a>
-<a class="sourceLine" id="cb89-12" title="12">           , <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</a>
-<a class="sourceLine" id="cb89-13" title="13">           , <span class="dt">scenario_repeat_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</a>
-<a class="sourceLine" id="cb89-14" title="14">           , <span class="dt">ppg_reference_groups=</span><span class="kw">c</span>(<span class="st">&#39;White&#39;</span>, <span class="st">&#39;Male&#39;</span>) <span class="co">## corresponds to each variable in group_vars</span></a>
-<a class="sourceLine" id="cb89-15" title="15">           , <span class="dt">include_non_disagg_results =</span> <span class="ot">FALSE</span> <span class="co"># Already have non-disaggregated results in the first run</span></a>
-<a class="sourceLine" id="cb89-16" title="16">             )</a>
-<a class="sourceLine" id="cb89-17" title="17">)</a></code></pre></div>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb105-1" title="1"><span class="co"># Multiple group variables and different reference groups</span></a>
+<a class="sourceLine" id="cb105-2" title="2">df_di_summary_long &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(</a>
+<a class="sourceLine" id="cb105-3" title="3">  <span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</a>
+<a class="sourceLine" id="cb105-4" title="4">           , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</a>
+<a class="sourceLine" id="cb105-5" title="5">           , <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</a>
+<a class="sourceLine" id="cb105-6" title="6">           , <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</a>
+<a class="sourceLine" id="cb105-7" title="7">           , <span class="dt">scenario_repeat_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</a>
+<a class="sourceLine" id="cb105-8" title="8">             )</a>
+<a class="sourceLine" id="cb105-9" title="9">  , <span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</a>
+<a class="sourceLine" id="cb105-10" title="10">           , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</a>
+<a class="sourceLine" id="cb105-11" title="11">           , <span class="dt">group_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</a>
+<a class="sourceLine" id="cb105-12" title="12">           , <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</a>
+<a class="sourceLine" id="cb105-13" title="13">           , <span class="dt">scenario_repeat_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</a>
+<a class="sourceLine" id="cb105-14" title="14">           , <span class="dt">ppg_reference_groups=</span><span class="kw">c</span>(<span class="st">&#39;White&#39;</span>, <span class="st">&#39;Male&#39;</span>) <span class="co">## corresponds to each variable in group_vars</span></a>
+<a class="sourceLine" id="cb105-15" title="15">           , <span class="dt">include_non_disagg_results =</span> <span class="ot">FALSE</span> <span class="co"># Already have non-disaggregated results in the first run</span></a>
+<a class="sourceLine" id="cb105-16" title="16">             )</a>
+<a class="sourceLine" id="cb105-17" title="17">)</a></code></pre></div>
 <pre><code>## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)
 ## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)</code></pre>
 <pre><code>## Joining, by = &quot;College_Status&quot;</code></pre>
@@ -1302,15 +1340,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <pre><code>## Joining, by = &quot;College_Status&quot;</code></pre>
 <pre><code>## Joining, by = &quot;Ed_Goal&quot;
 ## Joining, by = &quot;Ed_Goal&quot;</code></pre>
-<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb100-1" title="1"><span class="kw">dim</span>(df_di_summary_long)</a></code></pre></div>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb116-1" title="1"><span class="kw">dim</span>(df_di_summary_long)</a></code></pre></div>
 <pre><code>## [1] 1706   21</code></pre>
 </div>
 <div id="ferpa-blocksuppression" class="section level2">
 <h2>FERPA block/suppression</h2>
 <p>Since <code>di_iterate</code> disaggregates on many variables and subpopulations, it is not uncommon the returned results contain rows summarizing small samples. As is common in education research, care should be taken to not unintentionally disclose the educational outcomes of students (results linked to particular students, ie, FERPA regulation). The user might want to filter out rows with small samples (eg, <code>n &lt; 10</code>):</p>
-<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb102-1" title="1"><span class="co">## df_di_summary %&gt;%</span></a>
-<a class="sourceLine" id="cb102-2" title="2"><span class="co">##   mutate(FERPA_Block=ifelse(n &lt; 10, 1, 0)) %&gt;%</span></a>
-<a class="sourceLine" id="cb102-3" title="3"><span class="co">##   filter(FERPA_Block == 0)</span></a></code></pre></div>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" title="1"><span class="co">## df_di_summary %&gt;%</span></a>
+<a class="sourceLine" id="cb118-2" title="2"><span class="co">##   mutate(FERPA_Block=ifelse(n &lt; 10, 1, 0)) %&gt;%</span></a>
+<a class="sourceLine" id="cb118-3" title="3"><span class="co">##   filter(FERPA_Block == 0)</span></a></code></pre></div>
 </div>
 
 

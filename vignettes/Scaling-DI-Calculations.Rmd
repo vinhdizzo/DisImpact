@@ -298,7 +298,8 @@ args(di_iterate)
 In this section, we illustrate how each argument could be used.  Type `?di_iterate` to read the description of each.
 
 ### Passing a summarized data set to `data` and using `weight_var`
-Instead of passing in a student level data set, the user could also pass in a summarized data set (reduce data size).  To do so, the user should also specify `weight_var` to indicate the group size.  Let's illustrate with an example:
+
+Instead of passing in a student level data set, the user could also pass in a summarized data set, which saves space on your disk drive or in memory when imported into R.  When passing a summarized data set, the user should also specify `weight_var` to indicate the group size of each row.  Let's illustrate with an example:
 
 ```{r}
 dim(student_equity)
@@ -325,8 +326,8 @@ df_di_summary_2 <- di_iterate(data=student_equity_summ
                           , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
                           , weight_var='N' # SET THIS
                             )
-dim(df_di_summary)
-dim(df_di_summary_2) # more rows?  because of NA cohort
+dim(df_di_summary)  ## original results
+dim(df_di_summary_2) # more rows?  because of NA cohort from Cohort_English and Cohort_Math
 dim(df_di_summary_2 %>% filter(!is.na(cohort)))
 
 ## ## if user wants to see the extra rows
@@ -354,6 +355,7 @@ df_di_summary_2 <- di_iterate(data=student_equity
                             )
 dim(df_di_summary)
 dim(df_di_summary_2) ## less rows because no longer have disaggregated results
+table(df_di_summary$disaggregation)
 table(df_di_summary_2$disaggregation) # No more '- None'
 ```
 
@@ -362,6 +364,25 @@ table(df_di_summary_2$disaggregation) # No more '- None'
 For the percentage point gap (PPG) method, `di_iterate` defaults to using the overall success rate as the reference for comparison (`ppg_reference_groups='overall'`).  The user could set `ppg_reference_groups='hpg'` for using the highest performing group as the comparison group, or `ppg_reference_groups='all but current'` for using the combined success rate of all other groups excluding the group of interest (eg, if studying Hispanic students, then the reference group would be all non-Hispanic students).  The latter is sometimes referred to as "PPG minus 1."  The user could also specify specific groups as reference:
 
 ```{r}
+# Highest performing group as reference
+df_di_summary_2 <- di_iterate(data=student_equity
+                            , success_vars=c('Math', 'English', 'Transfer')
+                            , group_vars=c('Ethnicity', 'Gender')
+                            , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                            , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                            , ppg_reference_groups='hpg' ## SET THIS
+                              )
+
+# Reference: all other groups except group of interest (PPG minus 1)
+df_di_summary_2 <- di_iterate(data=student_equity
+                            , success_vars=c('Math', 'English', 'Transfer')
+                            , group_vars=c('Ethnicity', 'Gender')
+                            , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                            , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                            , ppg_reference_groups='all but current' ## SET THIS
+                              )
+
+# Reference: custom groups
 df_di_summary_2 <- di_iterate(data=student_equity
                             , success_vars=c('Math', 'English', 'Transfer')
                             , group_vars=c('Ethnicity', 'Gender')
@@ -375,7 +396,7 @@ The following arguments apply to the PPG: `min_moe`, `use_prop_in_moe`, `prop_su
 
 ### Proportionality index DI threshold
 
-For the proportionality index (PI) method, DI is determined using `di_prop_index_cutoff=0.8` by default.  This could be changed:
+For the proportionality index (PI) method, DI is determined using `di_prop_index_cutoff=0.8` by default.  This could be changed using the `di_prop_index_cutoff` argument.
 
 ```{r}
 df_di_summary_2 <- di_iterate(data=student_equity
@@ -389,9 +410,10 @@ df_di_summary_2 <- di_iterate(data=student_equity
 
 ### 80% index reference groups and DI threshold
 
-For the 80% index method, the highest performing group is used as reference by default (`di_80_index_reference_groups=NA`).  Similar to the PPG, the user could specify custom reference groups:
+For the 80% index method, the highest performing group is used as reference by default (`di_80_index_reference_groups=NA`).  Similar to the PPG, the user could specify custom reference groups.
 
 ```{r}
+# Custom referene groups
 df_di_summary_2 <- di_iterate(data=student_equity
                             , success_vars=c('Math', 'English', 'Transfer')
                             , group_vars=c('Ethnicity', 'Gender')
@@ -401,7 +423,7 @@ df_di_summary_2 <- di_iterate(data=student_equity
                               )
 ```
 
-The 80% index uses 80% as the default threshold for declaring DI.  The user could alter this with the `di_80_index_cutoff` argument:
+The 80% index uses 80% as the default threshold for declaring DI.  The user could alter this with the `di_80_index_cutoff` argument.
 
 ```{r}
 df_di_summary_2 <- di_iterate(data=student_equity
