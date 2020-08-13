@@ -20,6 +20,7 @@ The `DisImpact` R package contains functions that help in determining disproport
 3. [80% index](https://www.cccco.edu/-/media/CCCCO-Website/Files/DII/guidelines-for-measuring-disproportionate-impact-in-equity-plans-tfa-ada.pdf) method (method #2 in reference).
 
 ## Install Package
+
 ```{r}
 # From CRAN (Official)
 ## install.packages('DisImpact')
@@ -29,12 +30,14 @@ The `DisImpact` R package contains functions that help in determining disproport
 ```
 
 ## Load Packages
+
 ```{r, message=FALSE, warning=FALSE}
 library(DisImpact)
 library(dplyr) # Ease in manipulations with data frames
 ```
 
 ## Load toy student equity data
+
 To illustrate the functionality of the package, let's load a toy data set:
 ```{r}
 # Load fake data set
@@ -48,10 +51,11 @@ dim(student_equity)
 dSumm <- student_equity %>%
   group_by(Cohort, Ethnicity) %>%
   summarize(n=n(), Transfer_Rate=mean(Transfer))
-dSumm
+dSumm ## This is a summarized version of the data set
 ```
 
 ## Percentage point gap (PPG) method
+
 `di_ppg` is the main work function, and it can take on vectors or column names the tidy way:
 ```{r}
 # Vector
@@ -68,7 +72,7 @@ di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, data=student_equity) %>
   as.data.frame
 ```
 
-`di_ppg` is also applicable to summarized data; just pass the counts to `success` and group size to `weight`:
+`di_ppg` is also applicable to summarized data; just pass the counts to `success` and group size to `weight`.  For example, we use the summarized data set, `dSumm`, and sample size `n`, in the following:
 ```{r}
 di_ppg(success=Transfer_Rate*n, group=Ethnicity, cohort=Cohort, weight=n, data=dSumm) %>%
   as.data.frame
@@ -103,7 +107,7 @@ di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, reference=c(0.5, 0.55),
   as.data.frame
 ```
 
-The margin of error (MOE) in `di_ppg` has 2 underlying assumptions (defaults):
+Disproportionate impact using the PPG relies on calculating the margine margin of error (MOE) pertaining around the success rate.  The MOE calculated in `di_ppg` has 2 underlying assumptions (defaults):
 
 1. the minimum MOE returned is 0.03, and
 2. using 0.50 as the proportion in the margin of error formula, $1.96 \times \sqrt{\hat{p} (1-\hat{p}) / n}$.
@@ -128,6 +132,7 @@ di_ppg(success=Transfer, group=Ethnicity, data=student_equity %>% mutate(Transfe
 
 
 ## Proportionality index
+
 `di_prop_index` is the main work function for this method, and it can take on vectors or column names the tidy way:
 
 ```{r}
@@ -154,6 +159,7 @@ di_prop_index(success=student_equity$Transfer, group=student_equity$Ethnicity, c
 ```
 
 ## 80% index
+
 `di_80_index` is the main work function for this method, and it can take on vectors or column names the tidy way:
 
 ```{r}
@@ -187,14 +193,20 @@ By default, `di_80_index` uses 80% (`di_80_index_cutoff=0.80`) as the default th
 di_80_index(success=student_equity$Transfer, group=student_equity$Ethnicity, cohort=student_equity$Cohort, di_80_index_cutoff=0.50) %>% as.data.frame
 ```
 
-## When we have a non-success variable like drop-out
-Suppose we have a variable that indicates something negative.  We could calculate DI on the converse of it:
+## When dealing with a non-success variable like drop-out or probation
+
+All methods and functions implemented in the `DisImpact` package treat outcomes as positive: 1 is desired over 0 (higher rate is better, lower rate indicates disparity).  The choice of the name `success` in the functions' arguments is intentional to remind the user of this.
+
+Suppose we have a variable that indicates something negative (eg, a flag for students on academic probation).  We could calculate DI on the converse of it by using the `!` (logical negation) operator:
 ```{r}
+## di_ppg(success=!Probation, group=Ethnicity, data=student_equity) %>%
+##   as.data.frame ## If there were a Probation variable
 di_ppg(success=!Transfer, group=Ethnicity, data=student_equity) %>%
-  as.data.frame
+  as.data.frame ## Illustrating the point with `!`
 ```
 
 ## Transformations on the fly
+
 We can compute the success, group, and cohort variables on the fly:
 ```{r}
 # Transform success
@@ -208,6 +220,7 @@ di_ppg(success=Transfer, group=ifelse(Ethnicity %in% c('Black', 'Hispanic'), 'Bl
 ```
 
 ## Calculate DI for many variables and groups
+
 It is often the case that the user desires to calculate disproportionate impact across many outcome variables and many disaggregation/group variables.  The function `di_iterate` allows the user to specify a data set and the various variables to iterate across:
 ```{r}
 # Multiple group variables

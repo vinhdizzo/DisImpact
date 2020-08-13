@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vinh Nguyen" />
 
-<meta name="date" content="2020-08-10" />
+<meta name="date" content="2020-08-13" />
 
 <title>DisImpact Tutorial</title>
 
@@ -301,7 +301,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">DisImpact Tutorial</h1>
 <h4 class="author">Vinh Nguyen</h4>
-<h4 class="date">2020-08-10</h4>
+<h4 class="date">2020-08-13</h4>
 
 
 <div id="TOC">
@@ -313,7 +313,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><a href="#percentage-point-gap-ppg-method">Percentage point gap (PPG) method</a></li>
 <li><a href="#proportionality-index">Proportionality index</a></li>
 <li><a href="#index">80% index</a></li>
-<li><a href="#when-we-have-a-non-success-variable-like-drop-out">When we have a non-success variable like drop-out</a></li>
+<li><a href="#when-dealing-with-a-non-success-variable-like-drop-out-or-probation">When dealing with a non-success variable like drop-out or probation</a></li>
 <li><a href="#transformations-on-the-fly">Transformations on the fly</a></li>
 <li><a href="#calculate-di-for-many-variables-and-groups">Calculate DI for many variables and groups</a></li>
 </ul>
@@ -353,7 +353,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">dSumm &lt;-<span class="st"> </span>student_equity <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb6-2" title="2"><span class="st">  </span><span class="kw">group_by</span>(Cohort, Ethnicity) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb6-3" title="3"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">n=</span><span class="kw">n</span>(), <span class="dt">Transfer_Rate=</span><span class="kw">mean</span>(Transfer))</a>
-<a class="sourceLine" id="cb6-4" title="4">dSumm</a></code></pre></div>
+<a class="sourceLine" id="cb6-4" title="4">dSumm <span class="co">## This is a summarized version of the data set</span></a></code></pre></div>
 <pre><code>## # A tibble: 12 x 4
 ## # Groups:   Cohort [2]
 ##    Cohort Ethnicity           n Transfer_Rate
@@ -437,7 +437,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 10 0.04382693 0.4401731 0.5278269            1
 ## 11 0.09800000 0.2520000 0.4480000            1
 ## 12 0.03000000 0.6014706 0.6614706            0</code></pre>
-<p><code>di_ppg</code> is also applicable to summarized data; just pass the counts to <code>success</code> and group size to <code>weight</code>:</p>
+<p><code>di_ppg</code> is also applicable to summarized data; just pass the counts to <code>success</code> and group size to <code>weight</code>. For example, we use the summarized data set, <code>dSumm</code>, and sample size <code>n</code>, in the following:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer_Rate<span class="op">*</span>n, <span class="dt">group=</span>Ethnicity, <span class="dt">cohort=</span>Cohort, <span class="dt">weight=</span>n, <span class="dt">data=</span>dSumm) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb14-2" title="2"><span class="st">  </span>as.data.frame</a></code></pre></div>
 <pre><code>##    cohort           group    n success       pct reference reference_group
@@ -629,7 +629,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 10 0.04382693 0.4401731 0.5278269            1
 ## 11 0.09800000 0.2520000 0.4480000            1
 ## 12 0.03000000 0.6014706 0.6614706            0</code></pre>
-<p>The margin of error (MOE) in <code>di_ppg</code> has 2 underlying assumptions (defaults):</p>
+<p>Disproportionate impact using the PPG relies on calculating the margine margin of error (MOE) pertaining around the success rate. The MOE calculated in <code>di_ppg</code> has 2 underlying assumptions (defaults):</p>
 <ol style="list-style-type: decimal">
 <li>the minimum MOE returned is 0.03, and</li>
 <li>using 0.50 as the proportion in the margin of error formula, <span class="math inline">\(1.96 \times \sqrt{\hat{p} (1-\hat{p}) / n}\)</span>.</li>
@@ -970,11 +970,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 11   0.4708520            1
 ## 12   0.8495120            0</code></pre>
 </div>
-<div id="when-we-have-a-non-success-variable-like-drop-out" class="section level2">
-<h2>When we have a non-success variable like drop-out</h2>
-<p>Suppose we have a variable that indicates something negative. We could calculate DI on the converse of it:</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" title="1"><span class="kw">di_ppg</span>(<span class="dt">success=</span><span class="op">!</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb57-2" title="2"><span class="st">  </span>as.data.frame</a></code></pre></div>
+<div id="when-dealing-with-a-non-success-variable-like-drop-out-or-probation" class="section level2">
+<h2>When dealing with a non-success variable like drop-out or probation</h2>
+<p>All methods and functions implemented in the <code>DisImpact</code> package treat outcomes as positive: 1 is desired over 0 (higher rate is better, lower rate indicates disparity). The choice of the name <code>success</code> in the functions’ arguments is intentional to remind the user of this.</p>
+<p>Suppose we have a variable that indicates something negative (eg, a flag for students on academic probation). We could calculate DI on the converse of it by using the <code>!</code> (logical negation) operator:</p>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" title="1"><span class="co">## di_ppg(success=!Probation, group=Ethnicity, data=student_equity) %&gt;%</span></a>
+<a class="sourceLine" id="cb57-2" title="2"><span class="co">##   as.data.frame ## If there were a Probation variable</span></a>
+<a class="sourceLine" id="cb57-3" title="3"><span class="kw">di_ppg</span>(<span class="dt">success=</span><span class="op">!</span>Transfer, <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb57-4" title="4"><span class="st">  </span>as.data.frame <span class="co">## Illustrating the point with `!`</span></a></code></pre></div>
 <pre><code>##             group    n success       pct reference reference_group
 ## 1           Asian 6000    1708 0.2846667    0.4736         overall
 ## 2           Black 2000    1393 0.6965000    0.4736         overall
@@ -996,23 +999,23 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb59-1" title="1"><span class="co"># Transform success</span></a>
 <a class="sourceLine" id="cb59-2" title="2">a &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">1</span>, <span class="dt">size=</span><span class="kw">nrow</span>(student_equity), <span class="dt">replace=</span><span class="ot">TRUE</span>, <span class="dt">prob=</span><span class="kw">c</span>(<span class="fl">0.95</span>, <span class="fl">0.05</span>))</a>
 <a class="sourceLine" id="cb59-3" title="3"><span class="kw">mean</span>(a)</a></code></pre></div>
-<pre><code>## [1] 0.0516</code></pre>
+<pre><code>## [1] 0.0498</code></pre>
 <div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" title="1"><span class="kw">di_ppg</span>(<span class="dt">success=</span><span class="kw">pmax</span>(Transfer, a), <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb61-2" title="2"><span class="st">  </span>as.data.frame</a></code></pre></div>
 <pre><code>##             group    n success       pct reference reference_group
-## 1           Asian 6000    4389 0.7315000   0.55095         overall
-## 2           Black 2000     686 0.3430000   0.55095         overall
-## 3        Hispanic 4000    1001 0.2502500   0.55095         overall
-## 4 Multi-Ethnicity 1000     528 0.5280000   0.55095         overall
-## 5 Native American  200      82 0.4100000   0.55095         overall
-## 6           White 6800    4333 0.6372059   0.55095         overall
+## 1           Asian 6000    4380 0.7300000    0.5504         overall
+## 2           Black 2000     677 0.3385000    0.5504         overall
+## 3        Hispanic 4000    1020 0.2550000    0.5504         overall
+## 4 Multi-Ethnicity 1000     530 0.5300000    0.5504         overall
+## 5 Native American  200      85 0.4250000    0.5504         overall
+## 6           White 6800    4316 0.6347059    0.5504         overall
 ##          moe    pct_lo    pct_hi di_indicator
-## 1 0.03000000 0.7015000 0.7615000            0
-## 2 0.03000000 0.3130000 0.3730000            1
-## 3 0.03000000 0.2202500 0.2802500            1
-## 4 0.03099032 0.4970097 0.5589903            0
-## 5 0.06929646 0.3407035 0.4792965            1
-## 6 0.03000000 0.6072059 0.6672059            0</code></pre>
+## 1 0.03000000 0.7000000 0.7600000            0
+## 2 0.03000000 0.3085000 0.3685000            1
+## 3 0.03000000 0.2250000 0.2850000            1
+## 4 0.03099032 0.4990097 0.5609903            0
+## 5 0.06929646 0.3557035 0.4942965            1
+## 6 0.03000000 0.6047059 0.6647059            0</code></pre>
 <div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" title="1"><span class="co"># Collapse Black and Hispanic</span></a>
 <a class="sourceLine" id="cb63-2" title="2"><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span><span class="kw">ifelse</span>(Ethnicity <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Black&#39;</span>, <span class="st">&#39;Hispanic&#39;</span>), <span class="st">&#39;Black/Hispanic&#39;</span>, Ethnicity), <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</a></code></pre></div>
 <pre><code>##             group    n success       pct reference reference_group
