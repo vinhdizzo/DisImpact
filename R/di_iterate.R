@@ -163,13 +163,17 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
       lapply(function(x) c(unique(x), '- All')) %>%
       expand.grid(stringsAsFactors=FALSE)
 
-    # Exclude
+    # Exclude scenarios
     if (!is.null(exclude_scenario_df)) {
+      if (!all(names(exclude_scenario_df) %in% scenario_repeat_by_vars)) {
+        stop('`exclude_scenario_df` contain variables that are not specified in `scenario_repeat_by_vars`.')
+      }
       exclude__ <- NULL # CRAN: no visible binding for global variable
       dRepeatScenarios0 <- dRepeatScenarios0 %>%
         left_join(exclude_scenario_df %>% mutate(exclude__=1)) %>%
-        filter(!is.na(exclude__)) %>%
-        select(one_of(scenario_repeat_by_vars))
+        filter(is.na(exclude__)) %>% # missing means not meant to be excluded
+        # select(one_of(scenario_repeat_by_vars))
+        select(one_of(names(dRepeatScenarios0)))
     }
     
     # For each combination, determine row indices; take only combination with actual observations
@@ -263,7 +267,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
   ppg_check_valid_reference <- di_80_check_valid_reference <- di_80_index_reference_group <- NULL # CRAN: no visible binding for global variable
   dScenarios <- expand.grid(success_var=success_vars, group_var=group_vars, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1, ppg_check_valid_reference=FALSE, di_prop_index_cutoff=di_prop_index_cutoff, di_80_index_cutoff=di_80_index_cutoff, di_80_check_valid_reference=FALSE, stringsAsFactors=FALSE) %>%
     left_join(lu_success_cohort, by=c('success_var')) %>% 
-    left_join(dRef, by=c('group_var')) %>%
+    left_join(dRef, by=c('group_var')) %>% 
     select(success_var, group_var, cohort_var, ppg_reference_group, min_moe, use_prop_in_moe, prop_sub_0, prop_sub_1, ppg_check_valid_reference, di_prop_index_cutoff, di_80_index_cutoff, di_80_index_reference_group, di_80_check_valid_reference)
 
   # Function to iterate for each scenario
