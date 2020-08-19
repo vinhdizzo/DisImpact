@@ -1,5 +1,7 @@
 * 0.0.13
-  - di_iterate: check if variables specified are in data
+  - di_iterate: check if various specified variables are in data
+  - di_iterate: fixed the use of exclude_scenario_df (used to returned cases meant to be excluded)
+  - Updated tutorial vignette
 * 0.0.12
   - Updated Scaling DI vignette
   - di_iterate: check if weight_var exist when specified
