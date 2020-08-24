@@ -8,7 +8,7 @@
 ##' @param weight (Optional) A vector of case weights of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.  If \code{success} consists of counts instead of success indicators (1/0), then \code{weight} should also be specified to indicate the group size.
 ##' @param data (Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.
 ##' @param di_80_index_cutoff A numeric value between 0 and 1 that is used to determine disproportionate impact if the index comparing the success rate of the current group to the reference group falls below this threshold; defaults to 0.80.
-##' @param reference_group The reference group value in \code{group} that each group should be compared to in order to determine disproportionate impact.  By default (\code{=NA}), the group with the highest success rate is used as reference.
+##' @param reference_group The reference group value in \code{group} that each group should be compared to in order to determine disproportionate impact.  By default (\code{='hpg'}), the group with the highest success rate is used as reference.
 ##' @param check_valid_reference Check whether \code{reference_group} is a valid value; defaults to \code{TRUE}.  This argument exists to be used in \link{di_iterate} as when iterating DI calculations, there may be some scenarios where a specified reference group does not contain any students.
 ##' @return A data frame consisting of:
 ##' \itemize{
@@ -31,7 +31,7 @@
 ##' @export
 ##' @import dplyr
 ##' @importFrom rlang !! enquo
-di_80_index <- function(success, group, cohort, weight, data, di_80_index_cutoff=0.80, reference_group=NA, check_valid_reference=TRUE) {
+di_80_index <- function(success, group, cohort, weight, data, di_80_index_cutoff=0.80, reference_group='hpg', check_valid_reference=TRUE) {
   if (!missing(data)) {
     eq_success <- enquo(success)
     success <- data %>% ungroup %>% mutate(success=!!eq_success) %>% select(success) %>% unlist
@@ -43,7 +43,7 @@ di_80_index <- function(success, group, cohort, weight, data, di_80_index_cutoff
   stopifnot(!is.na(success), success>=0) # can be counts
   stopifnot(di_80_index_cutoff >= 0, di_80_index_cutoff <= 1)
   #missing_reference_group <- missing(reference_group)
-  missing_reference_group <- is.na(reference_group) # default to NA instead of not specified for use in di_iterate function
+  missing_reference_group <- reference_group == 'hpg' | is.na(reference_group) # default to NA instead of not specified for use in di_iterate function
   
   # Check if cohort is specified
   if (missing(cohort)) {

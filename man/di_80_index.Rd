@@ -11,7 +11,7 @@ di_80_index(
   weight,
   data,
   di_80_index_cutoff = 0.8,
-  reference_group = NA,
+  reference_group = "hpg",
   check_valid_reference = TRUE
 )
 }
@@ -28,7 +28,7 @@ di_80_index(
 
 \item{di_80_index_cutoff}{A numeric value between 0 and 1 that is used to determine disproportionate impact if the index comparing the success rate of the current group to the reference group falls below this threshold; defaults to 0.80.}
 
-\item{reference_group}{The reference group value in \code{group} that each group should be compared to in order to determine disproportionate impact.  By default (\code{=NA}), the group with the highest success rate is used as reference.}
+\item{reference_group}{The reference group value in \code{group} that each group should be compared to in order to determine disproportionate impact.  By default (\code{='hpg'}), the group with the highest success rate is used as reference.}
 
 \item{check_valid_reference}{Check whether \code{reference_group} is a valid value; defaults to \code{TRUE}.  This argument exists to be used in \link{di_iterate} as when iterating DI calculations, there may be some scenarios where a specified reference group does not contain any students.}
 }
