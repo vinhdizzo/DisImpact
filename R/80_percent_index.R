@@ -69,7 +69,7 @@ di_80_index <- function(success, group, cohort, weight, data, di_80_index_cutoff
 
   # Check if reference_group is valid
   if (check_valid_reference) {
-    if (!is.na(reference_group)) {
+    if (!is.na(reference_group) & reference_group != 'hpg') {
       stopifnot(reference_group %in% unique(group))
     }
   }
