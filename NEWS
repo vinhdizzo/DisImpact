@@ -2,6 +2,10 @@
   - di_iterate: check if various specified variables are in data
   - di_iterate: fixed the use of exclude_scenario_df (used to returned cases meant to be excluded)
   - Updated tutorial vignette
+  - di_ppg bug fix: remove NA when reference group passed and group contains NA (multiple rows returned before)
+  - di_80_index bug fix: remove NA when reference group passed and group contains NA (multiple rows returned before)
+  - di_80_index: add 'hpg' as the default argument instead of NA so users could understand this better
+  - di_iterate: use 'hpg' as default for di_80_index_reference_groups
 * 0.0.12
   - Updated Scaling DI vignette
   - di_iterate: check if weight_var exist when specified
