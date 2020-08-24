@@ -49,7 +49,7 @@
 ##' @export
 di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenario_repeat_by_vars=NULL, exclude_scenario_df=NULL, weight_var=NULL, include_non_disagg_results=TRUE, ppg_reference_groups='overall', min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5, di_prop_index_cutoff=0.80, di_80_index_cutoff=0.80, di_80_index_reference_groups='hpg', check_valid_reference=TRUE) {
   stopifnot(length(group_vars) == length(ppg_reference_groups) | length(ppg_reference_groups) == 1)
-  stopifnot(length(group_vars) == length(di_80_index_reference_groups) | (length(di_80_index_reference_groups) == 1 & di_80_index_reference_groups %in% c(NA, 'hpg')))
+  stopifnot(length(group_vars) == length(di_80_index_reference_groups) | length(di_80_index_reference_groups) == 1)
 
   # Check valid success_vars
   for (i in seq_along(success_vars)) {
@@ -90,7 +90,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
     } # else leave as is (overall, hpg, all but current to be used)
     if (length(di_80_index_reference_groups) > 1) {
       di_80_index_reference_groups <- c(di_80_index_reference_groups, NA) # Adding last NA for non-disaggregated results
-    } else if (length(di_80_index_reference_groups) == 1 & !is.na(di_80_index_reference_groups)) {
+    } else if (length(di_80_index_reference_groups) == 1 & !(is.na(di_80_index_reference_groups) | di_80_index_reference_groups=='hpg')) {
       di_80_index_reference_groups <- c(di_80_index_reference_groups, NA)
     } # else leave as is (overall, hpg, all but current to be used)
   }
