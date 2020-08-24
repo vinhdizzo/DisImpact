@@ -23,7 +23,7 @@
 ##' @param prop_sub_1 passed to \link[DisImpact]{di_ppg}; defaults to 0.50.
 ##' @param di_prop_index_cutoff Threshold used for determining disproportionate impact using the proportionality index; passed to \link[DisImpact]{di_prop_index}; defaults to 0.80.
 ##' @param di_80_index_cutoff Threshold used for determining disproportionate impact using the 80\% index; passed to \link[DisImpact]{di_80_index}; defaults to 0.80.
-##' @param di_80_index_reference_groups A character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the 80\% index; defaults to \code{NA} (highest performing group as reference).
+##' @param di_80_index_reference_groups A character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the 80\% index; defaults to \code{'hpg'} (highest performing group as reference).
 ##' @param check_valid_reference Check whether \code{ppg_reference_groups} and \code{di_80_index_reference_groups} contain valid values; defaults to \code{TRUE}.
 ##' @return A summarized data set (data frame) consisting of:
 ##' \itemize{
@@ -47,7 +47,7 @@
 ##' @importFrom purrr pmap
 ##' @importFrom tidyr unnest
 ##' @export
-di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenario_repeat_by_vars=NULL, exclude_scenario_df=NULL, weight_var=NULL, include_non_disagg_results=TRUE, ppg_reference_groups='overall', min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5, di_prop_index_cutoff=0.80, di_80_index_cutoff=0.80, di_80_index_reference_groups=NA, check_valid_reference=TRUE) {
+di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenario_repeat_by_vars=NULL, exclude_scenario_df=NULL, weight_var=NULL, include_non_disagg_results=TRUE, ppg_reference_groups='overall', min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5, di_prop_index_cutoff=0.80, di_80_index_cutoff=0.80, di_80_index_reference_groups='hpg', check_valid_reference=TRUE) {
   stopifnot(length(group_vars) == length(ppg_reference_groups) | length(ppg_reference_groups) == 1)
   stopifnot(length(group_vars) == length(di_80_index_reference_groups) | is.na(di_80_index_reference_groups))
 
@@ -73,7 +73,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
       }
     }
     for (i in 1:length(di_80_index_reference_groups)) {
-      if (!(di_80_index_reference_groups[i] %in% c(unique(data[[group_vars[i]]]))) & !is.na(di_80_index_reference_groups[i])) {
+      if (!(di_80_index_reference_groups[i] %in% c(unique(data[[group_vars[i]]]), 'hpg')) & !is.na(di_80_index_reference_groups[i])) {
         stop(paste0("'", di_80_index_reference_groups[i], "'", " is not valid for the argument `di_80_index_reference_groups` as it does not exist in the group variable `", group_vars[i], "`."))
       }
     }
