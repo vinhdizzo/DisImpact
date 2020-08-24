@@ -182,7 +182,7 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg',
                reference_type=='overall' ~ sum(success) / sum(n)
              , reference_type=='hpg' ~ max(pct)
              , reference_type=='all but current' ~ (sum(success) - success) / (sum(n) - n)
-             , reference_type!='numeric' ~ if(sum(group==reference_type, na.rm=TRUE) > 0) {success[group==reference_type] / n[group==reference_type]} else {NA_real_}
+             , reference_type!='numeric' ~ if(sum(group==reference_type, na.rm=TRUE) > 0) {success[group==reference_type & !is.na(group)] / n[group==reference_type & !is.na(group)]} else {NA_real_}
              , reference_type=='numeric' ~ reference_numeric
              )
              , reference_group=reference_type
