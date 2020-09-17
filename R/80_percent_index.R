@@ -19,8 +19,10 @@
 ##'   \item \code{pct} (proportion of successes for the cohort-group),
 ##'   \item \code{reference_group} (the reference group used to compare and determine disproportionate impact),
 ##'   \item \code{reference} (the reference rate used for comparison, corresponding to reference_group),
-##'   \item \code{di_80_index} (ratio of pct to the reference), and
-##'   \item \code{di_indicator} (1 if \code{di_80_index < di_80_index_cutoff}).
+##'   \item \code{di_80_index} (ratio of pct to the reference),
+##'   \item \code{di_indicator} (1 if \code{di_80_index < di_80_index_cutoff}),
+##'   \item \code{success_needed_not_di} (the number of additional successes needed in order to no longer be considered disproportionately impacted as compared to the reference), and
+##'   \item \code{success_needed_full_parity} (the number of additional successes needed in order to achieve full parity with the reference).
 ##' }
 ##' @examples
 ##' library(dplyr)
@@ -89,6 +91,9 @@ di_80_index <- function(success, group, cohort, weight, data, di_80_index_cutoff
          , di_indicator=ifelse(is.nan(di_80_index), 0, di_indicator) # di_80_index is NaN when the reference rate is zero; in this case, there is no DI
            ) %>% 
     ungroup %>%
+    mutate(success_needed_not_di=ifelse(di_indicator==1, ceiling((di_80_index_cutoff * reference - pct) * n), 0)
+           , success_needed_full_parity=ifelse(pct < reference, ceiling((reference - pct) * n), 0)
+    ) %>% 
     arrange(cohort, group)
 
   if (remove_cohort) {

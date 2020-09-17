@@ -42,8 +42,10 @@ A data frame consisting of:
   \item \code{pct} (proportion of successes for the cohort-group),
   \item \code{reference_group} (the reference group used to compare and determine disproportionate impact),
   \item \code{reference} (the reference rate used for comparison, corresponding to reference_group),
-  \item \code{di_80_index} (ratio of pct to the reference), and
-  \item \code{di_indicator} (1 if \code{di_80_index < di_80_index_cutoff}).
+  \item \code{di_80_index} (ratio of pct to the reference),
+  \item \code{di_indicator} (1 if \code{di_80_index < di_80_index_cutoff}),
+  \item \code{success_needed_not_di} (the number of additional successes needed in order to no longer be considered disproportionately impacted as compared to the reference), and
+  \item \code{success_needed_full_parity} (the number of additional successes needed in order to achieve full parity with the reference).
 }
 }
 \description{
