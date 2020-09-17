@@ -28,8 +28,10 @@ A data frame consisting of:
   \item \code{success} (number of successes for the cohort-group),
   \item \code{pct_success} (proportion of successes attributed to the group within the cohort),
   \item \code{pct_group} (proportion of sample attributed to the group within the cohort),
-  \item \code{di_prop_index} (ratio of pct_success to pct_group), and
-  \item \code{di_indicator} (1 if \code{di_prop_index < di_prop_index_cutoff}).
+  \item \code{di_prop_index} (ratio of pct_success to pct_group),
+  \item \code{di_indicator} (1 if \code{di_prop_index < di_prop_index_cutoff}), and
+  \item \code{success_needed_not_di} (the number of additional successes needed in order to no longer be considered disproportionately impacted as compared to the reference), and
+  \item \code{success_needed_full_parity} (the number of additional successes needed in order to achieve full parity with the reference).
 }
 When \code{di_prop_index < 1}, then there are signs of disproportionate impact.
 }

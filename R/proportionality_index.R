@@ -16,8 +16,10 @@
 ##'   \item \code{success} (number of successes for the cohort-group),
 ##'   \item \code{pct_success} (proportion of successes attributed to the group within the cohort),
 ##'   \item \code{pct_group} (proportion of sample attributed to the group within the cohort),
-##'   \item \code{di_prop_index} (ratio of pct_success to pct_group), and
-##'   \item \code{di_indicator} (1 if \code{di_prop_index < di_prop_index_cutoff}).
+##'   \item \code{di_prop_index} (ratio of pct_success to pct_group),
+##'   \item \code{di_indicator} (1 if \code{di_prop_index < di_prop_index_cutoff}), and
+##'   \item \code{success_needed_not_di} (the number of additional successes needed in order to no longer be considered disproportionately impacted as compared to the reference), and
+##'   \item \code{success_needed_full_parity} (the number of additional successes needed in order to achieve full parity with the reference).
 ##' }
 ##' When \code{di_prop_index < 1}, then there are signs of disproportionate impact.
 ##' @examples
@@ -76,7 +78,11 @@ di_prop_index <- function(success, group, cohort, weight, data, di_prop_index_cu
          , di_prop_index=pct_success/pct_group
          , di_indicator=ifelse(di_prop_index < di_prop_index_cutoff, 1, 0)
          , di_indicator=ifelse(is.nan(pct_success), 0, di_indicator) # pct_success when there are zero success for everyone; in this case, there is no DI
-           ) %>% 
+           ) %>%
+    # Following derived using the formula: (need + group_success) / (need + all_group_success) / pct_group = di_prop_index_cutoff, solve for need
+    mutate(success_needed_not_di=ifelse(di_indicator==1, ceiling((sum(success) * pct_group * di_prop_index_cutoff - success) / (1 - pct_group * di_prop_index_cutoff)), 0)
+           , success_needed_full_parity=ifelse(di_prop_index < 1, ceiling((sum(success) * pct_group * 1 - success) / (1 - pct_group * 1)), 0)
+    ) %>% 
     ungroup %>%
     arrange(cohort, group)
 
