@@ -73,8 +73,10 @@ ppg_moe <- function(n, proportion, min_moe=0.03, prop_sub_0=0.5, prop_sub_1=0.5)
 ##'   \item \code{reference} (reference value used in DI calculation),
 ##'   \item \code{moe} (margin of error),
 ##'   \item \code{pct_lo} (lower 95\% confidence limit for pct),
-##'   \item \code{pct_hi} (upper 95\% confidence limit for pct), and
-##'   \item \code{di_indicator} (1 if there is disproportionate impact, ie, when \code{pct_hi <= reference}).
+##'   \item \code{pct_hi} (upper 95\% confidence limit for pct),
+##'   \item \code{di_indicator} (1 if there is disproportionate impact, ie, when \code{pct_hi <= reference}), 
+##'   \item \code{n_needed_not_di} (the number of additional successes needed in order to no longer be considered disproportionately impacted as compared to the reference), and
+##'   \item \code{n_needed_full_parity} (the number of additional successes needed in order to achieve full parity with the reference).
 ##' }
 ##' @examples
 ##' library(dplyr)
@@ -203,6 +205,9 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg',
          , di_indicator=ifelse(pct_hi <= reference, 1, 0)
            ) %>%
     mutate(di_indicator=ifelse(reference_group=='all but current' & is.na(di_indicator), 0, di_indicator)) %>% # When 'all but current' is used and there is only a single group, there is no comparison group, so di_indicator is NA; set this to 0
+    mutate(n_needed_not_di=ifelse(di_indicator==1, ceiling((reference - (pct+moe)) * n), 0)
+           , n_needed_full_parity=ifelse(pct < reference, ceiling((reference - pct) * n), 0)
+           ) %>% 
     arrange(cohort, group)
   
   if (remove_cohort) {
