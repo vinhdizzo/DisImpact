@@ -1,3 +1,6 @@
+* 0.0.14
+  - di_ppg, di_80_index, di_prop_index: return success_needed_not_di, success_needed_full_parity
+  - di_iterate: return success_needed_not_di_ppg, success_needed_full_parity_ppg, success_needed_not_di_prop_index, success_needed_full_parity_prop_index, success_needed_not_di_80_index, success_needed_full_parity_80_index
 * 0.0.13
   - di_iterate: check if various specified variables are in data
   - di_iterate: fixed the use of exclude_scenario_df (used to returned cases meant to be excluded)
