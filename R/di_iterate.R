@@ -292,7 +292,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
     reference_val <- ppg_reference_group # Can specify actual group value since di_ppg has been updated
     
     # CRAN: no visible binding for global variable
-    success_variable <- disaggregation <- cohort_variable <- reference_group <- reference <- di_indicator <- cohort <- group <- success <- NULL
+    success_variable <- disaggregation <- cohort_variable <- reference_group <- reference <- di_indicator <- cohort <- group <- success <- success_needed_not_di <- success_needed_full_parity <- NULL
 
     di_ppg(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], weight=data[[weight_var]], reference=reference_val, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1, check_valid_reference=ppg_check_valid_reference) %>%
       rename(ppg_reference_group=reference_group, ppg_reference=reference, di_indicator_ppg=di_indicator, success_needed_not_di_ppg=success_needed_not_di, success_needed_full_parity_ppg=success_needed_full_parity) %>%
