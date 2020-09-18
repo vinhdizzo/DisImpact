@@ -295,17 +295,17 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
     success_variable <- disaggregation <- cohort_variable <- reference_group <- reference <- di_indicator <- cohort <- group <- success <- NULL
 
     di_ppg(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], weight=data[[weight_var]], reference=reference_val, min_moe=min_moe, use_prop_in_moe=use_prop_in_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1, check_valid_reference=ppg_check_valid_reference) %>%
-      rename(ppg_reference_group=reference_group, ppg_reference=reference, di_indicator_ppg=di_indicator) %>%
+      rename(ppg_reference_group=reference_group, ppg_reference=reference, di_indicator_ppg=di_indicator, success_needed_not_di_ppg=success_needed_not_di, success_needed_full_parity_ppg=success_needed_full_parity) %>%
       left_join(
         di_prop_index(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], weight=data[[weight_var]], di_prop_index_cutoff=di_prop_index_cutoff) %>%
-        select(cohort, group, n, success, di_prop_index, di_indicator) %>% 
-        rename(di_indicator_prop_index=di_indicator)
+        select(cohort, group, n, success, di_prop_index, di_indicator, success_needed_not_di, success_needed_full_parity) %>% 
+        rename(di_indicator_prop_index=di_indicator, success_needed_not_di_prop_index=success_needed_not_di, success_needed_full_parity_prop_index=success_needed_full_parity)
       , by=c('cohort', 'group', 'n', 'success')
       ) %>%
       left_join(
         di_80_index(success=data[[success_var]], group=data[[group_var]], cohort=data[[cohort_var]], weight=data[[weight_var]], di_80_index_cutoff=di_80_index_cutoff, reference_group=di_80_index_reference_group, check_valid_reference=di_80_check_valid_reference) %>%
-        select(cohort, group, n, success, reference_group, di_80_index, di_indicator) %>% 
-        rename(di_indicator_80_index=di_indicator, di_80_index_reference_group=reference_group)
+        select(cohort, group, n, success, reference_group, di_80_index, di_indicator, success_needed_not_di, success_needed_full_parity) %>% 
+        rename(di_indicator_80_index=di_indicator, di_80_index_reference_group=reference_group, success_needed_not_di_80_index=success_needed_not_di, success_needed_full_parity_80_index=success_needed_full_parity)
       , by=c('cohort', 'group', 'n', 'success')        
       ) %>% 
       mutate(
