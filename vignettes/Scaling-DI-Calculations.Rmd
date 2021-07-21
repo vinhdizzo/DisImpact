@@ -413,7 +413,7 @@ df_di_summary_2 <- di_iterate(data=student_equity
 For the 80% index method, the highest performing group is used as reference by default (`di_80_index_reference_groups=NA`).  Similar to the PPG, the user could specify custom reference groups.
 
 ```{r}
-# Custom referene groups
+# Custom reference groups
 df_di_summary_2 <- di_iterate(data=student_equity
                             , success_vars=c('Math', 'English', 'Transfer')
                             , group_vars=c('Ethnicity', 'Gender')
