@@ -1,0 +1,165 @@
+---
+title: "Example: Multi-Ethnicity Categorization"
+author: "Vinh Nguyen"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Example: Multi-Ethnicity Categorization}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Background on Multi-Ethnicity Categorization
+
+When it comes to disaggregating student outcomes by ethnicity, one typically relies on a single ethnicity categorization that assigns each student to a single race/ethnicity category.  However, it is not uncommon for students to identify as a member of more than one ethnicity group.  Categorization of ethnicity is typically simplified by assigning these multi-ethnicity students to a "more than 2 races" group or assigning students to a single race/ethnicity category using a pre-defined rule set.  For example, in the case of IPEDS ethnicity, if a student identifies as Hispanic or Latino, then that student would be grouped into the "Hispanic / Latino" ethnicity group regardless of however many additional race/ethnicity boxes are checked.
+
+Conducting a disproportionate impact (DI) analysis using a single ethnicity categorization has the potential to skew results when some students are left out (the impact can be large depending on the institution and/or the size of these groups), and could also mask some student groups that appear hidden under a single categorization formula.  A more inclusive approach to DI analysis would be to include students in all ethnicity groups that they identify with.  For example, if a studenty identifies as Hispanic and White, then they should be included in both the Hispanic group and the White group.  Similarly, if a student identifies as Black and Asian, then they should be included in both the Black group and the Asian group.
+
+Carrying out the previous analysis is certainly feasible, but suffers from practical implementation for at least two reasons:
+
+1. The distribution of the ethnicity group components do not add up to 100%, leading to a potentially distorted view and confusion among the audience.
+2. Working with more granular ethnicity data from multiple variables increases the complexity of the analysis considerably, reducing the likelihood that a multi-ethnicity view is adopted in most DI analysis.
+
+In this vignette, we illustrate how the `DisImpact` package could be adapted to carry out a multi-ethnicity analysis using the `di_iterate` function as the workhorse, and manipulating the returned summary data set.
+
+## Multi-Ethnicity Example Data Set
+
+As seen in the Scaling DI [vignette](./Scaling-DI-Calculations.html), one could repeat DI calculations over various success variables, group (disaggregation) variables, and cohort variables using `di_iterate`.  The following snippet illustrates this capability using default parameters:
+
+```{r, warning=FALSE}
+# Load some necessary packages
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(scales)
+library(forcats)
+library(DisImpact)
+
+# Load student equity data set
+data(student_equity)
+
+# Caclulate DI over several scenarios
+df_di_summary <- di_iterate(data=student_equity
+                          , success_vars=c('Math', 'English', 'Transfer')
+                          , group_vars=c('Ethnicity', 'Gender')
+                          , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                          , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                            )
+```
+
+In addition to the `Ethnicity` variable, the `student_equity` data set also contains ethnicity flags that are more granular, based on what students report.  A student could be assigned to more than one category.  For example, a student could fall into the Asian and South East Asian categories.  Similarly, a student could fall into both White and SWANA categories.
+
+```{r}
+head(student_equity)
+# Correlation to show overlap
+cor(student_equity[, str_detect(names(student_equity), 'EthnicityFlag')])
+```
+
+## Analysis of Multi-Ethnicity Data Using DisImpact
+
+For a multi-ethnicity analysis, one could pass a list of ethnicity flags to the `group` parameter of `di_iterate`, similar to how `Gender` and `Ethnicity` were passed in the previous example to create `df_di_summary`.  However, since the flags are binary (1's and 0's), and the ethnicity group names are in the variable names themselves (eg, `EthnicityFlag_Asian`), the user needs to filter on the appropriate rows corresponding to the groups of interest (1 value in the flags), extract the group names, and store the group names in the `group` column of the returned summary data set.  The following code illustrates this with the `student_equity` data set.
+
+```{r}
+# Identify the ethnicity flag variables
+want_vars <- names(student_equity)[str_detect(names(student_equity), '^EthnicityFlag')]
+want_vars <- want_vars[!str_detect(want_vars, 'Unknown')] # Remove nknownU
+want_vars <- want_vars[!str_detect(want_vars, 'Two')] # Remove Two or More Races
+want_vars # Ethnicity Flags of interest
+
+# Convert the ethnicity flags to character as required by di_iterate
+for (varname in want_vars) {
+  student_equity[[varname]] <- as.character(student_equity[[varname]])
+}
+
+# DI analysis
+df_di_summary_mult_eth <- di_iterate(data=student_equity
+                          , success_vars=c('Math', 'English', 'Transfer')
+                          , group_vars=want_vars # specify the list of ethnicity flag variables
+                          , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                          , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                            ) %>%
+  filter(group=='1') %>% # Ethnicity flags have 1's and 0's; filter on just the 1 group as that is of interest
+  # filter((group=='1') | (disaggregation=='- None' & group=='- All')) %>% 
+  mutate(group=str_replace(disaggregation, 'EthnicityFlag_', '') %>% gsub(pattern='([A-Z])', replacement=' \\1', x=.) %>% str_replace('^ ', '') # Rather than show '1', identify the ethnicity group names and assign them to group
+       , disaggregation='Multi-Ethnicity' # Originally is a list of variable names corresponding to the various ethnicity flags; call this disaggregation 'Multi-Ethnicity'
+         )
+
+# Check if re-assignments are correct
+table(df_di_summary_mult_eth$disaggregation, useNA='ifany')
+table(df_di_summary_mult_eth$group, useNA='ifany')
+
+# Illustration: the group proportions add up to more than 100% since a student could be counted in more than 1 group
+df_di_summary_mult_eth %>%
+  filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Transfer', cohort=='2018') %>%
+  select(group, n) %>%
+  mutate(Proportion=n / sum(student_equity$Cohort=='2018')) %>%
+  mutate(Sum_Proportion=sum(Proportion))
+```
+
+## Visualizing in Dashboard Platform
+
+Once a DI summary data set for multi-ethnicity is available, it could be combined with other summary data sets to be used in dashboard development as described in the Scaling DI [vignette](./Scaling-DI-Calculations.html).
+
+```{r}
+# Combine
+df_di_summary_combined <- bind_rows(
+  df_di_summary
+  , df_di_summary_mult_eth # Could first filter on rows of interest (eg, just the categorizations of interest to the institution)
+)
+
+# Disaggregation: Ethnicity
+df_di_summary_combined %>%
+  filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Math', disaggregation=='Ethnicity') %>%
+  select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
+  as.data.frame
+
+# Disaggregation: Multi-Ethnicity
+df_di_summary_combined %>%
+  filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Math', disaggregation=='Multi-Ethnicity') %>%
+  select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
+  as.data.frame
+```
+```{r include=FALSE}
+# run_plots <- FALSE
+run_plots <- TRUE
+if (run_plots) {
+  # Disaggregation: Ethnicity
+  df_di_summary_combined %>%
+    filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Math', disaggregation=='Ethnicity') %>%
+    select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
+    mutate(group=factor(group) %>% fct_reorder(desc(pct))) %>% 
+    ggplot(data=., mapping=aes(x=factor(cohort), y=pct, group=group, color=group)) +
+    geom_point(aes(size=factor(di_indicator_ppg, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
+    geom_line() +
+    xlab('Cohort') +
+    ylab('Rate') +
+    theme_bw() +
+    scale_color_manual(values=c('#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02'), name='Ethnicity') +
+    labs(size='Disproportionate Impact') +
+    scale_y_continuous(labels = percent, limits=c(0, 1)) +
+    ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = '- All' | College Status = '- All' | Outcome = 'Math' | Disaggregation = 'Ethnicity'"))
+  ggsave('Multi-Ethnicity_Dashboard_1.png', height=5, width=9)
+
+  # Disaggregation: Multi-Ethnicity
+  df_di_summary_combined %>%
+    filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Math', disaggregation=='Multi-Ethnicity') %>%
+    select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
+    mutate(group=factor(group) %>% fct_reorder(desc(pct))) %>% 
+    ggplot(data=., mapping=aes(x=factor(cohort), y=pct, group=group, color=group)) +
+    geom_point(aes(size=factor(di_indicator_ppg, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
+    geom_line() +
+    xlab('Cohort') +
+    ylab('Rate') +
+    theme_bw() +
+    scale_color_manual(values=c('#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99'), name='Multi-Ethnicity') +
+    labs(size='Disproportionate Impact') +
+    scale_y_continuous(labels = percent, limits=c(0, 1)) +
+    ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = '- All' | College Status = '- All' | Outcome = 'Math' | Disaggregation = 'Multi-Ethnicity'"))
+  ggsave('Multi-Ethnicity_Dashboard_2.png', height=5, width=9)
+}
+```
+![Multi-Ethnicity Dashboard Viz 1: Disaggregated by Ethnicity.](./Multi-Ethnicity_Dashboard_1.png){width=100%}
+![Multi-Ethnicity Dashboard Viz 2: Disaggregated by Multi-Ethnicity.](./Multi-Ethnicity_Dashboard_2.png){width=100%}
+
