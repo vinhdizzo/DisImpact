@@ -75,7 +75,8 @@
 ##   ) %>%
 ##   select(-random_id) %>%
 ##   group_by(Ethnicity) %>% 
-##   mutate_at(.vars=vars(starts_with('EthnicityFlag')), .funs=function(x) ifelse(is.na(x), sample(x[!is.na(x)], size=n(), replace=TRUE), x))
+##   mutate_at(.vars=vars(starts_with('EthnicityFlag')), .funs=function(x) ifelse(is.na(x), sample(x[!is.na(x)], size=n(), replace=TRUE), x)) %>%
+##   as.data.frame
 
 
 ## # Export data set to ./data
