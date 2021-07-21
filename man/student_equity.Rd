@@ -18,6 +18,7 @@ A data frame with 20,000 rows:
   \item{Ed_Goal}{student's educational goal (one of: \code{Deg/Transfer}, \code{Other}).}
   \item{College_Status}{student's educational status (one of: \code{First-time College},  \code{Other}).}
   \item{Student_ID}{student's unique identifier.}
+  \item{EthnicityFlag_*}{1 or 0 indicating whether or not a student self-identifies in a race/ethnicity group.  A student may self-identify as part of more than 1 group.}
 }
 }
 \usage{
