@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vinh Nguyen" />
 
-<meta name="date" content="2021-07-21" />
+<meta name="date" content="2021-07-22" />
 
 <title>Example: Multi-Ethnicity Categorization</title>
 
@@ -336,12 +336,13 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Example: Multi-Ethnicity Categorization</h1>
 <h4 class="author">Vinh Nguyen</h4>
-<h4 class="date">2021-07-21</h4>
+<h4 class="date">2021-07-22</h4>
 
 
 <div id="TOC">
 <ul>
 <li><a href="#background-on-multi-ethnicity-categorization">Background on Multi-Ethnicity Categorization</a></li>
+<li><a href="#multi-ethnicity-data-format">Multi-Ethnicity Data Format</a></li>
 <li><a href="#multi-ethnicity-example-data-set">Multi-Ethnicity Example Data Set</a></li>
 <li><a href="#analysis-of-multi-ethnicity-data-using-disimpact">Analysis of Multi-Ethnicity Data Using DisImpact</a></li>
 <li><a href="#visualizing-in-dashboard-platform">Visualizing in Dashboard Platform</a></li>
@@ -358,6 +359,16 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>Working with more granular ethnicity data from multiple variables increases the complexity of the analysis considerably, reducing the likelihood that a multi-ethnicity view is adopted in most DI analysis.</li>
 </ol>
 <p>In this vignette, we illustrate how the <code>DisImpact</code> package could be adapted to carry out a multi-ethnicity analysis using the <code>di_iterate</code> function as the workhorse, and manipulating the returned summary data set.</p>
+</div>
+<div id="multi-ethnicity-data-format" class="section level2">
+<h2>Multi-Ethnicity Data Format</h2>
+<p>In the case of single ethnicity categorization, ethnicity is usually stored in a single variable or column that lists the ethnicity group for each student (row). In the case of multi-ethnicity data, when a student could correspond to multiple groups, there are multiple ways to describe such information. Here, we describe three common approaches:</p>
+<ol style="list-style-type: decimal">
+<li>A <em>single variable/column</em> that lists all student groups that a student (row) corresponds to in a single data cell, usually delimited by a comma or some other delimeter. For example, the value in the data cell could have the value <code>Asian, Black, Hispanic</code> if the students fall into these three groups.</li>
+<li>A <em>wide format</em> format consisting of the same number of flags as there are groups, where each flag is binary (1/0), indicating group membership in each column. For example, if there are 9 groups, then there would be 9 additional variables/columns with names such as <code>Flag_Group_1</code>, …, <code>Flag_Group_9</code>, where each variable will take on a value of 1 or 0, with 1 indicating group membership, and 0 indicating non-membership.</li>
+<li>A <em>long format</em> that has each student corresponding to the same number of rows as the number of groups they are members of, with an ethnicity column similar to that of a single ethnicity categorization. For example, if a student self-identifies as Asian, Black, and Hispanic, then the student would have three rows in the data set, with an ethnicity column having the following three values in the three corresponding rows: <code>Asian</code>, <code>Black</code>, <code>Hispanic</code>.</li>
+</ol>
+<p>The second, wide format is preferred when it comes to conducting a DI analysis using the <code>DisImpact</code> package. The included <code>student_equity</code> data set consists of ethnicity flags, and these variables will be used in a multi-ethnicity DI analysis.</p>
 </div>
 <div id="multi-ethnicity-example-data-set" class="section level2">
 <h2>Multi-Ethnicity Example Data Set</h2>
@@ -447,201 +458,17 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 4                     0                            0
 ## 5                     0                            0
 ## 6                     0                            0</code></pre>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># Correlation to show overlap</span></span>
-<span id="cb14-2"><a href="#cb14-2"></a><span class="kw">cor</span>(student_equity[, <span class="kw">str_detect</span>(<span class="kw">names</span>(student_equity), <span class="st">&#39;EthnicityFlag&#39;</span>)])</span></code></pre></div>
-<pre><code>## Warning in cor(student_equity[, str_detect(names(student_equity),
-## &quot;EthnicityFlag&quot;)]): the standard deviation is zero</code></pre>
-<pre><code>##                                          EthnicityFlag_Asian
-## EthnicityFlag_Asian                               1.00000000
-## EthnicityFlag_Black                              -0.24180393
-## EthnicityFlag_Hispanic                           -0.31691086
-## EthnicityFlag_NativeAmerican                     -0.09020334
-## EthnicityFlag_PacificIslander                     0.02825176
-## EthnicityFlag_White                              -0.50364933
-## EthnicityFlag_Carribean                          -0.04630038
-## EthnicityFlag_EastAsian                           0.70909315
-## EthnicityFlag_SouthEastAsian                      0.56800540
-## EthnicityFlag_SouthWestAsianNorthAfrican         -0.20514653
-## EthnicityFlag_AANAPI                              0.93698596
-## EthnicityFlag_Unknown                                     NA
-## EthnicityFlag_TwoorMoreRaces                     -0.12246964
-##                                          EthnicityFlag_Black
-## EthnicityFlag_Asian                            -0.2418039252
-## EthnicityFlag_Black                             1.0000000000
-## EthnicityFlag_Hispanic                         -0.1218166059
-## EthnicityFlag_NativeAmerican                   -0.0216323675
-## EthnicityFlag_PacificIslander                  -0.0003003631
-## EthnicityFlag_White                            -0.2664094595
-## EthnicityFlag_Carribean                         0.2375203528
-## EthnicityFlag_EastAsian                        -0.1725121694
-## EthnicityFlag_SouthEastAsian                   -0.1344663370
-## EthnicityFlag_SouthWestAsianNorthAfrican       -0.0820501143
-## EthnicityFlag_AANAPI                           -0.2457531095
-## EthnicityFlag_Unknown                                     NA
-## EthnicityFlag_TwoorMoreRaces                   -0.0886492665
-##                                          EthnicityFlag_Hispanic
-## EthnicityFlag_Asian                                -0.316910857
-## EthnicityFlag_Black                                -0.121816606
-## EthnicityFlag_Hispanic                              1.000000000
-## EthnicityFlag_NativeAmerican                        0.081112847
-## EthnicityFlag_PacificIslander                       0.010590425
-## EthnicityFlag_White                                -0.156071248
-## EthnicityFlag_Carribean                             0.001571588
-## EthnicityFlag_EastAsian                            -0.233154399
-## EthnicityFlag_SouthEastAsian                       -0.164847715
-## EthnicityFlag_SouthWestAsianNorthAfrican           -0.155516547
-## EthnicityFlag_AANAPI                               -0.284588294
-## EthnicityFlag_Unknown                                        NA
-## EthnicityFlag_TwoorMoreRaces                        0.242421910
-##                                          EthnicityFlag_NativeAmerican
-## EthnicityFlag_Asian                                     -0.0902033398
-## EthnicityFlag_Black                                     -0.0216323675
-## EthnicityFlag_Hispanic                                   0.0811128468
-## EthnicityFlag_NativeAmerican                             1.0000000000
-## EthnicityFlag_PacificIslander                           -0.0001800831
-## EthnicityFlag_White                                     -0.0462189637
-## EthnicityFlag_Carribean                                 -0.0095562870
-## EthnicityFlag_EastAsian                                 -0.0673325742
-## EthnicityFlag_SouthEastAsian                            -0.0574324921
-## EthnicityFlag_SouthWestAsianNorthAfrican                -0.0395582489
-## EthnicityFlag_AANAPI                                     0.2049120657
-## EthnicityFlag_Unknown                                              NA
-## EthnicityFlag_TwoorMoreRaces                             0.1089998100
-##                                          EthnicityFlag_PacificIslander
-## EthnicityFlag_Asian                                       0.0282517640
-## EthnicityFlag_Black                                      -0.0003003631
-## EthnicityFlag_Hispanic                                    0.0105904247
-## EthnicityFlag_NativeAmerican                             -0.0001800831
-## EthnicityFlag_PacificIslander                             1.0000000000
-## EthnicityFlag_White                                       0.0098311958
-## EthnicityFlag_Carribean                                  -0.0067299624
-## EthnicityFlag_EastAsian                                   0.0031564233
-## EthnicityFlag_SouthEastAsian                              0.0397213293
-## EthnicityFlag_SouthWestAsianNorthAfrican                 -0.0165997035
-## EthnicityFlag_AANAPI                                      0.1028647348
-## EthnicityFlag_Unknown                                               NA
-## EthnicityFlag_TwoorMoreRaces                              0.1272816528
-##                                          EthnicityFlag_White
-## EthnicityFlag_Asian                             -0.503649331
-## EthnicityFlag_Black                             -0.266409459
-## EthnicityFlag_Hispanic                          -0.156071248
-## EthnicityFlag_NativeAmerican                    -0.046218964
-## EthnicityFlag_PacificIslander                    0.009831196
-## EthnicityFlag_White                              1.000000000
-## EthnicityFlag_Carribean                         -0.069604620
-## EthnicityFlag_EastAsian                         -0.357321619
-## EthnicityFlag_SouthEastAsian                    -0.285026016
-## EthnicityFlag_SouthWestAsianNorthAfrican         0.333043194
-## EthnicityFlag_AANAPI                            -0.515031724
-## EthnicityFlag_Unknown                                     NA
-## EthnicityFlag_TwoorMoreRaces                     0.321499625
-##                                          EthnicityFlag_Carribean
-## EthnicityFlag_Asian                                 -0.046300376
-## EthnicityFlag_Black                                  0.237520353
-## EthnicityFlag_Hispanic                               0.001571588
-## EthnicityFlag_NativeAmerican                        -0.009556287
-## EthnicityFlag_PacificIslander                       -0.006729962
-## EthnicityFlag_White                                 -0.069604620
-## EthnicityFlag_Carribean                              1.000000000
-## EthnicityFlag_EastAsian                             -0.028844267
-## EthnicityFlag_SouthEastAsian                        -0.031440662
-## EthnicityFlag_SouthWestAsianNorthAfrican            -0.028683237
-## EthnicityFlag_AANAPI                                -0.049471069
-## EthnicityFlag_Unknown                                         NA
-## EthnicityFlag_TwoorMoreRaces                         0.010590859
-##                                          EthnicityFlag_EastAsian
-## EthnicityFlag_Asian                                  0.709093154
-## EthnicityFlag_Black                                 -0.172512169
-## EthnicityFlag_Hispanic                              -0.233154399
-## EthnicityFlag_NativeAmerican                        -0.067332574
-## EthnicityFlag_PacificIslander                        0.003156423
-## EthnicityFlag_White                                 -0.357321619
-## EthnicityFlag_Carribean                             -0.028844267
-## EthnicityFlag_EastAsian                              1.000000000
-## EthnicityFlag_SouthEastAsian                        -0.091585710
-## EthnicityFlag_SouthWestAsianNorthAfrican            -0.166202950
-## EthnicityFlag_AANAPI                                 0.664410327
-## EthnicityFlag_Unknown                                         NA
-## EthnicityFlag_TwoorMoreRaces                        -0.093209102
-##                                          EthnicityFlag_SouthEastAsian
-## EthnicityFlag_Asian                                        0.56800540
-## EthnicityFlag_Black                                       -0.13446634
-## EthnicityFlag_Hispanic                                    -0.16484771
-## EthnicityFlag_NativeAmerican                              -0.05743249
-## EthnicityFlag_PacificIslander                              0.03972133
-## EthnicityFlag_White                                       -0.28502602
-## EthnicityFlag_Carribean                                   -0.03144066
-## EthnicityFlag_EastAsian                                   -0.09158571
-## EthnicityFlag_SouthEastAsian                               1.00000000
-## EthnicityFlag_SouthWestAsianNorthAfrican                  -0.10301339
-## EthnicityFlag_AANAPI                                       0.53221309
-## EthnicityFlag_Unknown                                              NA
-## EthnicityFlag_TwoorMoreRaces                              -0.01013528
-##                                          EthnicityFlag_SouthWestAsianNorthAfrican
-## EthnicityFlag_Asian                                                   -0.20514653
-## EthnicityFlag_Black                                                   -0.08205011
-## EthnicityFlag_Hispanic                                                -0.15551655
-## EthnicityFlag_NativeAmerican                                          -0.03955825
-## EthnicityFlag_PacificIslander                                         -0.01659970
-## EthnicityFlag_White                                                    0.33304319
-## EthnicityFlag_Carribean                                               -0.02868324
-## EthnicityFlag_EastAsian                                               -0.16620295
-## EthnicityFlag_SouthEastAsian                                          -0.10301339
-## EthnicityFlag_SouthWestAsianNorthAfrican                               1.00000000
-## EthnicityFlag_AANAPI                                                  -0.22104402
-## EthnicityFlag_Unknown                                                          NA
-## EthnicityFlag_TwoorMoreRaces                                           0.56406381
-##                                          EthnicityFlag_AANAPI
-## EthnicityFlag_Asian                                0.93698596
-## EthnicityFlag_Black                               -0.24575311
-## EthnicityFlag_Hispanic                            -0.28458829
-## EthnicityFlag_NativeAmerican                       0.20491207
-## EthnicityFlag_PacificIslander                      0.10286473
-## EthnicityFlag_White                               -0.51503172
-## EthnicityFlag_Carribean                           -0.04947107
-## EthnicityFlag_EastAsian                            0.66441033
-## EthnicityFlag_SouthEastAsian                       0.53221309
-## EthnicityFlag_SouthWestAsianNorthAfrican          -0.22104402
-## EthnicityFlag_AANAPI                               1.00000000
-## EthnicityFlag_Unknown                                      NA
-## EthnicityFlag_TwoorMoreRaces                      -0.06705758
-##                                          EthnicityFlag_Unknown
-## EthnicityFlag_Asian                                         NA
-## EthnicityFlag_Black                                         NA
-## EthnicityFlag_Hispanic                                      NA
-## EthnicityFlag_NativeAmerican                                NA
-## EthnicityFlag_PacificIslander                               NA
-## EthnicityFlag_White                                         NA
-## EthnicityFlag_Carribean                                     NA
-## EthnicityFlag_EastAsian                                     NA
-## EthnicityFlag_SouthEastAsian                                NA
-## EthnicityFlag_SouthWestAsianNorthAfrican                    NA
-## EthnicityFlag_AANAPI                                        NA
-## EthnicityFlag_Unknown                                        1
-## EthnicityFlag_TwoorMoreRaces                                NA
-##                                          EthnicityFlag_TwoorMoreRaces
-## EthnicityFlag_Asian                                       -0.12246964
-## EthnicityFlag_Black                                       -0.08864927
-## EthnicityFlag_Hispanic                                     0.24242191
-## EthnicityFlag_NativeAmerican                               0.10899981
-## EthnicityFlag_PacificIslander                              0.12728165
-## EthnicityFlag_White                                        0.32149962
-## EthnicityFlag_Carribean                                    0.01059086
-## EthnicityFlag_EastAsian                                   -0.09320910
-## EthnicityFlag_SouthEastAsian                              -0.01013528
-## EthnicityFlag_SouthWestAsianNorthAfrican                   0.56406381
-## EthnicityFlag_AANAPI                                      -0.06705758
-## EthnicityFlag_Unknown                                              NA
-## EthnicityFlag_TwoorMoreRaces                               1.00000000</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co">## # Correlation to show overlap</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="co">## cor(student_equity[, str_detect(names(student_equity), &#39;EthnicityFlag&#39;)])</span></span></code></pre></div>
 </div>
 <div id="analysis-of-multi-ethnicity-data-using-disimpact" class="section level2">
 <h2>Analysis of Multi-Ethnicity Data Using DisImpact</h2>
 <p>For a multi-ethnicity analysis, one could pass a list of ethnicity flags to the <code>group</code> parameter of <code>di_iterate</code>, similar to how <code>Gender</code> and <code>Ethnicity</code> were passed in the previous example to create <code>df_di_summary</code>. However, since the flags are binary (1’s and 0’s), and the ethnicity group names are in the variable names themselves (eg, <code>EthnicityFlag_Asian</code>), the user needs to filter on the appropriate rows corresponding to the groups of interest (1 value in the flags), extract the group names, and store the group names in the <code>group</code> column of the returned summary data set. The following code illustrates this with the <code>student_equity</code> data set.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># Identify the ethnicity flag variables</span></span>
-<span id="cb17-2"><a href="#cb17-2"></a>want_vars &lt;-<span class="st"> </span><span class="kw">names</span>(student_equity)[<span class="kw">str_detect</span>(<span class="kw">names</span>(student_equity), <span class="st">&#39;^EthnicityFlag&#39;</span>)]</span>
-<span id="cb17-3"><a href="#cb17-3"></a>want_vars &lt;-<span class="st"> </span>want_vars[<span class="op">!</span><span class="kw">str_detect</span>(want_vars, <span class="st">&#39;Unknown&#39;</span>)] <span class="co"># Remove nknownU</span></span>
-<span id="cb17-4"><a href="#cb17-4"></a>want_vars &lt;-<span class="st"> </span>want_vars[<span class="op">!</span><span class="kw">str_detect</span>(want_vars, <span class="st">&#39;Two&#39;</span>)] <span class="co"># Remove Two or More Races</span></span>
-<span id="cb17-5"><a href="#cb17-5"></a>want_vars <span class="co"># Ethnicity Flags of interest</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># Identify the ethnicity flag variables</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a>want_vars &lt;-<span class="st"> </span><span class="kw">names</span>(student_equity)[<span class="kw">str_detect</span>(<span class="kw">names</span>(student_equity), <span class="st">&#39;^EthnicityFlag&#39;</span>)]</span>
+<span id="cb15-3"><a href="#cb15-3"></a>want_vars &lt;-<span class="st"> </span>want_vars[<span class="op">!</span><span class="kw">str_detect</span>(want_vars, <span class="st">&#39;Unknown&#39;</span>)] <span class="co"># Remove nknownU</span></span>
+<span id="cb15-4"><a href="#cb15-4"></a>want_vars &lt;-<span class="st"> </span>want_vars[<span class="op">!</span><span class="kw">str_detect</span>(want_vars, <span class="st">&#39;Two&#39;</span>)] <span class="co"># Remove Two or More Races</span></span>
+<span id="cb15-5"><a href="#cb15-5"></a>want_vars <span class="co"># Ethnicity Flags of interest</span></span></code></pre></div>
 <pre><code>##  [1] &quot;EthnicityFlag_Asian&quot;                     
 ##  [2] &quot;EthnicityFlag_Black&quot;                     
 ##  [3] &quot;EthnicityFlag_Hispanic&quot;                  
@@ -653,23 +480,23 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ##  [9] &quot;EthnicityFlag_SouthEastAsian&quot;            
 ## [10] &quot;EthnicityFlag_SouthWestAsianNorthAfrican&quot;
 ## [11] &quot;EthnicityFlag_AANAPI&quot;</code></pre>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="co"># Convert the ethnicity flags to character as required by di_iterate</span></span>
-<span id="cb19-2"><a href="#cb19-2"></a><span class="cf">for</span> (varname <span class="cf">in</span> want_vars) {</span>
-<span id="cb19-3"><a href="#cb19-3"></a>  student_equity[[varname]] &lt;-<span class="st"> </span><span class="kw">as.character</span>(student_equity[[varname]])</span>
-<span id="cb19-4"><a href="#cb19-4"></a>}</span>
-<span id="cb19-5"><a href="#cb19-5"></a></span>
-<span id="cb19-6"><a href="#cb19-6"></a><span class="co"># DI analysis</span></span>
-<span id="cb19-7"><a href="#cb19-7"></a>df_di_summary_mult_eth &lt;-<span class="st"> </span><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</span>
-<span id="cb19-8"><a href="#cb19-8"></a>                          , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</span>
-<span id="cb19-9"><a href="#cb19-9"></a>                          , <span class="dt">group_vars=</span>want_vars <span class="co"># specify the list of ethnicity flag variables</span></span>
-<span id="cb19-10"><a href="#cb19-10"></a>                          , <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</span>
-<span id="cb19-11"><a href="#cb19-11"></a>                          , <span class="dt">scenario_repeat_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</span>
-<span id="cb19-12"><a href="#cb19-12"></a>                            ) <span class="op">%&gt;%</span></span>
-<span id="cb19-13"><a href="#cb19-13"></a><span class="st">  </span><span class="kw">filter</span>(group<span class="op">==</span><span class="st">&#39;1&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Ethnicity flags have 1&#39;s and 0&#39;s; filter on just the 1 group as that is of interest</span></span>
-<span id="cb19-14"><a href="#cb19-14"></a><span class="st">  </span><span class="co"># filter((group==&#39;1&#39;) | (disaggregation==&#39;- None&#39; &amp; group==&#39;- All&#39;)) %&gt;% </span></span>
-<span id="cb19-15"><a href="#cb19-15"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">group=</span><span class="kw">str_replace</span>(disaggregation, <span class="st">&#39;EthnicityFlag_&#39;</span>, <span class="st">&#39;&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">gsub</span>(<span class="dt">pattern=</span><span class="st">&#39;([A-Z])&#39;</span>, <span class="dt">replacement=</span><span class="st">&#39; </span><span class="ch">\\</span><span class="st">1&#39;</span>, <span class="dt">x=</span>.) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">str_replace</span>(<span class="st">&#39;^ &#39;</span>, <span class="st">&#39;&#39;</span>) <span class="co"># Rather than show &#39;1&#39;, identify the ethnicity group names and assign them to group</span></span>
-<span id="cb19-16"><a href="#cb19-16"></a>       , <span class="dt">disaggregation=</span><span class="st">&#39;Multi-Ethnicity&#39;</span> <span class="co"># Originally is a list of variable names corresponding to the various ethnicity flags; call this disaggregation &#39;Multi-Ethnicity&#39;</span></span>
-<span id="cb19-17"><a href="#cb19-17"></a>         )</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># Convert the ethnicity flags to character as required by di_iterate</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="cf">for</span> (varname <span class="cf">in</span> want_vars) {</span>
+<span id="cb17-3"><a href="#cb17-3"></a>  student_equity[[varname]] &lt;-<span class="st"> </span><span class="kw">as.character</span>(student_equity[[varname]])</span>
+<span id="cb17-4"><a href="#cb17-4"></a>}</span>
+<span id="cb17-5"><a href="#cb17-5"></a></span>
+<span id="cb17-6"><a href="#cb17-6"></a><span class="co"># DI analysis</span></span>
+<span id="cb17-7"><a href="#cb17-7"></a>df_di_summary_mult_eth &lt;-<span class="st"> </span><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</span>
+<span id="cb17-8"><a href="#cb17-8"></a>                          , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</span>
+<span id="cb17-9"><a href="#cb17-9"></a>                          , <span class="dt">group_vars=</span>want_vars <span class="co"># specify the list of ethnicity flag variables</span></span>
+<span id="cb17-10"><a href="#cb17-10"></a>                          , <span class="dt">cohort_vars=</span><span class="kw">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</span>
+<span id="cb17-11"><a href="#cb17-11"></a>                          , <span class="dt">scenario_repeat_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</span>
+<span id="cb17-12"><a href="#cb17-12"></a>                            ) <span class="op">%&gt;%</span></span>
+<span id="cb17-13"><a href="#cb17-13"></a><span class="st">  </span><span class="kw">filter</span>(group<span class="op">==</span><span class="st">&#39;1&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Ethnicity flags have 1&#39;s and 0&#39;s; filter on just the 1 group as that is of interest</span></span>
+<span id="cb17-14"><a href="#cb17-14"></a><span class="st">  </span><span class="co"># filter((group==&#39;1&#39;) | (disaggregation==&#39;- None&#39; &amp; group==&#39;- All&#39;)) %&gt;% </span></span>
+<span id="cb17-15"><a href="#cb17-15"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">group=</span><span class="kw">str_replace</span>(disaggregation, <span class="st">&#39;EthnicityFlag_&#39;</span>, <span class="st">&#39;&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">gsub</span>(<span class="dt">pattern=</span><span class="st">&#39;([A-Z])&#39;</span>, <span class="dt">replacement=</span><span class="st">&#39; </span><span class="ch">\\</span><span class="st">1&#39;</span>, <span class="dt">x=</span>.) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">str_replace</span>(<span class="st">&#39;^ &#39;</span>, <span class="st">&#39;&#39;</span>) <span class="co"># Rather than show &#39;1&#39;, identify the ethnicity group names and assign them to group</span></span>
+<span id="cb17-16"><a href="#cb17-16"></a>       , <span class="dt">disaggregation=</span><span class="st">&#39;Multi-Ethnicity&#39;</span> <span class="co"># Originally is a list of variable names corresponding to the various ethnicity flags; call this disaggregation &#39;Multi-Ethnicity&#39;</span></span>
+<span id="cb17-17"><a href="#cb17-17"></a>         )</span></code></pre></div>
 <pre><code>## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)
 ## Joining, by = c(&quot;Ed_Goal&quot;, &quot;College_Status&quot;)</code></pre>
 <pre><code>## Joining, by = &quot;College_Status&quot;</code></pre>
@@ -678,12 +505,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <pre><code>## Joining, by = &quot;College_Status&quot;</code></pre>
 <pre><code>## Joining, by = &quot;Ed_Goal&quot;
 ## Joining, by = &quot;Ed_Goal&quot;</code></pre>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="co"># Check if re-assignments are correct</span></span>
-<span id="cb25-2"><a href="#cb25-2"></a><span class="kw">table</span>(df_di_summary_mult_eth<span class="op">$</span>disaggregation, <span class="dt">useNA=</span><span class="st">&#39;ifany&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="co"># Check if re-assignments are correct</span></span>
+<span id="cb23-2"><a href="#cb23-2"></a><span class="kw">table</span>(df_di_summary_mult_eth<span class="op">$</span>disaggregation, <span class="dt">useNA=</span><span class="st">&#39;ifany&#39;</span>)</span></code></pre></div>
 <pre><code>## 
 ## Multi-Ethnicity 
 ##             978</code></pre>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="kw">table</span>(df_di_summary_mult_eth<span class="op">$</span>group, <span class="dt">useNA=</span><span class="st">&#39;ifany&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="kw">table</span>(df_di_summary_mult_eth<span class="op">$</span>group, <span class="dt">useNA=</span><span class="st">&#39;ifany&#39;</span>)</span></code></pre></div>
 <pre><code>## 
 ##                    A A N A P I                          Asian 
 ##                             90                             90 
@@ -697,12 +524,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ##                             90                             90 
 ##                          White 
 ##                             90</code></pre>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="co"># Illustration: the group proportions add up to more than 100% since a student could be counted in more than 1 group</span></span>
-<span id="cb29-2"><a href="#cb29-2"></a>df_di_summary_mult_eth <span class="op">%&gt;%</span></span>
-<span id="cb29-3"><a href="#cb29-3"></a><span class="st">  </span><span class="kw">filter</span>(Ed_Goal<span class="op">==</span><span class="st">&#39;- All&#39;</span>, College_Status<span class="op">==</span><span class="st">&#39;- All&#39;</span>, success_variable<span class="op">==</span><span class="st">&#39;Transfer&#39;</span>, cohort<span class="op">==</span><span class="st">&#39;2018&#39;</span>) <span class="op">%&gt;%</span></span>
-<span id="cb29-4"><a href="#cb29-4"></a><span class="st">  </span><span class="kw">select</span>(group, n) <span class="op">%&gt;%</span></span>
-<span id="cb29-5"><a href="#cb29-5"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Proportion=</span>n <span class="op">/</span><span class="st"> </span><span class="kw">sum</span>(student_equity<span class="op">$</span>Cohort<span class="op">==</span><span class="st">&#39;2018&#39;</span>)) <span class="op">%&gt;%</span></span>
-<span id="cb29-6"><a href="#cb29-6"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Sum_Proportion=</span><span class="kw">sum</span>(Proportion))</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="co"># Illustration: the group proportions add up to more than 100% since a student could be counted in more than 1 group</span></span>
+<span id="cb27-2"><a href="#cb27-2"></a>df_di_summary_mult_eth <span class="op">%&gt;%</span></span>
+<span id="cb27-3"><a href="#cb27-3"></a><span class="st">  </span><span class="kw">filter</span>(Ed_Goal<span class="op">==</span><span class="st">&#39;- All&#39;</span>, College_Status<span class="op">==</span><span class="st">&#39;- All&#39;</span>, success_variable<span class="op">==</span><span class="st">&#39;Transfer&#39;</span>, cohort<span class="op">==</span><span class="st">&#39;2018&#39;</span>) <span class="op">%&gt;%</span></span>
+<span id="cb27-4"><a href="#cb27-4"></a><span class="st">  </span><span class="kw">select</span>(group, n) <span class="op">%&gt;%</span></span>
+<span id="cb27-5"><a href="#cb27-5"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Proportion=</span>n <span class="op">/</span><span class="st"> </span><span class="kw">sum</span>(student_equity<span class="op">$</span>Cohort<span class="op">==</span><span class="st">&#39;2018&#39;</span>)) <span class="op">%&gt;%</span></span>
+<span id="cb27-6"><a href="#cb27-6"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Sum_Proportion=</span><span class="kw">sum</span>(Proportion))</span></code></pre></div>
 <pre><code>## # A tibble: 11 x 4
 ##    group                              n Proportion Sum_Proportion
 ##    &lt;chr&gt;                          &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;
@@ -721,17 +548,17 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="visualizing-in-dashboard-platform" class="section level2">
 <h2>Visualizing in Dashboard Platform</h2>
 <p>Once a DI summary data set for multi-ethnicity is available, it could be combined with other summary data sets to be used in dashboard development as described in the Scaling DI <a href="./Scaling-DI-Calculations.html">vignette</a>.</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a><span class="co"># Combine</span></span>
-<span id="cb31-2"><a href="#cb31-2"></a>df_di_summary_combined &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(</span>
-<span id="cb31-3"><a href="#cb31-3"></a>  df_di_summary</span>
-<span id="cb31-4"><a href="#cb31-4"></a>  , df_di_summary_mult_eth <span class="co"># Could first filter on rows of interest (eg, just the categorizations of interest to the institution)</span></span>
-<span id="cb31-5"><a href="#cb31-5"></a>)</span>
-<span id="cb31-6"><a href="#cb31-6"></a></span>
-<span id="cb31-7"><a href="#cb31-7"></a><span class="co"># Disaggregation: Ethnicity</span></span>
-<span id="cb31-8"><a href="#cb31-8"></a>df_di_summary_combined <span class="op">%&gt;%</span></span>
-<span id="cb31-9"><a href="#cb31-9"></a><span class="st">  </span><span class="kw">filter</span>(Ed_Goal<span class="op">==</span><span class="st">&#39;- All&#39;</span>, College_Status<span class="op">==</span><span class="st">&#39;- All&#39;</span>, success_variable<span class="op">==</span><span class="st">&#39;Math&#39;</span>, disaggregation<span class="op">==</span><span class="st">&#39;Ethnicity&#39;</span>) <span class="op">%&gt;%</span></span>
-<span id="cb31-10"><a href="#cb31-10"></a><span class="st">  </span><span class="kw">select</span>(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_<span class="dv">80</span>_index) <span class="op">%&gt;%</span></span>
-<span id="cb31-11"><a href="#cb31-11"></a><span class="st">  </span>as.data.frame</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="co"># Combine</span></span>
+<span id="cb29-2"><a href="#cb29-2"></a>df_di_summary_combined &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(</span>
+<span id="cb29-3"><a href="#cb29-3"></a>  df_di_summary</span>
+<span id="cb29-4"><a href="#cb29-4"></a>  , df_di_summary_mult_eth <span class="co"># Could first filter on rows of interest (eg, just the categorizations of interest to the institution)</span></span>
+<span id="cb29-5"><a href="#cb29-5"></a>)</span>
+<span id="cb29-6"><a href="#cb29-6"></a></span>
+<span id="cb29-7"><a href="#cb29-7"></a><span class="co"># Disaggregation: Ethnicity</span></span>
+<span id="cb29-8"><a href="#cb29-8"></a>df_di_summary_combined <span class="op">%&gt;%</span></span>
+<span id="cb29-9"><a href="#cb29-9"></a><span class="st">  </span><span class="kw">filter</span>(Ed_Goal<span class="op">==</span><span class="st">&#39;- All&#39;</span>, College_Status<span class="op">==</span><span class="st">&#39;- All&#39;</span>, success_variable<span class="op">==</span><span class="st">&#39;Math&#39;</span>, disaggregation<span class="op">==</span><span class="st">&#39;Ethnicity&#39;</span>) <span class="op">%&gt;%</span></span>
+<span id="cb29-10"><a href="#cb29-10"></a><span class="st">  </span><span class="kw">select</span>(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_<span class="dv">80</span>_index) <span class="op">%&gt;%</span></span>
+<span id="cb29-11"><a href="#cb29-11"></a><span class="st">  </span>as.data.frame</span></code></pre></div>
 <pre><code>##    cohort           group    n       pct di_indicator_ppg
 ## 1    2017           Asian 1456 0.8804945                0
 ## 2    2017           Black  452 0.7190265                1
@@ -782,11 +609,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 22                       0                     0
 ## 23                       0                     0
 ## 24                       0                     0</code></pre>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a><span class="co"># Disaggregation: Multi-Ethnicity</span></span>
-<span id="cb33-2"><a href="#cb33-2"></a>df_di_summary_combined <span class="op">%&gt;%</span></span>
-<span id="cb33-3"><a href="#cb33-3"></a><span class="st">  </span><span class="kw">filter</span>(Ed_Goal<span class="op">==</span><span class="st">&#39;- All&#39;</span>, College_Status<span class="op">==</span><span class="st">&#39;- All&#39;</span>, success_variable<span class="op">==</span><span class="st">&#39;Math&#39;</span>, disaggregation<span class="op">==</span><span class="st">&#39;Multi-Ethnicity&#39;</span>) <span class="op">%&gt;%</span></span>
-<span id="cb33-4"><a href="#cb33-4"></a><span class="st">  </span><span class="kw">select</span>(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_<span class="dv">80</span>_index) <span class="op">%&gt;%</span></span>
-<span id="cb33-5"><a href="#cb33-5"></a><span class="st">  </span>as.data.frame</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a><span class="co"># Disaggregation: Multi-Ethnicity</span></span>
+<span id="cb31-2"><a href="#cb31-2"></a>df_di_summary_combined <span class="op">%&gt;%</span></span>
+<span id="cb31-3"><a href="#cb31-3"></a><span class="st">  </span><span class="kw">filter</span>(Ed_Goal<span class="op">==</span><span class="st">&#39;- All&#39;</span>, College_Status<span class="op">==</span><span class="st">&#39;- All&#39;</span>, success_variable<span class="op">==</span><span class="st">&#39;Math&#39;</span>, disaggregation<span class="op">==</span><span class="st">&#39;Multi-Ethnicity&#39;</span>) <span class="op">%&gt;%</span></span>
+<span id="cb31-4"><a href="#cb31-4"></a><span class="st">  </span><span class="kw">select</span>(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_<span class="dv">80</span>_index) <span class="op">%&gt;%</span></span>
+<span id="cb31-5"><a href="#cb31-5"></a><span class="st">  </span>as.data.frame</span></code></pre></div>
 <pre><code>##    cohort                          group    n       pct di_indicator_ppg
 ## 1    2017                          Asian 1658 0.8703257                0
 ## 2    2018                          Asian 2557 0.8889323                0

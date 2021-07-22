@@ -24,6 +24,16 @@ Carrying out the previous analysis is certainly feasible, but suffers from pract
 
 In this vignette, we illustrate how the `DisImpact` package could be adapted to carry out a multi-ethnicity analysis using the `di_iterate` function as the workhorse, and manipulating the returned summary data set.
 
+## Multi-Ethnicity Data Format
+
+In the case of single ethnicity categorization, ethnicity is usually stored in a single variable or column that lists the ethnicity group for each student (row).  In the case of multi-ethnicity data, when a student could correspond to multiple groups, there are multiple ways to describe such information.  Here, we describe three common approaches:
+
+1. A *single variable/column* that lists all student groups that a student (row) corresponds to in a single data cell, usually delimited by a comma or some other delimeter.  For example, the value in the data cell could have the value `Asian, Black, Hispanic` if the students fall into these three groups.
+2. A *wide format* format consisting of the same number of flags as there are groups, where each flag is binary (1/0), indicating group membership in each column.  For example, if there are 9 groups, then there would be 9 additional variables/columns with names such as `Flag_Group_1`, ..., `Flag_Group_9`, where each variable will take on a value of 1 or 0, with 1 indicating group membership, and 0 indicating non-membership.
+3. A *long format* that has each student corresponding to the same number of rows as the number of groups they are members of, with an ethnicity column similar to that of a single ethnicity categorization.  For example, if a student self-identifies as Asian, Black, and Hispanic, then the student would have three rows in the data set, with an ethnicity column having the following three values in the three corresponding rows: `Asian`, `Black`, `Hispanic`.
+
+The second, wide format is preferred when it comes to conducting a DI analysis using the `DisImpact` package.  The included `student_equity` data set consists of ethnicity flags, and these variables will be used in a multi-ethnicity DI analysis.
+
 ## Multi-Ethnicity Example Data Set
 
 As seen in the Scaling DI [vignette](./Scaling-DI-Calculations.html), one could repeat DI calculations over various success variables, group (disaggregation) variables, and cohort variables using `di_iterate`.  The following snippet illustrates this capability using default parameters:
@@ -53,8 +63,8 @@ In addition to the `Ethnicity` variable, the `student_equity` data set also cont
 
 ```{r}
 head(student_equity)
-# Correlation to show overlap
-cor(student_equity[, str_detect(names(student_equity), 'EthnicityFlag')])
+## # Correlation to show overlap
+## cor(student_equity[, str_detect(names(student_equity), 'EthnicityFlag')])
 ```
 
 ## Analysis of Multi-Ethnicity Data Using DisImpact
