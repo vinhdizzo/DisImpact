@@ -81,6 +81,21 @@ want_vars <- want_vars[!str_detect(want_vars, 'Unknown')] # Remove Unknown
 want_vars <- want_vars[!str_detect(want_vars, 'Two')] # Remove Two or More Races
 want_vars # Ethnicity Flags of interest
 
+
+# Number of students
+## Total
+student_equity %>%
+  group_by(Cohort) %>%
+  tally
+
+## Each group
+student_equity %>%
+  select(Cohort, one_of(want_vars)) %>% 
+  group_by(Cohort) %>%
+  summarize_all(.funs=sum) %>%
+  as.data.frame
+## Observation: students can be in more than 1 group
+
 # Convert the ethnicity flags to character as required by di_iterate
 for (varname in want_vars) {
   student_equity[[varname]] <- as.character(student_equity[[varname]])
