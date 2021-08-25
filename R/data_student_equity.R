@@ -76,8 +76,15 @@
 ##   select(-random_id) %>%
 ##   group_by(Ethnicity) %>% 
 ##   mutate_at(.vars=vars(starts_with('EthnicityFlag')), .funs=function(x) ifelse(is.na(x), sample(x[!is.na(x)], size=n(), replace=TRUE), x)) %>%
+##   ungroup %>%
+##   # Fudge math success data to illustrate multi-ethnicity
+##   mutate(Math=ifelse(EthnicityFlag_PacificIslander==0, Math, sample(x=1:0, size=n(), replace=TRUE, prob=c(0.30, 0.70)))
+##        ## , Math=ifelse(EthnicityFlag_SouthEastAsian==0, Math, sample(x=1:0, size=n(), replace=TRUE, prob=c(0.50, 0.50)))
+##        ## , Math=ifelse(EthnicityFlag_Carribean==0, Math, sample(x=1:0, size=n(), replace=TRUE, prob=c(0.20, 0.80)))
+##        , Math=ifelse(Math==0, sample(c(NA, 0), size=length(Transfer), replace=TRUE, prob=c(0.2, 0.8)), Math)
+##        , Cohort_Math=ifelse(is.na(Math), NA, Cohort + sample(c(0, 1, 2), size=length(Transfer), replace=TRUE, prob=c(0.5, 0.3, 0.2)))
+##                      ) %>% 
 ##   as.data.frame
-
 
 ## # Export data set to ./data
 ## ##devtools::use_data(student_equity, overwrite=TRUE) ## deprecated
