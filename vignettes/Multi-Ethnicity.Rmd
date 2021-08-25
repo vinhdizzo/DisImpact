@@ -38,7 +38,7 @@ The second, wide format is preferred when it comes to conducting a DI analysis u
 
 ## Multi-Ethnicity Example Data Set
 
-As seen in the Scaling DI [vignette](./Scaling-DI-Calculations.html), one could repeat DI calculations over various success variables, group (disaggregation) variables, and cohort variables using the `di_iterate` function.  The original intent of the `di_iterate` function is to take in a student-level data set and output a data set with summary results of dissagregation that could be referenced in a dashboard tool like Tableau or PowerBI.  A pre-calculated data set (the output of `di_iterate`) makes it relatively easy to visualize disaggregation, equity gaps, and disproportionate impact across many outcome variables, cohort variables, disaggregation variables, and scenarios (subset) by filtering on the appropriate rows (summarized results).  The following snippet illustrates this capability, with one non-default argument specified (`di_80_index_reference_groups='all but current'`) in order to compare each group to all other groups when using the 80% index (instead of the highest performing group):
+As seen in the Scaling DI [vignette](./Scaling-DI-Calculations.html), one could repeat DI calculations over various success variables, group (disaggregation) variables, and cohort variables using the `di_iterate` function.  The original intent of the `di_iterate` function is to take in a student-level data set and output a data set with summary results of dissagregation that could be referenced in a dashboard tool like Tableau or PowerBI.  A pre-calculated data set (the output of `di_iterate`) makes it relatively easy to visualize disaggregation, equity gaps, and disproportionate impact across many outcome variables, cohort variables, disaggregation variables, and scenarios (subset) by filtering on the appropriate rows (summarized results).  The following snippet illustrates this capability using default options:
 
 ```{r, warning=FALSE}
 # Load some necessary packages
@@ -58,7 +58,6 @@ df_di_summary <- di_iterate(data=student_equity
                           , group_vars=c('Ethnicity', 'Gender')
                           , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
                           , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
-                          , di_80_index_reference_groups='all but current'
                             )
 ```
 
@@ -158,8 +157,8 @@ df_di_summary_combined %>%
   select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
   mutate(group=factor(group) %>% fct_reorder(desc(pct))) %>% 
   ggplot(data=., mapping=aes(x=factor(cohort), y=pct, group=group, color=group)) +
-  ## geom_point(aes(size=factor(di_indicator_ppg, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
-  geom_point(aes(size=factor(di_indicator_80_index, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
+  geom_point(aes(size=factor(di_indicator_ppg, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
+  ## geom_point(aes(size=factor(di_indicator_80_index, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
   geom_line() +
   xlab('Cohort') +
   ylab('Rate') +
@@ -177,8 +176,8 @@ df_di_summary_combined %>%
   select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
   mutate(group=factor(group) %>% fct_reorder(desc(pct))) %>% 
   ggplot(data=., mapping=aes(x=factor(cohort), y=pct, group=group, color=group)) +
-  ## geom_point(aes(size=factor(di_indicator_ppg, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
-  geom_point(aes(size=factor(di_indicator_80_index, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
+  geom_point(aes(size=factor(di_indicator_ppg, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
+  ## geom_point(aes(size=factor(di_indicator_80_index, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
   geom_line() +
   xlab('Cohort') +
   ylab('Rate') +
