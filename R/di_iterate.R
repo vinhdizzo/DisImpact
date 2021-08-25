@@ -23,7 +23,7 @@
 ##' @param prop_sub_1 passed to \link[DisImpact]{di_ppg}; defaults to 0.50.
 ##' @param di_prop_index_cutoff Threshold used for determining disproportionate impact using the proportionality index; passed to \link[DisImpact]{di_prop_index}; defaults to 0.80.
 ##' @param di_80_index_cutoff Threshold used for determining disproportionate impact using the 80\% index; passed to \link[DisImpact]{di_80_index}; defaults to 0.80.
-##' @param di_80_index_reference_groups A character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the 80\% index; defaults to \code{'hpg'} (highest performing group as reference).
+##' @param di_80_index_reference_groups A character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the 80\% index; defaults to \code{'hpg'} (highest performing group as reference), but could also be \code{'overall'} or \code{'all but current'}.
 ##' @param check_valid_reference Check whether \code{ppg_reference_groups} and \code{di_80_index_reference_groups} contain valid values; defaults to \code{TRUE}.
 ##' @return A summarized data set (data frame) consisting of:
 ##' \itemize{
@@ -73,7 +73,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
       }
     }
     for (i in 1:length(di_80_index_reference_groups)) {
-      if (!(di_80_index_reference_groups[i] %in% c(unique(data[[group_vars[i]]]), 'hpg')) & !is.na(di_80_index_reference_groups[i])) {
+      if (!(di_80_index_reference_groups[i] %in% c(unique(data[[group_vars[i]]]), c('hpg', 'overall', 'all but current'))) & !is.na(di_80_index_reference_groups[i])) {
         stop(paste0("'", di_80_index_reference_groups[i], "'", " is not valid for the argument `di_80_index_reference_groups` as it does not exist in the group variable `", group_vars[i], "`."))
       }
     }
@@ -90,7 +90,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
     } # else leave as is (overall, hpg, all but current to be used)
     if (length(di_80_index_reference_groups) > 1) {
       di_80_index_reference_groups <- c(di_80_index_reference_groups, NA) # Adding last NA for non-disaggregated results
-    } else if (length(di_80_index_reference_groups) == 1 & !(is.na(di_80_index_reference_groups) | di_80_index_reference_groups=='hpg')) {
+    } else if (length(di_80_index_reference_groups) == 1 & !(is.na(di_80_index_reference_groups) | di_80_index_reference_groups %in% c('hpg', 'overall', 'all but current'))) {
       di_80_index_reference_groups <- c(di_80_index_reference_groups, NA)
     } # else leave as is (overall, hpg, all but current to be used)
   }

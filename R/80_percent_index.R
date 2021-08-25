@@ -8,7 +8,7 @@
 ##' @param weight (Optional) A vector of case weights of the same length as \code{success} or an unquoted reference (name) to a column in \code{data} if it is specified.  If \code{success} consists of counts instead of success indicators (1/0), then \code{weight} should also be specified to indicate the group size.
 ##' @param data (Optional) A data frame containing the variables of interest.  If \code{data} is specified, then \code{success}, \code{group}, and \code{cohort} will be searched within it.
 ##' @param di_80_index_cutoff A numeric value between 0 and 1 that is used to determine disproportionate impact if the index comparing the success rate of the current group to the reference group falls below this threshold; defaults to 0.80.
-##' @param reference_group The reference group value in \code{group} that each group should be compared to in order to determine disproportionate impact.  By default (\code{='hpg'}), the group with the highest success rate is used as reference.
+##' @param reference_group The reference group value in \code{group} that each group should be compared to in order to determine disproportionate impact.  By default (\code{='hpg'}), the group with the highest success rate is used as reference.  The user could also specify a value of \code{'overall'} to use the overall rate as the reference for comparison, or \code{'all but current'} to use the combined success rate of all other groups excluding the current group for each comparison.
 ##' @param check_valid_reference Check whether \code{reference_group} is a valid value; defaults to \code{TRUE}.  This argument exists to be used in \link{di_iterate} as when iterating DI calculations, there may be some scenarios where a specified reference group does not contain any students.
 ##' @return A data frame consisting of:
 ##' \itemize{
@@ -44,8 +44,9 @@ di_80_index <- function(success, group, cohort, weight, data, di_80_index_cutoff
   #stopifnot(success %in% c(1, 0))
   stopifnot(!is.na(success), success>=0) # can be counts
   stopifnot(di_80_index_cutoff >= 0, di_80_index_cutoff <= 1)
+  reference_group_valid_specs <- c('hpg', 'overall', 'all but current')
   #missing_reference_group <- missing(reference_group)
-  missing_reference_group <- reference_group == 'hpg' | is.na(reference_group) # default to NA instead of not specified for use in di_iterate function
+  missing_reference_group <- reference_group %in% reference_group_valid_specs | is.na(reference_group) # default to NA instead of not specified for use in di_iterate function
   
   # Check if cohort is specified
   if (missing(cohort)) {
@@ -71,7 +72,7 @@ di_80_index <- function(success, group, cohort, weight, data, di_80_index_cutoff
 
   # Check if reference_group is valid
   if (check_valid_reference) {
-    if (!is.na(reference_group) & reference_group != 'hpg') {
+    if (!is.na(reference_group) & !(reference_group %in% reference_group_valid_specs)) {
       stopifnot(reference_group %in% unique(group))
     }
   }
@@ -84,8 +85,34 @@ di_80_index <- function(success, group, cohort, weight, data, di_80_index_cutoff
     summarize(n=sum(weight), success=sum(success), pct=success/n) %>%
     ungroup %>%
     group_by(cohort) %>% 
-    mutate(reference_group=ifelse(missing_reference_group, group[pct==max(pct)], reference_group)
-         , reference=ifelse(missing_reference_group, max(pct), pct[group == reference_group & !is.na(group)])
+    mutate(# reference_group=ifelse(missing_reference_group, group[pct==max(pct)], reference_group)
+         #, reference=ifelse(missing_reference_group, max(pct), pct[group == reference_group & !is.na(group)])
+      reference=if (is.na(reference_group)) { # NA
+                  max(pct)
+                  } else if (missing_reference_group & !is.na(reference_group)) {
+                  if (reference_group == 'hpg') {
+                    max(pct)
+                  } else if (reference_group == 'overall') {
+                    sum(success) / sum(n)
+                  } else if (reference_group == 'all but current') {
+                    (sum(success) - success) / (sum(n) - n)
+                  }
+                } else {
+                  pct[group == reference_group & !is.na(group)]
+                }
+         , reference_group=if (is.na(reference_group)) { # NA
+                  group[pct==max(pct)][1] # can be more than 1 groups
+                  } else if (missing_reference_group & !is.na(reference_group)) {
+                  if (reference_group == 'hpg') {
+                    group[pct==max(pct)][1] # can be more than 1 groups
+                  } else if (reference_group == 'overall') {
+                    reference_group
+                  } else if (reference_group == 'all but current') {
+                    reference_group
+                  }
+                } else {
+                  reference_group
+                }
          , di_80_index=pct/reference
          , di_indicator=ifelse(di_80_index < di_80_index_cutoff, 1, 0)
          , di_indicator=ifelse(is.nan(di_80_index), 0, di_indicator) # di_80_index is NaN when the reference rate is zero; in this case, there is no DI
