@@ -3,7 +3,9 @@ title: "Example: Intersectionality"
 author: "Vinh Nguyen"
 date: "`r Sys.Date()`"
 output:
-  rmarkdown::html_vignette:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
     toc: true
 vignette: >
   %\VignetteIndexEntry{Example: Intersectionality}

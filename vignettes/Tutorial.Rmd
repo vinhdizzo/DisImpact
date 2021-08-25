@@ -3,7 +3,9 @@ title: "DisImpact Tutorial"
 author: "Vinh Nguyen"
 date: "`r Sys.Date()`"
 output:
-  rmarkdown::html_vignette:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
     toc: true
 vignette: >
   %\VignetteIndexEntry{DisImpact Tutorial}
@@ -131,7 +133,7 @@ di_ppg(success=Transfer, group=Ethnicity, data=student_equity %>% mutate(Transfe
 ```
 
 
-## Proportionality index
+## Proportionality index method
 
 `di_prop_index` is the main work function for this method, and it can take on vectors or column names the tidy way:
 
@@ -158,7 +160,7 @@ Note that the referenced document describing this method does not recommend a th
 di_prop_index(success=student_equity$Transfer, group=student_equity$Ethnicity, cohort=student_equity$Cohort, di_prop_index_cutoff=0.5) %>% as.data.frame
 ```
 
-## 80% index
+## 80% index method
 
 `di_80_index` is the main work function for this method, and it can take on vectors or column names the tidy way:
 
@@ -234,4 +236,4 @@ bind_rows(
 )
 ```
 
-There is a separate vignette that explains how one might leverage `di_iterate` for rapid dashboard development and deployment.
+There is a separate [vignette](Scaling-DI-Calculations.html) that explains how one might leverage `di_iterate` for rapid dashboard development and deployment with disaggregation and disproportionate impact features.

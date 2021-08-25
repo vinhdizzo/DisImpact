@@ -3,7 +3,9 @@ title: "Example: Multi-Ethnicity Categorization"
 author: "Vinh Nguyen"
 date: "`r Sys.Date()`"
 output:
-  rmarkdown::html_vignette:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
     toc: true
 vignette: >
   %\VignetteIndexEntry{Example: Multi-Ethnicity Categorization}
