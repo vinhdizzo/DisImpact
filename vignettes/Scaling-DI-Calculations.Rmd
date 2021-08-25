@@ -94,7 +94,7 @@ df_di_summary %>% head %>% as.data.frame # first few rows
 
 ```
 
-The variables `di_indicator_ppg`, `di_indicator_prop_index`, and `di_indicator_80_index` are DI flags using the three methods.
+The variables `di_indicator_ppg`, `di_indicator_prop_index`, and `di_indicator_80_index` are DI flags using the three methods.  For additional explanations on other variables/columns in the returned data set, type `?di_iterate` in the R console to bring up the documentation.
 
 Next, note that the scenario `'- All'` is included for all variables passed to `scenario_repeat_by_vars` by default:
 ```{r}
