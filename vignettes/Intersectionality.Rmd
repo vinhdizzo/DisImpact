@@ -89,63 +89,53 @@ df_di_summary_intersection %>%
   select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
   as.data.frame
 ```
-```{r include=FALSE}
-# run_plots <- FALSE
-run_plots <- TRUE
-if (run_plots) {
-  # Disaggregation: Ethnicity
-  df_di_summary_intersection %>%
-    filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Math', disaggregation=='Ethnicity') %>%
-    select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
-    mutate(group=factor(group) %>% fct_reorder(desc(pct))) %>% 
-    ggplot(data=., mapping=aes(x=factor(cohort), y=pct, group=group, color=group)) +
-    geom_point(aes(size=factor(di_indicator_ppg, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
-    geom_line() +
-    xlab('Cohort') +
-    ylab('Rate') +
-    theme_bw() +
-    scale_color_manual(values=c('#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02'), name='Ethnicity') +
-    labs(size='Disproportionate Impact') +
-    scale_y_continuous(labels = percent, limits=c(0, 1)) +
-    ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = '- All' | College Status = '- All' | Outcome = 'Math' | Disaggregation = 'Ethnicity'"))
-  ggsave('Intersectionality_Dashboard_1.png', height=5, width=9)
 
-  # Disaggregation: Gender
-  df_di_summary_intersection %>%
-    filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Math', disaggregation=='Gender') %>%
-    select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
-    mutate(group=factor(group) %>% fct_reorder(desc(pct))) %>% 
-    ggplot(data=., mapping=aes(x=factor(cohort), y=pct, group=group, color=group)) +
-    geom_point(aes(size=factor(di_indicator_ppg, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
-    geom_line() +
-    xlab('Cohort') +
-    ylab('Rate') +
-    theme_bw() +
-    scale_color_manual(values=c('#e7298a', '#66a61e', '#e6ab02'), name='Gender') +
-    labs(size='Disproportionate Impact') +
-    scale_y_continuous(labels = percent, limits=c(0, 1)) +
-    ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = '- All' | College Status = '- All' | Outcome = 'Math' | Disaggregation = 'Gender'"))
-  ggsave('Intersectionality_Dashboard_2.png', height=5, width=9)
-  
-  # Disaggregation: Ethnicity + Gender
-  df_di_summary_intersection %>%
-    filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Math', disaggregation=='Ethnicity + Gender') %>%
-    select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
-    mutate(group=factor(group) %>% fct_reorder(desc(pct))) %>% 
-    ggplot(data=., mapping=aes(x=factor(cohort), y=pct, group=group, color=group)) +
-    geom_point(aes(size=factor(di_indicator_ppg, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
-    geom_line() +
-    xlab('Cohort') +
-    ylab('Rate') +
-    theme_bw() +
-    scale_color_manual(values=c('#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99', '#b15928'), name='Ethnicity + Gender') +
-    labs(size='Disproportionate Impact') +
-    scale_y_continuous(labels = percent, limits=c(0, 1)) +
-    ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = '- All' | College Status = '- All' | Outcome = 'Math' | Disaggregation = 'Ethnicity + Gender'"))
-  ggsave('Intersectionality_Dashboard_3.png', height=5, width=9)
-}
+```{r, fig.width=9, fig.height=5}
+# Disaggregation: Ethnicity
+df_di_summary_intersection %>%
+  filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Math', disaggregation=='Ethnicity') %>%
+  select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
+  mutate(group=factor(group) %>% fct_reorder(desc(pct))) %>% 
+  ggplot(data=., mapping=aes(x=factor(cohort), y=pct, group=group, color=group)) +
+  geom_point(aes(size=factor(di_indicator_ppg, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
+  geom_line() +
+  xlab('Cohort') +
+  ylab('Rate') +
+  theme_bw() +
+  scale_color_manual(values=c('#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02'), name='Ethnicity') +
+  labs(size='Disproportionate Impact') +
+  scale_y_continuous(labels = percent, limits=c(0, 1)) +
+  ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = '- All' | College Status = '- All' | Outcome = 'Math' | Disaggregation = 'Ethnicity'"))
+
+# Disaggregation: Gender
+df_di_summary_intersection %>%
+  filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Math', disaggregation=='Gender') %>%
+  select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
+  mutate(group=factor(group) %>% fct_reorder(desc(pct))) %>% 
+  ggplot(data=., mapping=aes(x=factor(cohort), y=pct, group=group, color=group)) +
+  geom_point(aes(size=factor(di_indicator_ppg, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
+  geom_line() +
+  xlab('Cohort') +
+  ylab('Rate') +
+  theme_bw() +
+  scale_color_manual(values=c('#e7298a', '#66a61e', '#e6ab02'), name='Gender') +
+  labs(size='Disproportionate Impact') +
+  scale_y_continuous(labels = percent, limits=c(0, 1)) +
+  ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = '- All' | College Status = '- All' | Outcome = 'Math' | Disaggregation = 'Gender'"))
+
+# Disaggregation: Ethnicity + Gender
+df_di_summary_intersection %>%
+  filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Math', disaggregation=='Ethnicity + Gender') %>%
+  select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
+  mutate(group=factor(group) %>% fct_reorder(desc(pct))) %>% 
+  ggplot(data=., mapping=aes(x=factor(cohort), y=pct, group=group, color=group)) +
+  geom_point(aes(size=factor(di_indicator_ppg, levels=c(0, 1), labels=c('Not DI', 'DI')))) +
+  geom_line() +
+  xlab('Cohort') +
+  ylab('Rate') +
+  theme_bw() +
+  scale_color_manual(values=c('#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99', '#b15928'), name='Ethnicity + Gender') +
+  labs(size='Disproportionate Impact') +
+  scale_y_continuous(labels = percent, limits=c(0, 1)) +
+  ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = '- All' | College Status = '- All' | Outcome = 'Math' | Disaggregation = 'Ethnicity + Gender'"))
 ```
-![Intersectionality Dashboard Viz 1: Disaggregated by Ethnicity.](./Intersectionality_Dashboard_1.png){width=100%}
-![Intersectionality Dashboard Viz 2: Disaggregated by Gender.](./Intersectionality_Dashboard_2.png){width=100%}
-![Intersectionality Dashboard Viz 3: Disaggregated by Ethnicity + Gender.](./Intersectionality_Dashboard_3.png){width=100%}
-
