@@ -14,7 +14,19 @@
 #'   \item{Ed_Goal}{student's educational goal (one of: \code{Deg/Transfer}, \code{Other}).}
 #'   \item{College_Status}{student's educational status (one of: \code{First-time College},  \code{Other}).}
 #'   \item{Student_ID}{student's unique identifier.}
-#'   \item{EthnicityFlag_*}{1 or 0 indicating whether or not a student self-identifies in a race/ethnicity group.  A student may self-identify as part of more than 1 group.}
+#'   \item{EthnicityFlag_Asian}{1 (yes) or 0 (no) indicating whether or not a student self-identifies as Asian.}
+#'   \item{EthnicityFlag_Black}{1 (yes) or 0 (no) indicating whether or not a student self-identifies as Black.}
+#'   \item{EthnicityFlag_Hispanic}{1 (yes) or 0 (no) indicating whether or not a student self-identifies as Hispanic.}
+#'   \item{EthnicityFlag_NativeAmerican}{1 (yes) or 0 (no) indicating whether or not a student self-identifies as Native American.}
+#'   \item{EthnicityFlag_PacificIslander}{1 (yes) or 0 (no) indicating whether or not a student self-identifies as Pacific Islander.}
+#'   \item{EthnicityFlag_White}{1 (yes) or 0 (no) indicating whether or not a student self-identifies as White.}
+#'   \item{EthnicityFlag_Carribean}{1 (yes) or 0 (no) indicating whether or not a student self-identifies as Carribean.}
+#'   \item{EthnicityFlag_EastAsian}{1 (yes) or 0 (no) indicating whether or not a student self-identifies as East Asian.}
+#'   \item{EthnicityFlag_SouthEastAsian}{1 (yes) or 0 (no) indicating whether or not a student self-identifies as Southeast Asian.}
+#'   \item{EthnicityFlag_SouthWestAsianNorthAfrican}{1 (yes) or 0 (no) indicating whether or not a student self-identifies as Southwest Asian / North African (SWANA).}
+#'   \item{EthnicityFlag_AANAPI}{1 (yes) or 0 (no) indicating whether or not a student self-identifies as Asian-American or Native American Pacific Islander (AANAPI).}
+#'   \item{EthnicityFlag_Unknown}{1 (yes) or 0 (no) indicating whether or not a student self-identifies as Unknown.}
+#'   \item{EthnicityFlag_TwoorMoreRaces}{1 (yes) or 0 (no) indicating whether or not a student self-identifies as two or more races.}
 #' }
 #' @docType data
 #' 
