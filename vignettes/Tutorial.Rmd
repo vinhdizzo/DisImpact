@@ -44,7 +44,15 @@ To illustrate the functionality of the package, let's load a toy data set:
 ```{r}
 # Load fake data set
 data(student_equity)
+
+# Print first few observations
+head(student_equity)
+
+# For description of data set
+## ?student_equity
 ```
+
+For a description of the `student_equity` data set, type `?student_equity` in the R console.
 
 The toy data set can be summarized as follows:
 ```{r}
@@ -66,6 +74,8 @@ di_ppg(success=student_equity$Transfer, group=student_equity$Ethnicity) %>% as.d
 di_ppg(success=Transfer, group=Ethnicity, data=student_equity) %>%
   as.data.frame
 ```
+
+For a description of the `di_ppg` function, including both function arguments and returned results, type `?di_ppg` in the R console.
 
 Sometimes, one might want to break out the DI calculation by cohort:
 ```{r}
@@ -98,7 +108,7 @@ di_ppg(success=Transfer, group=Ethnicity, cohort=Cohort, reference='Asian', data
   as.data.frame
 ```
 
-The user could also pass in custom reference points for comparison (eg, a state-wide rate).  `di_ppg` accepts either a single reference point to be used or a vector of reference points, one for each cohort.  For the latter, the vector of reference points will be taken to correspond to the `cohort` variable, alphabetically ordered.
+The user could also pass in custom reference points for comparison (e.g., a state-wide rate).  `di_ppg` accepts either a single reference point to be used or a vector of reference points, one for each cohort.  For the latter, the vector of reference points will be taken to correspond to the `cohort` variable, alphabetically ordered.
 ```{r}
 # With custom reference (single)
 di_ppg(success=Transfer, group=Ethnicity, reference=0.54, data=student_equity) %>%
@@ -153,6 +163,8 @@ di_prop_index(success=Transfer, group=Ethnicity, cohort=Cohort, data=student_equ
   as.data.frame
 ```
 
+For a description of the `di_prop_index` function, including both function arguments and returned results, type `?di_prop_index` in the R console.
+
 Note that the referenced document describing this method does not recommend a threshold on the proportionality index for declaring disproportionate impact.  The `di_prop_index` function uses `di_prop_index_cutoff=0.8` as the default threshold, which the user could change.
 
 ```{r}
@@ -180,6 +192,8 @@ di_80_index(success=Transfer, group=Ethnicity, cohort=Cohort, data=student_equit
   as.data.frame
 ```
 
+For a description of the `di_80_index` function, including both function arguments and returned results, type `?di_80_index` in the R console.
+
 By default, `di_80_index` uses the group with the highest success rate as reference in calculating the index.  One could specify the the comparison group using the `reference_group` argument (a value from `group`).
 
 ```{r}
@@ -199,7 +213,7 @@ di_80_index(success=student_equity$Transfer, group=student_equity$Ethnicity, coh
 
 All methods and functions implemented in the `DisImpact` package treat outcomes as positive: 1 is desired over 0 (higher rate is better, lower rate indicates disparity).  The choice of the name `success` in the functions' arguments is intentional to remind the user of this.
 
-Suppose we have a variable that indicates something negative (eg, a flag for students on academic probation).  We could calculate DI on the converse of it by using the `!` (logical negation) operator:
+Suppose we have a variable that indicates something negative (e.g., a flag for students on academic probation).  We could calculate DI on the converse of it by using the `!` (logical negation) operator:
 ```{r}
 ## di_ppg(success=!Probation, group=Ethnicity, data=student_equity) %>%
 ##   as.data.frame ## If there were a Probation variable
