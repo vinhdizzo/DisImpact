@@ -179,6 +179,7 @@ code span.ot { color: #007020; }
 </ul></li>
 <li><a href="#multiple-ppg-or-di-parameter-scenarios-in-results">Multiple PPG or DI parameter scenarios in results</a></li>
 <li><a href="#ferpa-blocksuppression">FERPA block/suppression</a></li>
+<li><a href="#appendix-r-and-r-package-versions">Appendix: R and R Package Versions</a></li>
 </ul>
 </div>
 </div>
@@ -1552,6 +1553,43 @@ code span.ot { color: #007020; }
 <div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="#cb133-1"></a><span class="co">## df_di_summary %&gt;%</span></span>
 <span id="cb133-2"><a href="#cb133-2"></a><span class="co">##   mutate(FERPA_Block=ifelse(n &lt; 10, 1, 0)) %&gt;%</span></span>
 <span id="cb133-3"><a href="#cb133-3"></a><span class="co">##   filter(FERPA_Block == 0)</span></span></code></pre></div>
+</div>
+<div id="appendix-r-and-r-package-versions" class="section level1">
+<h1>Appendix: R and R Package Versions</h1>
+<p>This vignette was generated using an R session with the following packages. There may be some discrepancies when the reader replicates the code caused by version mismatch.</p>
+<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb134-1"><a href="#cb134-1"></a><span class="kw">sessionInfo</span>()</span></code></pre></div>
+<pre><code>## R version 4.0.2 (2020-06-22)
+## Platform: x86_64-w64-mingw32/x64 (64-bit)
+## Running under: Windows 10 x64 (build 17763)
+## 
+## Matrix products: default
+## 
+## locale:
+## [1] LC_COLLATE=English_United States.1252 
+## [2] LC_CTYPE=English_United States.1252   
+## [3] LC_MONETARY=English_United States.1252
+## [4] LC_NUMERIC=C                          
+## [5] LC_TIME=English_United States.1252    
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] scales_1.1.1         forcats_0.5.1        ggplot2_3.3.3       
+## [4] knitr_1.33           dplyr_1.0.6          DisImpact_0.0.15    
+## [7] RevoUtils_11.0.2     RevoUtilsMath_11.0.0
+## 
+## loaded via a namespace (and not attached):
+##  [1] pillar_1.6.1      bslib_0.2.5.1     compiler_4.0.2    jquerylib_0.1.4  
+##  [5] highr_0.9         prettydoc_0.4.1   tools_4.0.2       digest_0.6.27    
+##  [9] jsonlite_1.7.2    evaluate_0.14     lifecycle_1.0.0   tibble_3.1.2     
+## [13] gtable_0.3.0      pkgconfig_2.0.3   rlang_0.4.11      yaml_2.2.1       
+## [17] xfun_0.23         withr_2.4.2       stringr_1.4.0     generics_0.1.0   
+## [21] vctrs_0.3.8       sass_0.4.0        grid_4.0.2        tidyselect_1.1.1 
+## [25] glue_1.4.2        R6_2.5.0          fansi_0.5.0       rmarkdown_2.9    
+## [29] farver_2.1.0      purrr_0.3.4       tidyr_1.1.3       magrittr_2.0.1   
+## [33] ellipsis_0.3.2    htmltools_0.5.1.1 colorspace_2.0-1  labeling_0.4.2   
+## [37] utf8_1.2.1        stringi_1.4.6     munsell_0.5.0     crayon_1.4.1</code></pre>
 </div>
     </section>
   </div>

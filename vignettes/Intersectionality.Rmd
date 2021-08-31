@@ -139,3 +139,11 @@ df_di_summary_intersection %>%
   scale_y_continuous(labels = percent, limits=c(0, 1)) +
   ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = '- All' | College Status = '- All' | Outcome = 'Math' | Disaggregation = 'Ethnicity + Gender'"))
 ```
+
+# Appendix: R and R Package Versions
+
+This vignette was generated using an R session with the following packages.  There may be some discrepancies when the reader replicates the code caused by version mismatch.
+
+```{r}
+sessionInfo()
+```

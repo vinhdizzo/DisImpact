@@ -174,6 +174,7 @@ code span.ot { color: #007020; }
 <li><a href="#when-dealing-with-a-non-success-variable-like-drop-out-or-probation">When dealing with a non-success variable like drop-out or probation</a></li>
 <li><a href="#transformations-on-the-fly">Transformations on the fly</a></li>
 <li><a href="#calculate-di-for-many-variables-and-groups">Calculate DI for many variables and groups</a></li>
+<li><a href="#appendix-r-and-r-package-versions">Appendix: R and R Package Versions</a></li>
 </ul>
 </div>
 </div>
@@ -1060,29 +1061,29 @@ code span.ot { color: #007020; }
 <div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1"></a><span class="co"># Transform success</span></span>
 <span id="cb63-2"><a href="#cb63-2"></a>a &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">1</span>, <span class="dt">size=</span><span class="kw">nrow</span>(student_equity), <span class="dt">replace=</span><span class="ot">TRUE</span>, <span class="dt">prob=</span><span class="kw">c</span>(<span class="fl">0.95</span>, <span class="fl">0.05</span>))</span>
 <span id="cb63-3"><a href="#cb63-3"></a><span class="kw">mean</span>(a)</span></code></pre></div>
-<pre><code>## [1] 0.0528</code></pre>
+<pre><code>## [1] 0.0491</code></pre>
 <div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1"></a><span class="kw">di_ppg</span>(<span class="dt">success=</span><span class="kw">pmax</span>(Transfer, a), <span class="dt">group=</span>Ethnicity, <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span></span>
 <span id="cb65-2"><a href="#cb65-2"></a><span class="st">  </span>as.data.frame</span></code></pre></div>
 <pre><code>##             group    n success       pct reference reference_group        moe
-## 1           Asian 6000    4390 0.7316667   0.55145         overall 0.03000000
-## 2           Black 2000     684 0.3420000   0.55145         overall 0.03000000
-## 3        Hispanic 4000    1023 0.2557500   0.55145         overall 0.03000000
-## 4 Multi-Ethnicity 1000     536 0.5360000   0.55145         overall 0.03099032
-## 5 Native American  200      79 0.3950000   0.55145         overall 0.06929646
-## 6           White 6800    4317 0.6348529   0.55145         overall 0.03000000
+## 1           Asian 6000    4364 0.7273333   0.54965         overall 0.03000000
+## 2           Black 2000     687 0.3435000   0.54965         overall 0.03000000
+## 3        Hispanic 4000    1012 0.2530000   0.54965         overall 0.03000000
+## 4 Multi-Ethnicity 1000     528 0.5280000   0.54965         overall 0.03099032
+## 5 Native American  200      84 0.4200000   0.54965         overall 0.06929646
+## 6           White 6800    4318 0.6350000   0.54965         overall 0.03000000
 ##      pct_lo    pct_hi di_indicator success_needed_not_di
-## 1 0.7016667 0.7616667            0                     0
-## 2 0.3120000 0.3720000            1                   359
-## 3 0.2257500 0.2857500            1                  1063
-## 4 0.5050097 0.5669903            0                     0
-## 5 0.3257035 0.4642965            1                    18
-## 6 0.6048529 0.6648529            0                     0
+## 1 0.6973333 0.7573333            0                     0
+## 2 0.3135000 0.3735000            1                   353
+## 3 0.2230000 0.2830000            1                  1067
+## 4 0.4970097 0.5589903            0                     0
+## 5 0.3507035 0.4892965            1                    13
+## 6 0.6050000 0.6650000            0                     0
 ##   success_needed_full_parity
 ## 1                          0
-## 2                        419
-## 3                       1183
-## 4                         16
-## 5                         32
+## 2                        413
+## 3                       1187
+## 4                         22
+## 5                         26
 ## 6                          0</code></pre>
 <div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1"></a><span class="co"># Collapse Black and Hispanic</span></span>
 <span id="cb67-2"><a href="#cb67-2"></a><span class="kw">di_ppg</span>(<span class="dt">success=</span>Transfer, <span class="dt">group=</span><span class="kw">ifelse</span>(Ethnicity <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Black&#39;</span>, <span class="st">&#39;Hispanic&#39;</span>), <span class="st">&#39;Black/Hispanic&#39;</span>, Ethnicity), <span class="dt">data=</span>student_equity) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame</span></code></pre></div>
@@ -1286,6 +1287,41 @@ code span.ot { color: #007020; }
 ## #   di_indicator_80_index &lt;dbl&gt;, success_needed_not_di_80_index &lt;dbl&gt;,
 ## #   success_needed_full_parity_80_index &lt;dbl&gt;</code></pre>
 <p>There is a separate <a href="Scaling-DI-Calculations.html">vignette</a> that explains how one might leverage <code>di_iterate</code> for rapid dashboard development and deployment with disaggregation and disproportionate impact features.</p>
+</div>
+<div id="appendix-r-and-r-package-versions" class="section level1">
+<h1>Appendix: R and R Package Versions</h1>
+<p>This vignette was generated using an R session with the following packages. There may be some discrepancies when the reader replicates the code caused by version mismatch.</p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1"></a><span class="kw">sessionInfo</span>()</span></code></pre></div>
+<pre><code>## R version 4.0.2 (2020-06-22)
+## Platform: x86_64-w64-mingw32/x64 (64-bit)
+## Running under: Windows 10 x64 (build 17763)
+## 
+## Matrix products: default
+## 
+## locale:
+## [1] LC_COLLATE=English_United States.1252 
+## [2] LC_CTYPE=English_United States.1252   
+## [3] LC_MONETARY=English_United States.1252
+## [4] LC_NUMERIC=C                          
+## [5] LC_TIME=English_United States.1252    
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] dplyr_1.0.6          DisImpact_0.0.15     RevoUtils_11.0.2    
+## [4] RevoUtilsMath_11.0.0
+## 
+## loaded via a namespace (and not attached):
+##  [1] rstudioapi_0.13   knitr_1.33        magrittr_2.0.1    tidyselect_1.1.1 
+##  [5] R6_2.5.0          rlang_0.4.11      fansi_0.5.0       stringr_1.4.0    
+##  [9] tools_4.0.2       xfun_0.23         utf8_1.2.1        cli_2.5.0        
+## [13] jquerylib_0.1.4   htmltools_0.5.1.1 ellipsis_0.3.2    yaml_2.2.1       
+## [17] digest_0.6.27     tibble_3.1.2      lifecycle_1.0.0   crayon_1.4.1     
+## [21] tidyr_1.1.3       purrr_0.3.4       sass_0.4.0        prettydoc_0.4.1  
+## [25] vctrs_0.3.8       glue_1.4.2        evaluate_0.14     rmarkdown_2.9    
+## [29] stringi_1.4.6     compiler_4.0.2    bslib_0.2.5.1     pillar_1.6.1     
+## [33] generics_0.1.0    jsonlite_1.7.2    pkgconfig_2.0.3</code></pre>
 </div>
     </section>
   </div>

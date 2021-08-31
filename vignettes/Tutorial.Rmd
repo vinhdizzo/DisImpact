@@ -251,3 +251,11 @@ bind_rows(
 ```
 
 There is a separate [vignette](Scaling-DI-Calculations.html) that explains how one might leverage `di_iterate` for rapid dashboard development and deployment with disaggregation and disproportionate impact features.
+
+# Appendix: R and R Package Versions
+
+This vignette was generated using an R session with the following packages.  There may be some discrepancies when the reader replicates the code caused by version mismatch.
+
+```{r}
+sessionInfo()
+```

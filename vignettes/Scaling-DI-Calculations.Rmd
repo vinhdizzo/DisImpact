@@ -455,3 +455,11 @@ Since `di_iterate` disaggregates on many variables and subpopulations, it is not
 ##   mutate(FERPA_Block=ifelse(n < 10, 1, 0)) %>%
 ##   filter(FERPA_Block == 0)
 ```
+
+# Appendix: R and R Package Versions
+
+This vignette was generated using an R session with the following packages.  There may be some discrepancies when the reader replicates the code caused by version mismatch.
+
+```{r}
+sessionInfo()
+```
