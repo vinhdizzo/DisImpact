@@ -23,12 +23,12 @@ The `DisImpact` R package contains functions that help in determining disproport
 
 # Install Package
 
-```{r}
+```R
 # From CRAN (Official)
-## install.packages('DisImpact')
+install.packages('DisImpact')
 
 # From github (Development)
-## devtools::install_github('vinhdizzo/DisImpact')
+devtools::install_github('vinhdizzo/DisImpact')
 ```
 
 # Load Packages
