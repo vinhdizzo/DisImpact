@@ -13,7 +13,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## Background on Intersectionality
+# Background on Intersectionality
 
 Disaggregation and disproportionate impact (DI) analysis allows analysts to identify student groups in need of support, helping the institution prioritize resources in order to close equity gaps.  As can be seen in the Scaling DI [vignette](./Scaling-DI-Calculations.html), one could repeat DI calculations over various success variables, group (disaggregation) variables, and cohort variables using the `di_iterate` function from the `DisImpact` package.  For example, one could choose to repeat the disaggregation by multiple demographic variables (eg, ethnicity, gender, low income status, foster youth status, undocumented status, and LGBTQIA+ status), and for each of the disaggregation, identify the groups that are disproportionately impacted on each outcome.
 
@@ -21,7 +21,7 @@ Conducting a DI analysis as described is a good first step in understanding stud
 
 This vignette describes how one might account for intersectionality using the `DisImpact` package.
 
-## Intersectionality Using `DisImpact`
+# Intersectionality Using `DisImpact`
 
 First, let's conduct a DI analysis on the `student_equity` data set using a few demographic variables, as described in the Scaling DI [vignette](./Scaling-DI-Calculations.html).
 
@@ -66,7 +66,7 @@ df_di_summary_intersection <- di_iterate(data=student_equity_intersection # Spec
   filter(!(disaggregation=='Ethnicity + Gender') | !str_detect(group, ', Other')) # Remove Ethnicity + Gender groups that correspond to 
 ```
 
-## Visualizing in Dashboard Platform
+# Visualizing in Dashboard Platform
 
 Once a DI summary data set with intersections of interest is available, it could be used in dashboard development as described in the Scaling DI [vignette](./Scaling-DI-Calculations.html).
 

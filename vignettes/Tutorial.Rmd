@@ -13,7 +13,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## Introduction
+# Introduction
 
 The `DisImpact` R package contains functions that help in determining disproportionate impact (DI) based on the following methodologies:
 
@@ -21,7 +21,7 @@ The `DisImpact` R package contains functions that help in determining disproport
 2. [proportionality index](https://www.cccco.edu/-/media/CCCCO-Website/Files/DII/guidelines-for-measuring-disproportionate-impact-in-equity-plans-tfa-ada.pdf) method (method #1 in reference), and
 3. [80% index](https://www.cccco.edu/-/media/CCCCO-Website/Files/DII/guidelines-for-measuring-disproportionate-impact-in-equity-plans-tfa-ada.pdf) method (method #2 in reference).
 
-## Install Package
+# Install Package
 
 ```{r}
 # From CRAN (Official)
@@ -31,14 +31,14 @@ The `DisImpact` R package contains functions that help in determining disproport
 ## devtools::install_github('vinhdizzo/DisImpact')
 ```
 
-## Load Packages
+# Load Packages
 
 ```{r, message=FALSE, warning=FALSE}
 library(DisImpact)
 library(dplyr) # Ease in manipulations with data frames
 ```
 
-## Load toy student equity data
+# Load toy student equity data
 
 To illustrate the functionality of the package, let's load a toy data set:
 ```{r}
@@ -64,7 +64,7 @@ dSumm <- student_equity %>%
 dSumm ## This is a summarized version of the data set
 ```
 
-## Percentage point gap (PPG) method
+# Percentage point gap (PPG) method
 
 `di_ppg` is the main work function, and it can take on vectors or column names the tidy way:
 ```{r}
@@ -143,7 +143,7 @@ di_ppg(success=Transfer, group=Ethnicity, data=student_equity %>% mutate(Transfe
 ```
 
 
-## Proportionality index method
+# Proportionality index method
 
 `di_prop_index` is the main work function for this method, and it can take on vectors or column names the tidy way:
 
@@ -172,7 +172,7 @@ Note that the referenced document describing this method does not recommend a th
 di_prop_index(success=student_equity$Transfer, group=student_equity$Ethnicity, cohort=student_equity$Cohort, di_prop_index_cutoff=0.5) %>% as.data.frame
 ```
 
-## 80% index method
+# 80% index method
 
 `di_80_index` is the main work function for this method, and it can take on vectors or column names the tidy way:
 
@@ -209,7 +209,7 @@ By default, `di_80_index` uses 80% (`di_80_index_cutoff=0.80`) as the default th
 di_80_index(success=student_equity$Transfer, group=student_equity$Ethnicity, cohort=student_equity$Cohort, di_80_index_cutoff=0.50) %>% as.data.frame
 ```
 
-## When dealing with a non-success variable like drop-out or probation
+# When dealing with a non-success variable like drop-out or probation
 
 All methods and functions implemented in the `DisImpact` package treat outcomes as positive: 1 is desired over 0 (higher rate is better, lower rate indicates disparity).  The choice of the name `success` in the functions' arguments is intentional to remind the user of this.
 
@@ -221,7 +221,7 @@ di_ppg(success=!Transfer, group=Ethnicity, data=student_equity) %>%
   as.data.frame ## Illustrating the point with `!`
 ```
 
-## Transformations on the fly
+# Transformations on the fly
 
 We can compute the success, group, and cohort variables on the fly:
 ```{r}
@@ -235,7 +235,7 @@ di_ppg(success=pmax(Transfer, a), group=Ethnicity, data=student_equity) %>%
 di_ppg(success=Transfer, group=ifelse(Ethnicity %in% c('Black', 'Hispanic'), 'Black/Hispanic', Ethnicity), data=student_equity) %>% as.data.frame
 ```
 
-## Calculate DI for many variables and groups
+# Calculate DI for many variables and groups
 
 It is often the case that the user desires to calculate disproportionate impact across many outcome variables and many disaggregation/group variables.  The function `di_iterate` allows the user to specify a data set and the various variables to iterate across:
 ```{r}

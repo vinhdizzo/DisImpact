@@ -13,7 +13,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## Background on Multi-Ethnicity Categorization
+# Background on Multi-Ethnicity Categorization
 
 When it comes to disaggregating student outcomes by ethnicity, colleges typically rely on an ethnicity categorization that assigns each student to a single race/ethnicity category.  However, it is not uncommon for students to identify as a member of more than one race/ethnicity group.  Categorization of ethnicity is typically simplified by assigning these multi-ethnicity students to a "2 or more Races" group or assigning students to a single race/ethnicity category using a predefined rule set.  For example, in the case of IPEDS ethnicity reporting, which mirrors the US Census, students are asked on their college application (CCC Apply for California Community Colleges) if they are "Hispanic / Latino" (yes or no) in one question.  Then in a subsequent question, students are asked to check all races that they identify with (e.g., White, Black, Asian, etc.).  If a student identifies as Hispanic or Latino, then that student would be grouped into the "Hispanic / Latino" ethnicity group in IPEDS reporting regardless of however many additional race/ethnicity boxes are checked.
 
@@ -26,7 +26,7 @@ Carrying out the previous analysis is certainly feasible, but suffers from pract
 
 In this vignette, we illustrate how the `DisImpact` package could be adapted to carry out a multi-ethnicity analysis using the `di_iterate` function as the workhorse, and manipulating the returned summary data set.
 
-## Multi-Ethnicity Data Format
+# Multi-Ethnicity Data Format
 
 In the case of single ethnicity categorization, ethnicity is usually stored in a single variable or column that lists the ethnicity group for each student (row).  In the case of multi-ethnicity data, when a student could correspond to multiple groups, there are multiple ways to describe such information.  Here, we describe three common approaches:
 
@@ -36,7 +36,7 @@ In the case of single ethnicity categorization, ethnicity is usually stored in a
 
 The second, wide format is preferred when it comes to conducting a DI analysis using the `DisImpact` package.  The included `student_equity` data set consists of ethnicity flags, and these variables will be used in a multi-ethnicity DI analysis.
 
-## Multi-Ethnicity Example Data Set
+# Multi-Ethnicity Example Data Set
 
 As seen in the Scaling DI [vignette](./Scaling-DI-Calculations.html), one could repeat DI calculations over various success variables, group (disaggregation) variables, and cohort variables using the `di_iterate` function.  The original intent of the `di_iterate` function is to take in a student-level data set and output a data set with summary results of dissagregation that could be referenced in a dashboard tool like Tableau or PowerBI.  A pre-calculated data set (the output of `di_iterate`) makes it relatively easy to visualize disaggregation, equity gaps, and disproportionate impact across many outcome variables, cohort variables, disaggregation variables, and scenarios (subset) by filtering on the appropriate rows (summarized results).  The following snippet illustrates this capability using default options:
 
@@ -69,7 +69,7 @@ head(student_equity)
 ## cor(student_equity[, str_detect(names(student_equity), 'EthnicityFlag')])
 ```
 
-## Analysis of Multi-Ethnicity Data Using DisImpact
+# Analysis of Multi-Ethnicity Data Using DisImpact
 
 For a multi-ethnicity analysis, one could pass a list of ethnicity flags to the `group` parameter of `di_iterate`, similar to how `Gender` and `Ethnicity` were passed in the previous example to create `df_di_summary`.  However, since the flags are binary (1's and 0's), and the ethnicity group names are in the variable names themselves (eg, `EthnicityFlag_Asian`), the user needs to filter on the appropriate rows corresponding to the groups of interest (1 value in the flags), extract the group names, and store the group names in the `group` column of the returned summary data set.  The following code illustrates this with the `student_equity` data set.
 
@@ -126,7 +126,7 @@ df_di_summary_mult_eth %>%
   mutate(Sum_Proportion=sum(Proportion))
 ```
 
-## Visualizing in Dashboard Platform
+# Visualizing in Dashboard Platform
 
 Once a DI summary data set for multi-ethnicity is available, it could be combined with other summary data sets to be used in dashboard development as described in the Scaling DI [vignette](./Scaling-DI-Calculations.html).
 

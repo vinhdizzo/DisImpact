@@ -13,7 +13,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## Introduction
+# Introduction
 
 It is often desirable to visualize student success data with the ability to disaggregate by multiple group variables to highlight equity gaps and disproportionate impact (DI) in an interactive dashboard (e.g., Tableau or Power BI).  It is certainly feasible to calculate disproportionate impact on the fly in standard dashboard tools, but doing so:
 
@@ -32,7 +32,7 @@ Using this workflow, one could scale up DI calculations and rapidly develop dash
 
 The `DisImpact` package offers the `di_iterate` function that allows one to accomplish step 2 in the suggested workflow.
 
-## Load `DisImpact` and toy data set
+# Load `DisImpact` and toy data set
 
 First, load the necessary packages.
 
@@ -56,7 +56,7 @@ kable(student_equity[1:6, ], caption='A few rows from the `student_equity` data 
 
 To get a description of each variable, type `?student_equity` in the R console.
 
-## Execute `di_iterate` on a data set
+# Execute `di_iterate` on a data set
 
 Let's illustrate the `di_iterate` function with some key arguments:
 
@@ -86,7 +86,7 @@ df_di_summary <- di_iterate(data=student_equity
 ## df_di_summary <- di_iterate(data=student_equity, success_vars=c('Math', 'English', 'Transfer'), group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort'), scenario_repeat_by_vars=c('Ed_Goal', 'College_Status'), ppg_reference_groups=c('all but current'), di_80_index_reference_groups=c('White', 'Male'))
 ```
 
-## Explore resulting summary data set
+# Explore resulting summary data set
 
 ```{r}
 dim(df_di_summary)
@@ -122,7 +122,7 @@ df_di_summary %>%
   kable
 ```
 
-## Visualization (emulating dashboard features)
+# Visualization (emulating dashboard features)
 
 In this section, we emulate what a dashboard could visualize.
 
@@ -253,7 +253,7 @@ df_di_summary %>%
   ggtitle('Dashboard drop-down selections:', subtitle=paste0("Ed Goal = 'Deg/Transfer' | College Status = '- All' | Outcome = 'English' | Disaggregation = 'Gender'"))
 ```
 
-## What is the difference between `group_vars` and `scenario_repeat_by_vars`?
+# What is the difference between `group_vars` and `scenario_repeat_by_vars`?
 
 For different classification variables, (e.g., age group, full time status, and education goal), the user might be confused as to whether to pass these into the `group_vars` argument or the `scenario_repeat_by_vars` argument.  The answer is it depends on what the user wants to analyze.  If we think of a single student population of interest (e.g., the data set being passed to `di_iterate` such as all students enrolled at the institution), then the user should pass into `group_vars` all variables that they are *interested in disaggregating on and performing a DI analysis* (e.g., are there disparity among ethnic student groups?  First generation students?).  The `group_vars` argument is required.
 
@@ -272,7 +272,7 @@ If on the other hand, the user passes ethnicity and first generation status to `
    a. Among all students defined by `data`?
    b. Among different subpopulations defined by age group?  (e.g., among each of these groups: 18-21, 22-25, 26-35, 35-50, 51+)
 
-## Understanding the default parameters in `di_iterate`, and overriding them
+# Understanding the default parameters in `di_iterate`, and overriding them
 
 The function `di_iterate` has been designed to be highly flexible through the use of function arguments / parameters, with many defaults:
 ```{r}
@@ -281,7 +281,7 @@ args(di_iterate)
 
 In this section, we illustrate how each argument could be used.  Type `?di_iterate` to read the description of each.
 
-### Passing a summarized data set to `data` and using `weight_var`
+## Passing a summarized data set to `data` and using `weight_var`
 
 Instead of passing in a student level data set, the user could also pass in a summarized data set, which saves space on your disk drive or in memory when imported into R.  When passing a summarized data set, the user should also specify `weight_var` to indicate the group size of each row.  Let's illustrate with an example:
 
@@ -325,7 +325,7 @@ all.equal(df_di_summary
 
 ```
 
-### Suppress non-disaggregated results using `include_non_disagg_results`
+## Suppress non-disaggregated results using `include_non_disagg_results`
 
 By default, the non-disaggregated results are also returned.  If the user wants to suppress this, they could set `include_non_disagg_results=FALSE`:
 
@@ -343,7 +343,7 @@ table(df_di_summary$disaggregation)
 table(df_di_summary_2$disaggregation) # No more '- None'
 ```
 
-### PPG reference groups and other parameters
+## PPG reference groups and other parameters
 
 For the percentage point gap (PPG) method, `di_iterate` defaults to using the overall success rate as the reference for comparison (`ppg_reference_groups='overall'`).  The user could set `ppg_reference_groups='hpg'` to use the highest performing group as the comparison group, or `ppg_reference_groups='all but current'` for using the combined success rate of all other groups excluding the group of interest (e.g., if studying Hispanic students, then the reference group would be all non-Hispanic students).  The latter is sometimes referred to as "PPG minus 1" or "PPG-1."  The user could also specify specific groups as reference:
 
@@ -378,7 +378,7 @@ df_di_summary_2 <- di_iterate(data=student_equity
 
 The following arguments apply to the PPG: `min_moe`, `use_prop_in_moe`, `prop_sub_0`, `prop_sub_1`, and `use_prop_in_moe`.  See `?di_ppg` for more details.
 
-### Proportionality index DI threshold
+## Proportionality index DI threshold
 
 For the proportionality index (PI) method, DI is determined using `di_prop_index_cutoff=0.8` by default.  This could be changed using the `di_prop_index_cutoff` argument.
 
@@ -392,7 +392,7 @@ df_di_summary_2 <- di_iterate(data=student_equity
                               )
 ```
 
-### 80% index reference groups and DI threshold
+## 80% index reference groups and DI threshold
 
 For the 80% index method, the highest performing group is used as reference by default (`di_80_index_reference_groups='hpg'`).  Similar to the PPG, the user could specify custom reference groups.
 
@@ -421,7 +421,7 @@ df_di_summary_2 <- di_iterate(data=student_equity
                               )
 ```
 
-## Multiple PPG or DI parameter scenarios in results
+# Multiple PPG or DI parameter scenarios in results
 
 In a single call of `di_iterate`, the results of all three DI methods are returned in one run.  If the user is interested in doing DI calculations using various scenarios of the same method (e.g., using the overall rate as reference for PPG, and using a pre-specified list of reference rates), then it is recommended that the user execute `di_iterate` multiple times and combining the results (stacking).  If the user chooses to do this, then it is a good idea to set `include_non_disagg_results=FALSE` in subsequent `di_iterate` runs to not duplicate rows of non-disaggregated results.
 
@@ -447,7 +447,7 @@ df_di_summary_long <- bind_rows(
 dim(df_di_summary_long)
 ```
 
-## FERPA block/suppression
+# FERPA block/suppression
 
 Since `di_iterate` disaggregates on many variables and subpopulations, it is not uncommon the returned results contain rows summarizing small samples.  As is common in education research, care should be taken to not unintentionally disclose the educational outcomes of students (results linked to particular students, ie, FERPA regulation).  The user might want to filter out rows with small samples (e.g., `n < 10`):
 ```{r}

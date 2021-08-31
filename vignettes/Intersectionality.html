@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vinh Nguyen" />
 
-<meta name="date" content="2021-08-25" />
+<meta name="date" content="2021-08-31" />
 
 <title>Example: Intersectionality</title>
 
@@ -156,7 +156,7 @@ code span.ot { color: #007020; }
 <div class="inner">
 <h1 class="title toc-ignore">Example: Intersectionality</h1>
 <h3 class="author">Vinh Nguyen</h3>
-<h3 class="date">2021-08-25</h3>
+<h3 class="date">2021-08-31</h3>
 </div>
 </header>
 
@@ -174,14 +174,14 @@ code span.ot { color: #007020; }
 <div id="content-wrapper">
   <div class="inner clearfix">
     <section id="main-content">
-<div id="background-on-intersectionality" class="section level2">
-<h2>Background on Intersectionality</h2>
+<div id="background-on-intersectionality" class="section level1">
+<h1>Background on Intersectionality</h1>
 <p>Disaggregation and disproportionate impact (DI) analysis allows analysts to identify student groups in need of support, helping the institution prioritize resources in order to close equity gaps. As can be seen in the Scaling DI <a href="./Scaling-DI-Calculations.html">vignette</a>, one could repeat DI calculations over various success variables, group (disaggregation) variables, and cohort variables using the <code>di_iterate</code> function from the <code>DisImpact</code> package. For example, one could choose to repeat the disaggregation by multiple demographic variables (eg, ethnicity, gender, low income status, foster youth status, undocumented status, and LGBTQIA+ status), and for each of the disaggregation, identify the groups that are disproportionately impacted on each outcome.</p>
 <p>Conducting a DI analysis as described is a good first step in understanding student needs. It however ignores the concept of intersectionality, that considering each demographic variable individually leaves out the intersections of identity, where the level of disproportionate impact may be compounded. For example, “men of color” and “African American LGBTQIA+” communities be even more disproportionately impacted on outcomes than what’s reported when each variable is disaggregated on thier own (ethnicity, gender, and LGBTQIA+).</p>
 <p>This vignette describes how one might account for intersectionality using the <code>DisImpact</code> package.</p>
 </div>
-<div id="intersectionality-using-disimpact" class="section level2">
-<h2>Intersectionality Using <code>DisImpact</code></h2>
+<div id="intersectionality-using-disimpact" class="section level1">
+<h1>Intersectionality Using <code>DisImpact</code></h1>
 <p>First, let’s conduct a DI analysis on the <code>student_equity</code> data set using a few demographic variables, as described in the Scaling DI <a href="./Scaling-DI-Calculations.html">vignette</a>.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Load some necessary packages</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(dplyr)</span></code></pre></div>
@@ -254,8 +254,8 @@ code span.ot { color: #007020; }
 <pre><code>## Joining, by = &quot;Ed_Goal&quot;
 ## Joining, by = &quot;Ed_Goal&quot;</code></pre>
 </div>
-<div id="visualizing-in-dashboard-platform" class="section level2">
-<h2>Visualizing in Dashboard Platform</h2>
+<div id="visualizing-in-dashboard-platform" class="section level1">
+<h1>Visualizing in Dashboard Platform</h1>
 <p>Once a DI summary data set with intersections of interest is available, it could be used in dashboard development as described in the Scaling DI <a href="./Scaling-DI-Calculations.html">vignette</a>.</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="co"># Disaggregation: Ethnicity</span></span>
 <span id="cb20-2"><a href="#cb20-2"></a>df_di_summary_intersection <span class="op">%&gt;%</span></span>

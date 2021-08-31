@@ -12,7 +12,7 @@
 
 <meta name="author" content="Vinh Nguyen" />
 
-<meta name="date" content="2021-08-26" />
+<meta name="date" content="2021-08-31" />
 
 <title>Scaling Disproportionate Impact (DI) Calculations for Interactive Visualizations</title>
 
@@ -156,7 +156,7 @@ code span.ot { color: #007020; }
 <div class="inner">
 <h1 class="title toc-ignore">Scaling Disproportionate Impact (DI) Calculations for Interactive Visualizations</h1>
 <h3 class="author">Vinh Nguyen</h3>
-<h3 class="date">2021-08-26</h3>
+<h3 class="date">2021-08-31</h3>
 </div>
 </header>
 
@@ -186,8 +186,8 @@ code span.ot { color: #007020; }
 <div id="content-wrapper">
   <div class="inner clearfix">
     <section id="main-content">
-<div id="introduction" class="section level2">
-<h2>Introduction</h2>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
 <p>It is often desirable to visualize student success data with the ability to disaggregate by multiple group variables to highlight equity gaps and disproportionate impact (DI) in an interactive dashboard (e.g., Tableau or Power BI). It is certainly feasible to calculate disproportionate impact on the fly in standard dashboard tools, but doing so:</p>
 <ol style="list-style-type: decimal">
 <li>increases development time,</li>
@@ -204,8 +204,8 @@ code span.ot { color: #007020; }
 <p>Using this workflow, one could scale up DI calculations and rapidly develop dashboards with the ability to disaggregate and highlight equity gaps / disproportionate impact for many disaggregation variables, many outcomes, and many scenarios / student populations.</p>
 <p>The <code>DisImpact</code> package offers the <code>di_iterate</code> function that allows one to accomplish step 2 in the suggested workflow.</p>
 </div>
-<div id="load-disimpact-and-toy-data-set" class="section level2">
-<h2>Load <code>DisImpact</code> and toy data set</h2>
+<div id="load-disimpact-and-toy-data-set" class="section level1">
+<h1>Load <code>DisImpact</code> and toy data set</h1>
 <p>First, load the necessary packages.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(DisImpact)</span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(dplyr) <span class="co"># Ease in manipulations with data frames</span></span></code></pre></div>
@@ -432,8 +432,8 @@ code span.ot { color: #007020; }
 </table>
 <p>To get a description of each variable, type <code>?student_equity</code> in the R console.</p>
 </div>
-<div id="execute-di_iterate-on-a-data-set" class="section level2">
-<h2>Execute <code>di_iterate</code> on a data set</h2>
+<div id="execute-di_iterate-on-a-data-set" class="section level1">
+<h1>Execute <code>di_iterate</code> on a data set</h1>
 <p>Let’s illustrate the <code>di_iterate</code> function with some key arguments:</p>
 <ul>
 <li><code>data</code>: a data frame of unitary (student) level or summarized data.</li>
@@ -465,8 +465,8 @@ code span.ot { color: #007020; }
 <span id="cb12-6"><a href="#cb12-6"></a></span>
 <span id="cb12-7"><a href="#cb12-7"></a><span class="co">## df_di_summary &lt;- di_iterate(data=student_equity, success_vars=c(&#39;Math&#39;, &#39;English&#39;, &#39;Transfer&#39;), group_vars=c(&#39;Ethnicity&#39;, &#39;Gender&#39;), cohort_vars=c(&#39;Cohort_Math&#39;, &#39;Cohort_English&#39;, &#39;Cohort&#39;), scenario_repeat_by_vars=c(&#39;Ed_Goal&#39;, &#39;College_Status&#39;), ppg_reference_groups=c(&#39;all but current&#39;), di_80_index_reference_groups=c(&#39;White&#39;, &#39;Male&#39;))</span></span></code></pre></div>
 </div>
-<div id="explore-resulting-summary-data-set" class="section level2">
-<h2>Explore resulting summary data set</h2>
+<div id="explore-resulting-summary-data-set" class="section level1">
+<h1>Explore resulting summary data set</h1>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">dim</span>(df_di_summary)</span></code></pre></div>
 <pre><code>## [1] 898  27</code></pre>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>df_di_summary <span class="op">%&gt;%</span><span class="st"> </span>head <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame <span class="co"># first few rows</span></span></code></pre></div>
@@ -901,8 +901,8 @@ code span.ot { color: #007020; }
 </tbody>
 </table>
 </div>
-<div id="visualization-emulating-dashboard-features" class="section level2">
-<h2>Visualization (emulating dashboard features)</h2>
+<div id="visualization-emulating-dashboard-features" class="section level1">
+<h1>Visualization (emulating dashboard features)</h1>
 <p>In this section, we emulate what a dashboard could visualize.</p>
 <p>Imagine a dashboard with the following dropdown menus and option values:</p>
 <ul>
@@ -1267,8 +1267,8 @@ code span.ot { color: #007020; }
 <pre><code>## Warning: Using size for a discrete variable is not advised.</code></pre>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
 </div>
-<div id="what-is-the-difference-between-group_vars-and-scenario_repeat_by_vars" class="section level2">
-<h2>What is the difference between <code>group_vars</code> and <code>scenario_repeat_by_vars</code>?</h2>
+<div id="what-is-the-difference-between-group_vars-and-scenario_repeat_by_vars" class="section level1">
+<h1>What is the difference between <code>group_vars</code> and <code>scenario_repeat_by_vars</code>?</h1>
 <p>For different classification variables, (e.g., age group, full time status, and education goal), the user might be confused as to whether to pass these into the <code>group_vars</code> argument or the <code>scenario_repeat_by_vars</code> argument. The answer is it depends on what the user wants to analyze. If we think of a single student population of interest (e.g., the data set being passed to <code>di_iterate</code> such as all students enrolled at the institution), then the user should pass into <code>group_vars</code> all variables that they are <em>interested in disaggregating on and performing a DI analysis</em> (e.g., are there disparity among ethnic student groups? First generation students?). The <code>group_vars</code> argument is required.</p>
 <p>On the other hand, the <code>scenario_repeat_by_vars</code> argument is optional, and when not specified, the DI analysis is performed on all outcomes specified in <code>success_vars</code> and all disaggregation variables specified in <code>group_vars</code>, using all students passed to <code>data</code> as a single population. The user should only pass variables into <code>scenario_repeat_by_vars</code> if they want to split the student population into multiple subpopulations to perform DI analysis on. For example, if ethnicity, first generation status, and age group and were specified in <code>group_vars</code>, then the user is trying to answer the following questions:</p>
 <ol style="list-style-type: decimal">
@@ -1290,8 +1290,8 @@ code span.ot { color: #007020; }
 </ol></li>
 </ol>
 </div>
-<div id="understanding-the-default-parameters-in-di_iterate-and-overriding-them" class="section level2">
-<h2>Understanding the default parameters in <code>di_iterate</code>, and overriding them</h2>
+<div id="understanding-the-default-parameters-in-di_iterate-and-overriding-them" class="section level1">
+<h1>Understanding the default parameters in <code>di_iterate</code>, and overriding them</h1>
 <p>The function <code>di_iterate</code> has been designed to be highly flexible through the use of function arguments / parameters, with many defaults:</p>
 <div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a><span class="kw">args</span>(di_iterate)</span></code></pre></div>
 <pre><code>## function (data, success_vars, group_vars, cohort_vars = NULL, 
@@ -1302,8 +1302,8 @@ code span.ot { color: #007020; }
 ##     di_80_index_reference_groups = &quot;hpg&quot;, check_valid_reference = TRUE) 
 ## NULL</code></pre>
 <p>In this section, we illustrate how each argument could be used. Type <code>?di_iterate</code> to read the description of each.</p>
-<div id="passing-a-summarized-data-set-to-data-and-using-weight_var" class="section level3">
-<h3>Passing a summarized data set to <code>data</code> and using <code>weight_var</code></h3>
+<div id="passing-a-summarized-data-set-to-data-and-using-weight_var" class="section level2">
+<h2>Passing a summarized data set to <code>data</code> and using <code>weight_var</code></h2>
 <p>Instead of passing in a student level data set, the user could also pass in a summarized data set, which saves space on your disk drive or in memory when imported into R. When passing a summarized data set, the user should also specify <code>weight_var</code> to indicate the group size of each row. Let’s illustrate with an example:</p>
 <div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1"></a><span class="kw">dim</span>(student_equity)</span></code></pre></div>
 <pre><code>## [1] 20000    24</code></pre>
@@ -1366,8 +1366,8 @@ code span.ot { color: #007020; }
 <span id="cb66-8"><a href="#cb66-8"></a>          ) <span class="co"># returned results are the same</span></span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
-<div id="suppress-non-disaggregated-results-using-include_non_disagg_results" class="section level3">
-<h3>Suppress non-disaggregated results using <code>include_non_disagg_results</code></h3>
+<div id="suppress-non-disaggregated-results-using-include_non_disagg_results" class="section level2">
+<h2>Suppress non-disaggregated results using <code>include_non_disagg_results</code></h2>
 <p>By default, the non-disaggregated results are also returned. If the user wants to suppress this, they could set <code>include_non_disagg_results=FALSE</code>:</p>
 <div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1"></a>df_di_summary_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</span>
 <span id="cb68-2"><a href="#cb68-2"></a>                          , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</span>
@@ -1397,8 +1397,8 @@ code span.ot { color: #007020; }
 ## Ethnicity    Gender 
 ##       539       269</code></pre>
 </div>
-<div id="ppg-reference-groups-and-other-parameters" class="section level3">
-<h3>PPG reference groups and other parameters</h3>
+<div id="ppg-reference-groups-and-other-parameters" class="section level2">
+<h2>PPG reference groups and other parameters</h2>
 <p>For the percentage point gap (PPG) method, <code>di_iterate</code> defaults to using the overall success rate as the reference for comparison (<code>ppg_reference_groups=&#39;overall&#39;</code>). The user could set <code>ppg_reference_groups=&#39;hpg&#39;</code> to use the highest performing group as the comparison group, or <code>ppg_reference_groups=&#39;all but current&#39;</code> for using the combined success rate of all other groups excluding the group of interest (e.g., if studying Hispanic students, then the reference group would be all non-Hispanic students). The latter is sometimes referred to as “PPG minus 1” or “PPG-1.” The user could also specify specific groups as reference:</p>
 <div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1"></a><span class="co"># Highest performing group as reference</span></span>
 <span id="cb82-2"><a href="#cb82-2"></a>df_di_summary_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</span>
@@ -1450,8 +1450,8 @@ code span.ot { color: #007020; }
 ## Joining, by = &quot;Ed_Goal&quot;</code></pre>
 <p>The following arguments apply to the PPG: <code>min_moe</code>, <code>use_prop_in_moe</code>, <code>prop_sub_0</code>, <code>prop_sub_1</code>, and <code>use_prop_in_moe</code>. See <code>?di_ppg</code> for more details.</p>
 </div>
-<div id="proportionality-index-di-threshold" class="section level3">
-<h3>Proportionality index DI threshold</h3>
+<div id="proportionality-index-di-threshold" class="section level2">
+<h2>Proportionality index DI threshold</h2>
 <p>For the proportionality index (PI) method, DI is determined using <code>di_prop_index_cutoff=0.8</code> by default. This could be changed using the <code>di_prop_index_cutoff</code> argument.</p>
 <div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1"></a>df_di_summary_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</span>
 <span id="cb102-2"><a href="#cb102-2"></a>                            , <span class="dt">success_vars=</span><span class="kw">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</span>
@@ -1469,8 +1469,8 @@ code span.ot { color: #007020; }
 <pre><code>## Joining, by = &quot;Ed_Goal&quot;
 ## Joining, by = &quot;Ed_Goal&quot;</code></pre>
 </div>
-<div id="index-reference-groups-and-di-threshold" class="section level3">
-<h3>80% index reference groups and DI threshold</h3>
+<div id="index-reference-groups-and-di-threshold" class="section level2">
+<h2>80% index reference groups and DI threshold</h2>
 <p>For the 80% index method, the highest performing group is used as reference by default (<code>di_80_index_reference_groups=&#39;hpg&#39;</code>). Similar to the PPG, the user could specify custom reference groups.</p>
 <div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1"></a><span class="co"># Custom reference groups</span></span>
 <span id="cb108-2"><a href="#cb108-2"></a>df_di_summary_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">di_iterate</span>(<span class="dt">data=</span>student_equity</span>
@@ -1507,8 +1507,8 @@ code span.ot { color: #007020; }
 ## Joining, by = &quot;Ed_Goal&quot;</code></pre>
 </div>
 </div>
-<div id="multiple-ppg-or-di-parameter-scenarios-in-results" class="section level2">
-<h2>Multiple PPG or DI parameter scenarios in results</h2>
+<div id="multiple-ppg-or-di-parameter-scenarios-in-results" class="section level1">
+<h1>Multiple PPG or DI parameter scenarios in results</h1>
 <p>In a single call of <code>di_iterate</code>, the results of all three DI methods are returned in one run. If the user is interested in doing DI calculations using various scenarios of the same method (e.g., using the overall rate as reference for PPG, and using a pre-specified list of reference rates), then it is recommended that the user execute <code>di_iterate</code> multiple times and combining the results (stacking). If the user chooses to do this, then it is a good idea to set <code>include_non_disagg_results=FALSE</code> in subsequent <code>di_iterate</code> runs to not duplicate rows of non-disaggregated results.</p>
 <div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="#cb120-1"></a><span class="co"># Multiple group variables and different reference groups</span></span>
 <span id="cb120-2"><a href="#cb120-2"></a>df_di_summary_long &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(</span>
@@ -1546,8 +1546,8 @@ code span.ot { color: #007020; }
 <div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="#cb131-1"></a><span class="kw">dim</span>(df_di_summary_long)</span></code></pre></div>
 <pre><code>## [1] 1706   27</code></pre>
 </div>
-<div id="ferpa-blocksuppression" class="section level2">
-<h2>FERPA block/suppression</h2>
+<div id="ferpa-blocksuppression" class="section level1">
+<h1>FERPA block/suppression</h1>
 <p>Since <code>di_iterate</code> disaggregates on many variables and subpopulations, it is not uncommon the returned results contain rows summarizing small samples. As is common in education research, care should be taken to not unintentionally disclose the educational outcomes of students (results linked to particular students, ie, FERPA regulation). The user might want to filter out rows with small samples (e.g., <code>n &lt; 10</code>):</p>
 <div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="#cb133-1"></a><span class="co">## df_di_summary %&gt;%</span></span>
 <span id="cb133-2"><a href="#cb133-2"></a><span class="co">##   mutate(FERPA_Block=ifelse(n &lt; 10, 1, 0)) %&gt;%</span></span>
