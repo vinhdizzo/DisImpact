@@ -1,6 +1,7 @@
-##' @export
 ##' @import dplyr
-di_iterate_from_long <- function(data, num_var, denom_var, disagg_var_col, group_var_col, disagg_var_col_2=NULL, group_var_col_2=NULL, cohort_var_col=NULL, summarize_by_vars, ...) {
+##' @importFrom tidyselect one_of
+##' @export
+di_iterate_on_long <- function(data, num_var, denom_var, disagg_var_col, group_var_col, disagg_var_col_2=NULL, group_var_col_2=NULL, cohort_var_col=NULL, summarize_by_vars, ...) {
   # Check to see that success_vars, group_vars, and cohort_vars are not defined
   other_args <- names(list(...))
   if (!is.null(other_args)) {
