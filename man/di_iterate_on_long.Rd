@@ -2,7 +2,7 @@
 % Please edit documentation in R/di_iterate_on_long.R
 \name{di_iterate_on_long}
 \alias{di_iterate_on_long}
-\title{Iteratively calculate disproportionate impact using multiple methods for a long and summarized data set.}
+\title{Iteratively calculate disproportionate impact using multiple methods for a long and summarized data set}
 \usage{
 di_iterate_on_long(
   data,
@@ -20,19 +20,19 @@ di_iterate_on_long(
 \arguments{
 \item{data}{A data frame for which to iterate DI calculations for a set of variables.}
 
-\item{num_var}{A character value corresponding to the variable or column name in \code{data} that stores success counts (the numerator in success rates).  Success rates are calculated by aggregating \code{num_var} and \code{denom_var} for each unique combination of values in \code{disagg_var_col}, \code{group_var_col}, \code{disagg_var_col_2}, \code{group_var_col_2}, \code{cohort_var_col}, and \code{summarize_by_vars}.  If such combinations are unique (single row), then rows are not collapsed.}
+\item{num_var}{A variable name (character value) from \code{data} where the variable stores success counts (the numerator in success rates).  Success rates are calculated by aggregating \code{num_var} and \code{denom_var} for each unique combination of values in \code{disagg_var_col}, \code{group_var_col}, \code{disagg_var_col_2}, \code{group_var_col_2}, \code{cohort_var_col}, and \code{summarize_by_vars}.  If such combinations are unique (single row), then rows are not collapsed.}
 
-\item{denom_var}{A character value corresponding to the variable or column name in \code{data} that stores the group size (the denominator in success rates).}
+\item{denom_var}{A variable name (character value) from \code{data} where the variable stores the group size (the denominator in success rates).}
 
-\item{disagg_var_col}{A character value corresponding to the variable or column name in \code{data} that stores the disaggregation variable.  The disaggregation variable could include such values as 'Ethnicity', 'Age Group', and 'Foster Youth'.}
+\item{disagg_var_col}{A variable name (character value) from \code{data} where the variable stores the different disaggregation scenarios.  The disaggregation variable could include such values as 'Ethnicity', 'Age Group', and 'Foster Youth', corresponding to three disaggregation scenarios.}
 
-\item{group_var_col}{A character value corresponding to the variable or column name in \code{data} that stores the group name for each group within a level of disaggregation specified in \code{disagg_var_col}.  For example, the group names could include 'Asian', 'White', 'Black', 'Latinx', 'Native American', and 'Other' for a disaggregation on ethnicity; 'Under 18', '18-21', '22-25', and '25+' for an age group disaggregation; and 'Yes' and 'No' for a foster youth status disaggregation.}
+\item{group_var_col}{A variable name (character value) from \code{data} where the variable stores the group name for each group within a level of disaggregation specified in \code{disagg_var_col}.  For example, the group names could include 'Asian', 'White', 'Black', 'Latinx', 'Native American', and 'Other' for a disaggregation on ethnicity; 'Under 18', '18-21', '22-25', and '25+' for an age group disaggregation; and 'Yes' and 'No' for a foster youth status disaggregation.}
 
-\item{disagg_var_col_2}{(Optional) A character value corresponding to the variable or column name in \code{data} that stores an optional second disaggregation variable, which allows for the intersectionality of two variables.  The second disaggregation variable could describe something not in \code{disagg_var_col_2}, such as 'Gender', which would require all groups described in \code{group_var_col} be broken out by gender.}
+\item{disagg_var_col_2}{(Optional) A variable name (character value) from \code{data} where the variable stores an optional second disaggregation variable, which allows for the intersectionality of variables listed in \code{disagg_var_col} and \code{disagg_var_col_2}.  The second disaggregation variable could describe something not in \code{disagg_var_col_2}, such as 'Gender', which would require all groups described in \code{group_var_col} to be broken out by gender.}
 
-\item{group_var_col_2}{(Optional) A character value corresponding to the variable or column name in \code{data} that stores the group name for each group within a second level of disaggregation specified in \code{disagg_var_col_2}.  For example, the group names could include 'Male', 'Female', 'Non-binary', and 'Unknown' if 'Gender' is a value in the variable \code{disagg_var_col_2}.}
+\item{group_var_col_2}{(Optional) A variable name (character value) from \code{data} where the variable stores the group name for each group within a second level of disaggregation specified in \code{disagg_var_col_2}.  For example, the group names could include 'Male', 'Female', 'Non-binary', and 'Unknown' if 'Gender' is a value in the variable \code{disagg_var_col_2}.}
 
-\item{cohort_var_col}{(Optional) A character value corresponding to the variable or column name in \code{data} that stores the cohort label for the data described in each row.}
+\item{cohort_var_col}{(Optional) A variable name (character value) from \code{data} where the variable stores the cohort label for the data described in each row.}
 
 \item{summarize_by_vars}{(Optional) A character vector of variable names in \code{data} for which \code{num_var} and \code{denom_var} are used for aggregation to calculate success rates for the dispropotionate impact (DI) analysis set up by \code{disagg_var_col}, \code{group_var_col}, \code{disagg_var_col_2}, and \code{group_var_col_2}.  For example, \code{summarize_by_vars=c('Outcome')} could specify a single variable/column that describes the outcome or metric in \code{num_var}, where the outcome values might include 'Completion of Transfer-Level Math', 'Completion of Transfer-Level English','Transfer', 'Associate Degree'.}
 
@@ -57,9 +57,7 @@ di_iterate_on_long(
 \value{
 A summarized data set (data frame) consisting of:
 \itemize{
-  \item \code{success_variable} (elements of \code{success_vars}),
-  \item \code{disaggregation} (elements of \code{group_vars}),
-  \item \code{cohort} (values corresponding to the variables specified in \code{cohort_vars},
+  \item variables specified by \code{summarize_by_vars}, \code{disagg_var_col}, \code{group_var_col}, \code{disagg_var_col_2}, and \code{group_var_col_2}
   \item \code{di_indicator_ppg} (1 if there is disproportionate impact per the percentage point gap method, 0 otherwise),
   \item \code{di_indicator_prop_index} (1 if there is disproportionate impact per the proportionality index, 0 otherwise),
   \item \code{di_indicator_80_index} (1 if there is disproportionate impact per the 80\% index, 0 otherwise), and
@@ -67,7 +65,7 @@ A summarized data set (data frame) consisting of:
 }
 }
 \description{
-Calculate disproportionate impact via the percentage point gap (PPG), proportionality index, and 80\% index methods for a "long" and summarized data set with many success variables and disaggregation variables, where the success counts and disaggregation groups are stored in single column or variable for each.
+Calculate disproportionate impact via the percentage point gap (PPG), proportionality index, and 80\% index methods for a "long" and summarized data set with many success variables and disaggregation variables, where the success counts and disaggregation groups are stored in a single column or variable for each.
 }
 \details{
 Iteratively calculate disproportionate impact via the percentage point gap (PPG), proportionality index, and 80\% index methods for all combinations of \code{success_vars}, \code{group_vars}, and \code{cohort_vars}, for each combination of subgroups specified by \code{scenario_repeat_by_vars}.
@@ -76,7 +74,9 @@ Iteratively calculate disproportionate impact via the percentage point gap (PPG)
 library(dplyr)
 data(ssm_cohort)
 # Multiple group variables
-di_iterate_on_long(data=ssm_cohort, success_vars=c('Transfer')
-  , group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort')
-  , ppg_reference_groups='overall')
+di_iterate_on_long(data=ssm_cohort, num_var='value', denom_var='denom'
+  , disagg_var_col='disagg1', group_var_col='subgroup1'
+  , cohort_var_col='academicYear', summarize_by_vars=c('categoryLabel')
+  , ppg_reference_groups='all but current' # PPG-1
+  , di_80_index_reference_groups='all but current')
 }
