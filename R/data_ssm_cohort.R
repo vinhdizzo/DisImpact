@@ -1,6 +1,6 @@
 #' Long summarized disaggregated data set
 #'
-#' Sample data downloaded from the California Community College's Chancellor's Office Student Success Metrics dashboard
+#' Sample data downloaded from the California Community College's Chancellor's Office Student Success Metrics dashboard.
 #' @format A data frame with summarized data:
 #' \describe{
 #'   \item{value}{Success count (numerator).}

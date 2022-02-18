@@ -33,7 +33,7 @@ A data frame with summarized data:
 data(ssm_cohort)
 }
 \description{
-Sample data downloaded from the California Community College's Chancellor's Office Student Success Metrics dashboard
+Sample data downloaded from the California Community College's Chancellor's Office Student Success Metrics dashboard.
 }
 \examples{
 data(ssm_cohort)
