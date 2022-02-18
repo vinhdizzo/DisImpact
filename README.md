@@ -22,3 +22,4 @@ The `DisImpact` package offers several vignettes/tutorials to get the user famil
 2. [Scaling DI calculations](https://CRAN.R-project.org/package=DisImpact/vignettes/Scaling-DI-Calculations.html) across a variety of scenarios.
 3. [Multi-Ethnicity Categorization](https://CRAN.R-project.org/package=DisImpact/vignettes/Multi-Ethnicity.html) and how to analyze such data with `DisImpact`.
 4. [Intersectionality](https://CRAN.R-project.org/package=DisImpact/vignettes/Intersectionality.html) and how to perform such analysis with `DisImpact`.
+5. [DI Calculations on long, summarized data sets](https://CRAN.R-project.org/package=DisImpact/vignettes/DI-On-Long-Summarized-Data.html) using the `di_iterate_on_long` function.
