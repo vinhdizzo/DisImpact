@@ -10,16 +10,8 @@
 ##' @param disagg_var_col_2 (Optional) A variable name (character value) from \code{data} where the variable stores an optional second disaggregation variable, which allows for the intersectionality of variables listed in \code{disagg_var_col} and \code{disagg_var_col_2}.  The second disaggregation variable could describe something not in \code{disagg_var_col_2}, such as 'Gender', which would require all groups described in \code{group_var_col} to be broken out by gender.
 ##' @param group_var_col_2 (Optional) A variable name (character value) from \code{data} where the variable stores the group name for each group within a second level of disaggregation specified in \code{disagg_var_col_2}.  For example, the group names could include 'Male', 'Female', 'Non-binary', and 'Unknown' if 'Gender' is a value in the variable \code{disagg_var_col_2}.
 ##' @param cohort_var_col (Optional) A variable name (character value) from \code{data} where the variable stores the cohort label for the data described in each row.
-##' @param summarize_by_vars (Optional) A character vector of variable names in \code{data} for which \code{num_var} and \code{denom_var} are used for aggregation to calculate success rates for the dispropotionate impact (DI) analysis set up by \code{disagg_var_col}, \code{group_var_col}, \code{disagg_var_col_2}, and \code{group_var_col_2}.  For example, \code{summarize_by_vars=c('Outcome')} could specify a single variable/column that describes the outcome or metric in \code{num_var}, where the outcome values might include 'Completion of Transfer-Level Math', 'Completion of Transfer-Level English','Transfer', 'Associate Degree'. 
-##' @param ppg_reference_groups Either \code{'overall'}, \code{'hpg'}, \code{'all but current'}, or a character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the percentage point gap method.
-##' @param min_moe The minimum margin of error to be used in the PPG calculation, passed to \link[DisImpact]{di_ppg}.
-##' @param use_prop_in_moe Whether the estimated proportions should be used in the margin of error calculation by the PPG, passed to \link[DisImpact]{di_ppg}.
-##' @param prop_sub_0 passed to \link[DisImpact]{di_ppg}; defaults to 0.50.
-##' @param prop_sub_1 passed to \link[DisImpact]{di_ppg}; defaults to 0.50.
-##' @param di_prop_index_cutoff Threshold used for determining disproportionate impact using the proportionality index; passed to \link[DisImpact]{di_prop_index}; defaults to 0.80.
-##' @param di_80_index_cutoff Threshold used for determining disproportionate impact using the 80\% index; passed to \link[DisImpact]{di_80_index}; defaults to 0.80.
-##' @param di_80_index_reference_groups A character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the 80\% index; defaults to \code{'hpg'} (highest performing group as reference), but could also be \code{'overall'} or \code{'all but current'}.
-##' @param check_valid_reference Check whether \code{ppg_reference_groups} and \code{di_80_index_reference_groups} contain valid values; defaults to \code{TRUE}.
+##' @param summarize_by_vars (Optional) A character vector of variable names in \code{data} for which \code{num_var} and \code{denom_var} are used for aggregation to calculate success rates for the dispropotionate impact (DI) analysis set up by \code{disagg_var_col}, \code{group_var_col}, \code{disagg_var_col_2}, and \code{group_var_col_2}.  For example, \code{summarize_by_vars=c('Outcome')} could specify a single variable/column that describes the outcome or metric in \code{num_var}, where the outcome values might include 'Completion of Transfer-Level Math', 'Completion of Transfer-Level English','Transfer', 'Associate Degree'.
+##' @param ... (Optional) Other arguments such as \code{ppg_reference_groups}, \code{min_moe}, \code{use_prop_in_moe}, \code{prop_sub_0}, \code{prop_sub_1}, \code{di_prop_index_cutoff}, \code{di_80_index_cutoff}, \code{di_80_index_reference_groups}, and \code{check_valid_reference} from \link[DisImpact]{di_iterate}.
 ##' @return A summarized data set (data frame) consisting of:
 ##' \itemize{
 ##'   \item variables specified by \code{summarize_by_vars}, \code{disagg_var_col}, \code{group_var_col}, \code{disagg_var_col_2}, and \code{group_var_col_2},
@@ -31,7 +23,8 @@
 ##' @examples
 ##' library(dplyr)
 ##' data(ssm_cohort)
-##' di_iterate_on_long(data=ssm_cohort, num_var='value', denom_var='denom'
+##' di_iterate_on_long(data=ssm_cohort %>% filter(missingFlag==0) # remove missing data
+##'   , num_var='value', denom_var='denom'
 ##'   , disagg_var_col='disagg1', group_var_col='subgroup1'
 ##'   , cohort_var_col='academicYear', summarize_by_vars=c('categoryLabel')
 ##'   , ppg_reference_groups='all but current' # PPG-1
