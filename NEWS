@@ -1,3 +1,7 @@
+* 0.0.16
+  - New function `di_iterate_on_long` allows for DI calculation on long, summarized data sets.
+  - New vignette: Disproportionate Impact (DI) Calculations on Long, Summarized Data Sets
+  - New data set: ssm_cohort
 * 0.0.15
   - student_equity toy data set: added EthnicityFlag_* variables that are more granular than Ethnicity, where students could be assigned to more than 1 group; also modified to force DI in Pacific Islanders
   - Added a Multi-Ethnicity vignette / tutorial
