@@ -81,6 +81,9 @@ di_iterate_on_long <- function(data, num_var, denom_var, disagg_var_col, group_v
     , ...
   )
 
+  # For CRAN
+  cohort <- group <- success_variable <- cohort_variable <- disaggregation <- ..scenario.. <- ..group.. <- NULL
+  
   d_results <- lu_scenarios %>%
     left_join(lu_groups) %>% 
     left_join(di_results %>%
