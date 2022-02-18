@@ -57,7 +57,7 @@ di_iterate_on_long(
 \value{
 A summarized data set (data frame) consisting of:
 \itemize{
-  \item variables specified by \code{summarize_by_vars}, \code{disagg_var_col}, \code{group_var_col}, \code{disagg_var_col_2}, and \code{group_var_col_2}
+  \item variables specified by \code{summarize_by_vars}, \code{disagg_var_col}, \code{group_var_col}, \code{disagg_var_col_2}, and \code{group_var_col_2},
   \item \code{di_indicator_ppg} (1 if there is disproportionate impact per the percentage point gap method, 0 otherwise),
   \item \code{di_indicator_prop_index} (1 if there is disproportionate impact per the proportionality index, 0 otherwise),
   \item \code{di_indicator_80_index} (1 if there is disproportionate impact per the 80\% index, 0 otherwise), and
@@ -73,7 +73,6 @@ Iteratively calculate disproportionate impact via the percentage point gap (PPG)
 \examples{
 library(dplyr)
 data(ssm_cohort)
-# Multiple group variables
 di_iterate_on_long(data=ssm_cohort, num_var='value', denom_var='denom'
   , disagg_var_col='disagg1', group_var_col='subgroup1'
   , cohort_var_col='academicYear', summarize_by_vars=c('categoryLabel')
