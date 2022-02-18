@@ -1,0 +1,184 @@
+---
+title: "Disproportionate Impact (DI) Calculations on Long, Summarized Data Sets"
+author: "Vinh Nguyen"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Disproportionate Impact (DI) Calculations on Long, Summarized Data Sets}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+Analysts typically work with raw or unitary data as many have access to either student information systems or data warehouses that store information at the student level.  Most functions in the `DisImpact` package are designed with such data structures in mind.  However, when analysts collaborate with other data providers or have limited access to data, the data provided are typically summarized or aggregated to protect student privacy.  For example, the California Community Colleges Chancellor's Office (CCCCO) [Student Success Metrics](https://www.calpassplus.org/LaunchBoard/Student-Success-Metrics.aspx) (SSM) dashboard allows users to download the data that underlies the visualizations.
+
+This data set is summarized by cohort, outcome, time window, and value, meaning each row corresponds to a data point in a visualization within the dashboard.  The `DisImpact` package allows one to calculate disproportionate impact (DI) for such a data structure using the `di_iterate_on_long` function, which is very similar to the `di_iterate` function illustrated in the [Scaling DI Calculations](./Scaling-DI-Calculations.html) vignette.
+
+# Load `DisImpact` and toy data set
+
+First, load the necessary packages.
+
+```{r, message=FALSE, warning=FALSE}
+library(DisImpact)
+library(dplyr) # Ease in manipulations with data frames
+```
+
+Second, load a toy data set.
+
+```{r}
+data(ssm_cohort) # provided from DisImpact
+dim(ssm_cohort)
+# head(ssm_cohort)
+```
+
+```{r echo=FALSE, results='asis'}
+library(knitr)
+kable(ssm_cohort[1:6, !(names(ssm_cohort) %in% c('description', 'categoryLabel', 'source'))], caption='A few rows from the `ssm_cohort` data set.  The following variables are ommitted in this print out: `description`, `categoryLabel`, `source`.')
+```
+
+To get a description of each variable, type `?ssm_cohort` in the R console.
+
+# Select relevant rows
+
+In the following code, we select relevant rows that correspond to the outcomes of interest (`categoryLabel`), the disaggregations of interest (`disagg1`), and all non-missing and non-FERPA-suppressed groups:
+
+```{r}
+d_relevant <- ssm_cohort %>%
+  filter(
+    categoryLabel %in% c('Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF'
+                       , 'Attained the Vision Goal Definition of Completion'
+                       , 'Earned an Associate Degree'
+                       , 'Transferred to a Four-Year Postsecondary Institution'
+                         )
+    , disagg1 %in% c('Ethnicity', 'Foster Youth', 'Veterans')
+    , disagg2 == 'None' # There's also Gender
+    , missingFlag == 0
+    , ferpaFlag == 0
+  )
+d_relevant %>%
+  group_by(disagg1, subgroup1) %>%
+  tally
+```
+
+In the following code, we select similar rows to the previous selection, but also allow for each group within the first level of disaggregation to also be disaggregated by gender (`disagg2`):
+
+```{r}
+d_relevant_gender <- ssm_cohort %>%
+  filter(
+    categoryLabel %in% c('Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF'
+                       , 'Attained the Vision Goal Definition of Completion'
+                       , 'Earned an Associate Degree'
+                       , 'Transferred to a Four-Year Postsecondary Institution'
+                         )
+    , disagg1 %in% c('Ethnicity', 'Foster Youth', 'Veterans')
+    # , disagg2 == 'None' # There's also Gender
+    , disagg2 == 'Gender'
+    , missingFlag == 0
+    , ferpaFlag == 0
+  )
+d_relevant_gender %>%
+  group_by(disagg1, subgroup1, disagg2, subgroup2) %>%
+  tally
+```
+
+For an ethnicity group like Asian (or any group specified by the disaggregation variable `disagg1`), the data set `d_relevant` would have a row for the group, and the data set `d_relevant` would have multiple rows, one corresponding to each gender class.
+
+# Execute `di_iterate_on_long` on a data set
+
+Let's illustrate the `di_iterate_on_long` function with some key arguments:
+
+- `data`: A data frame for which to iterate DI calculations for a set of variables.
+- `num_var`: A variable name (character value) from `data` where the variable stores success counts (the numerator in success rates).  Success rates are calculated by aggregating `num_var` and `denom_var` for each unique combination of values in `disagg_var_col`, `group_var_col`, `disagg_var_col_2`, `group_var_col_2`, `cohort_var_col`, and `summarize_by_vars`.  If such combinations are unique (single row), then rows are not collapsed.
+- `denom_var`: A variable name (character value) from `data` where the variable stores the group size (the denominator in success rates).
+- `disagg_var_col`: A variable name (character value) from `data` where the variable stores the different disaggregation scenarios.  The disaggregation variable could include such values as 'Ethnicity', 'Age Group', and 'Foster Youth', corresponding to three disaggregation scenarios.
+- `group_var_col`: A variable name (character value) from `data` where the variable stores the group name for each group within a level of disaggregation specified in `disagg_var_col`.  For example, the group names could include 'Asian', 'White', 'Black', 'Latinx', 'Native American', and 'Other' for a disaggregation on ethnicity; 'Under 18', '18-21', '22-25', and '25+' for an age group disaggregation; and 'Yes' and 'No' for a foster youth status disaggregation.
+- `disagg_var_col_2`: (Optional) A variable name (character value) from `data` where the variable stores an optional second disaggregation variable, which allows for the intersectionality of variables listed in `disagg_var_col` and `disagg_var_col_2`.  The second disaggregation variable could describe something not in `disagg_var_col_2`, such as 'Gender', which would require all groups described in `group_var_col` to be broken out by gender.
+- `group_var_col_2`: (Optional) A variable name (character value) from `data` where the variable stores the group name for each group within a second level of disaggregation specified in `disagg_var_col_2`.  For example, the group names could include 'Male', 'Female', 'Non-binary', and 'Unknown' if 'Gender' is a value in the variable `disagg_var_col_2`.
+- `cohort_var_col`: (Optional) A variable name (character value) from `data` where the variable stores the cohort label for the data described in each row.
+- `summarize_by_vars`: (Optional) A character vector of variable names in `data` for which `num_var` and `denom_var` are used for aggregation to calculate success rates for the dispropotionate impact (DI) analysis set up by `disagg_var_col`, `group_var_col`, `disagg_var_col_2`, and `group_var_col_2`.  For example, `summarize_by_vars=c('Outcome')` could specify a single variable/column that describes the outcome or metric in `num_var`, where the outcome values might include 'Completion of Transfer-Level Math', 'Completion of Transfer-Level English','Transfer', 'Associate Degree'.
+
+To see the details of these and other arguments, type `?di_iterate_on_long` in the R console.
+
+```{r warning=FALSE}
+# Example 1: By outcome, cohort
+di_summ_1 <- di_iterate_on_long(data=d_relevant
+                                , num_var='value'
+                                , denom_var='denom'
+                                , disagg_var_col='disagg1'
+                                , group_var_col='subgroup1'
+                                , cohort_var_col='academicYear'
+                                , summarize_by_vars=c('categoryLabel', 'cohort')
+                                , ppg_reference_groups='all but current' # PPG-1
+                                , di_80_index_reference_groups='all but current' # Relative rates analogous to PPG-1 for reference group
+                                  )
+nrow(di_summ_1)
+nrow(d_relevant)
+di_summ_1 %>%
+  head %>%
+  as.data.frame
+```
+
+To calculate DI with cohort year collapsed, then one could omit the `cohort_var_col` argument for rows with common `disagg_var_col`, `group_var_col`, and those in `summarize_by_vars` to be aggregated or collapsed:
+
+```{r warning=FALSE}
+# Example 2: by outcome, collapse cohort academic years
+di_summ_2 <- di_iterate_on_long(data=d_relevant
+                                , num_var='value'
+                                , denom_var='denom'
+                                , disagg_var_col='disagg1'
+                                , group_var_col='subgroup1'
+                                # , cohort_var_col='academicYear'
+                                , summarize_by_vars=c('categoryLabel', 'cohort')
+                                , ppg_reference_groups='all but current'
+                                , di_80_index_reference_groups='all but current'
+                                  )
+nrow(di_summ_2)
+nrow(d_relevant)
+
+di_summ_2 %>%
+  head %>%
+  as.data.frame
+```
+
+# Second layer of disaggregation / Intersectionality
+
+Sometimes, users may want to incorporate a second layer of disaggregation / intersection with another a second variable (e.g., gender).  The [Intersectionality](./Intersectionality.html) vignette discusses this in some detail.  One could do this using the second derived data set, `d_relevant_gender`, which contains summarized data with rows split out by gender:
+
+```{r warning=FALSE}
+# Example 3: by outcome, intersecting gender
+di_summ_3 <- di_iterate_on_long(data=d_relevant_gender
+                                , num_var='value'
+                                , denom_var='denom'
+                                , disagg_var_col='disagg1'
+                                , group_var_col='subgroup1'
+                                , disagg_var_col_2='disagg2'
+                                , group_var_col_2='subgroup2'
+                                , cohort_var_col='academicYear'
+                                , summarize_by_vars=c('categoryLabel', 'cohort')
+                                , ppg_reference_groups='overall'
+                                , di_80_index_reference_groups='all but current'
+                                  )
+nrow(di_summ_3)
+nrow(d_relevant_gender)
+
+di_summ_3 %>%
+  head %>%
+  as.data.frame
+```
+
+# Additional Information
+
+For additional illustrations of various parameter changes in `di_iterate_on_long`, please see the [Scaling DI Calculations](./Scaling-DI-Calculations.html) vignette as the `di_iterate_on_long` function is very similar to `di_iterate` that's applied to a unitary data set.
+
+# Appendix: R and R Package Versions
+
+This vignette was generated using an R session with the following packages.  There may be some discrepancies when the reader replicates the code caused by version mismatch.
+
+```{r}
+sessionInfo()
+```
