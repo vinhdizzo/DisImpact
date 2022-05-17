@@ -14,6 +14,7 @@ di_iterate_on_long(
   group_var_col_2 = NULL,
   cohort_var_col = NULL,
   summarize_by_vars = NULL,
+  custom_reference_group_flag_var = NULL,
   ...
 )
 }
@@ -35,6 +36,8 @@ di_iterate_on_long(
 \item{cohort_var_col}{(Optional) A variable name (character value) from \code{data} where the variable stores the cohort label for the data described in each row.}
 
 \item{summarize_by_vars}{(Optional) A character vector of variable names in \code{data} for which \code{num_var} and \code{denom_var} are used for aggregation to calculate success rates for the dispropotionate impact (DI) analysis set up by \code{disagg_var_col}, \code{group_var_col}, \code{disagg_var_col_2}, and \code{group_var_col_2}.  For example, \code{summarize_by_vars=c('Outcome')} could specify a single variable/column that describes the outcome or metric in \code{num_var}, where the outcome values might include 'Completion of Transfer-Level Math', 'Completion of Transfer-Level English','Transfer', 'Associate Degree'.}
+
+\item{custom_reference_group_flag_var}{(Optional) A variable name (character value) from \code{data} where the variable flags the row or group that should be used as the reference group (\code{1} if row is a reference group, \code{0} otherwise) for comparison in the percentage point gap method and the 80\% index method.  When this argument is used, then the \code{ppg_reference_groups} and \code{di_80_index_reference_groups} arguments should not be specified.}
 
 \item{...}{(Optional) Other arguments such as \code{ppg_reference_groups}, \code{min_moe}, \code{use_prop_in_moe}, \code{prop_sub_0}, \code{prop_sub_1}, \code{di_prop_index_cutoff}, \code{di_80_index_cutoff}, \code{di_80_index_reference_groups}, and \code{check_valid_reference} from \link[DisImpact]{di_iterate}.}
 }

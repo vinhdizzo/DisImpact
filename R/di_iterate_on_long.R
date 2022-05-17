@@ -11,6 +11,7 @@
 ##' @param group_var_col_2 (Optional) A variable name (character value) from \code{data} where the variable stores the group name for each group within a second level of disaggregation specified in \code{disagg_var_col_2}.  For example, the group names could include 'Male', 'Female', 'Non-binary', and 'Unknown' if 'Gender' is a value in the variable \code{disagg_var_col_2}.
 ##' @param cohort_var_col (Optional) A variable name (character value) from \code{data} where the variable stores the cohort label for the data described in each row.
 ##' @param summarize_by_vars (Optional) A character vector of variable names in \code{data} for which \code{num_var} and \code{denom_var} are used for aggregation to calculate success rates for the dispropotionate impact (DI) analysis set up by \code{disagg_var_col}, \code{group_var_col}, \code{disagg_var_col_2}, and \code{group_var_col_2}.  For example, \code{summarize_by_vars=c('Outcome')} could specify a single variable/column that describes the outcome or metric in \code{num_var}, where the outcome values might include 'Completion of Transfer-Level Math', 'Completion of Transfer-Level English','Transfer', 'Associate Degree'.
+##' @param custom_reference_group_flag_var (Optional) A variable name (character value) from \code{data} where the variable flags the row or group that should be used as the reference group (\code{1} if row is a reference group, \code{0} otherwise) for comparison in the percentage point gap method and the 80\% index method.  When this argument is used, then the \code{ppg_reference_groups} and \code{di_80_index_reference_groups} arguments should not be specified.
 ##' @param ... (Optional) Other arguments such as \code{ppg_reference_groups}, \code{min_moe}, \code{use_prop_in_moe}, \code{prop_sub_0}, \code{prop_sub_1}, \code{di_prop_index_cutoff}, \code{di_80_index_cutoff}, \code{di_80_index_reference_groups}, and \code{check_valid_reference} from \link[DisImpact]{di_iterate}.
 ##' @return A summarized data set (data frame) consisting of:
 ##' \itemize{
@@ -32,7 +33,7 @@
 ##' @import dplyr
 ##' @importFrom tidyselect one_of
 ##' @export
-di_iterate_on_long <- function(data, num_var, denom_var, disagg_var_col, group_var_col, disagg_var_col_2=NULL, group_var_col_2=NULL, cohort_var_col=NULL, summarize_by_vars=NULL, ...) {
+di_iterate_on_long <- function(data, num_var, denom_var, disagg_var_col, group_var_col, disagg_var_col_2=NULL, group_var_col_2=NULL, cohort_var_col=NULL, summarize_by_vars=NULL, custom_reference_group_flag_var=NULL, ...) {
   
   other_args <- names(list(...))
   if (!is.null(other_args)) {
@@ -46,12 +47,18 @@ di_iterate_on_long <- function(data, num_var, denom_var, disagg_var_col, group_v
     # Check valid values
     if (any('ppg_reference_groups' == other_args)) {
       if (!all(list(...)$ppg_reference_groups %in% c('hpg', 'overall', 'all but current'))) {
-        stop("The `ppg_reference_groups` argument only accepts 'hpg', 'overall', or 'all but current'.  For custom reference groups, please use the `ppg_reference_group_flag_var` argument.")
+        stop("The `ppg_reference_groups` argument only accepts 'hpg', 'overall', or 'all but current'.  For custom reference groups, please use the `ppg_custom_reference_group_flag_var` argument.")
+      }
+      if (!is.null(custom_reference_group_flag_var)) {
+        stop("Only one of these arguments should be specified: `ppg_reference_groups`, `custom_reference_group_flag_var`.")
       }
     }
-    if (any('di_80_reference_groups' == other_args)) {
-      if (!all(list(...)$di_80_reference_groups %in% c('hpg', 'overall', 'all but current'))) {
-        stop("The `di_80_reference_groups` argument only accepts 'hpg', 'overall', or 'all but current'.  For custom reference groups, please use the `di_80_reference_group_flag_var` argument.")
+    if (any('di_80_index_reference_groups' == other_args)) {
+      if (!all(list(...)$di_80_index_reference_groups %in% c('hpg', 'overall', 'all but current'))) {
+        stop("The `di_80_index_reference_groups` argument only accepts 'hpg', 'overall', or 'all but current'.  For custom reference groups, please use the `di_80_index_custom_reference_group_flag_var` argument.")
+      }
+      if (!is.null(custom_reference_group_flag_var)) {
+        stop("Only one of these arguments should be specified: `di_80_index_reference_groups`, `custom_reference_group_flag_var`.")
       }
     }
         
@@ -71,34 +78,58 @@ di_iterate_on_long <- function(data, num_var, denom_var, disagg_var_col, group_v
 
   # Table of groups
   lu_groups <- data %>%
-    select(one_of(summarize_by_vars, disagg_var_col, disagg_var_col_2, cohort_var_col, group_var_col, group_var_col_2)) %>%
+    select(one_of(summarize_by_vars, disagg_var_col, disagg_var_col_2, cohort_var_col, group_var_col, group_var_col_2, custom_reference_group_flag_var)) %>%
     distinct %>%
-    mutate(..group..=row_number())
-  
-  di_results <- di_iterate(
-    data=data %>%
-      left_join(lu_scenarios) %>%
-      left_join(lu_groups)
-    , success_vars=num_var
-    , weight_var=denom_var
-    # , group_vars=group_var_col
-    , group_vars='..group..'
-    , cohort_vars='..scenario..'
-    , include_non_disagg_results=FALSE
-    , ...
-  )
+    mutate(..group..=row_number(), ..groupref..=..group..)
+
+  # Custom reference
+  if (!is.null(custom_reference_group_flag_var)) {
+    lu_groups$..groupref..[lu_groups[[custom_reference_group_flag_var]] == 1] <- 'Custom'
+
+    di_results <- di_iterate(
+      data=data %>%
+        left_join(lu_scenarios) %>%
+        left_join(lu_groups)
+      , success_vars=num_var
+      , weight_var=denom_var
+      # , group_vars=group_var_col
+      # , group_vars='..group..'
+      , group_vars='..groupref..'
+      , cohort_vars='..scenario..'
+      , include_non_disagg_results=FALSE
+      , ppg_reference_groups='Custom'
+      , di_80_index_reference_groups='Custom'
+      , ...
+    )
+  } else {
+    di_results <- di_iterate(
+      data=data %>%
+        left_join(lu_scenarios) %>%
+        left_join(lu_groups)
+      , success_vars=num_var
+      , weight_var=denom_var
+      # , group_vars=group_var_col
+      # , group_vars='..group..'
+      , group_vars='..groupref..'
+      , cohort_vars='..scenario..'
+      , include_non_disagg_results=FALSE
+      , ...
+    )
+  }
 
   # For CRAN
-  cohort <- group <- success_variable <- cohort_variable <- disaggregation <- ..scenario.. <- ..group.. <- NULL
+  cohort <- group <- success_variable <- cohort_variable <- disaggregation <- ..scenario.. <- ..group.. <- ..groupref.. <- NULL
   
   d_results <- lu_scenarios %>%
     left_join(lu_groups) %>% 
     left_join(di_results %>%
               rename(..scenario..=cohort) %>%
-              rename(..group..=group) %>% 
+              # rename(..group..=group) %>%
+              rename(..groupref..=group) %>% 
               select(-success_variable, -cohort_variable, -disaggregation)
               ) %>%
-    select(-..scenario.., -..group..)
+    # select(-..scenario.., -..group..)
+    select(-..scenario.., -..group.., -..groupref..)
   # names(d_results)[names(d_results) == 'group'] <- group_var_col
   return(d_results)
 }
