@@ -33,14 +33,28 @@
 ##' @importFrom tidyselect one_of
 ##' @export
 di_iterate_on_long <- function(data, num_var, denom_var, disagg_var_col, group_var_col, disagg_var_col_2=NULL, group_var_col_2=NULL, cohort_var_col=NULL, summarize_by_vars=NULL, ...) {
-  # Check to see that success_vars, group_vars, and cohort_vars are not defined
+  
   other_args <- names(list(...))
   if (!is.null(other_args)) {
+    # Check to see that success_vars, group_vars, and cohort_vars are not defined
     lu_invalid_vars <- c('success_vars', 'weight_var', 'group_vars', 'cohort_vars', 'include_non_disagg_results')
     invalid_vars <- other_args[other_args %in% lu_invalid_vars]
     if (length(invalid_vars) > 0) {
       stop(paste0('The following arguments should not be specified: ', paste0('`', invalid_vars, '`', collapse=', '), '.'))
       }
+
+    # Check valid values
+    if (any('ppg_reference_groups' == other_args)) {
+      if (!all(list(...)$ppg_reference_groups %in% c('hpg', 'overall', 'all but current'))) {
+        stop("The `ppg_reference_groups` argument only accepts 'hpg', 'overall', or 'all but current'.  For custom reference groups, please use the `ppg_reference_group_flag_var` argument.")
+      }
+    }
+    if (any('di_80_reference_groups' == other_args)) {
+      if (!all(list(...)$di_80_reference_groups %in% c('hpg', 'overall', 'all but current'))) {
+        stop("The `di_80_reference_groups` argument only accepts 'hpg', 'overall', or 'all but current'.  For custom reference groups, please use the `di_80_reference_group_flag_var` argument.")
+      }
+    }
+        
   }
 
   if (!is.null(disagg_var_col_2)) {
