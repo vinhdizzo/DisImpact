@@ -12,23 +12,20 @@
 
 <meta name="author" content="Vinh Nguyen" />
 
-<meta name="date" content="2022-02-17" />
+<meta name="date" content="2022-05-17" />
 
 <title>Disproportionate Impact (DI) Calculations on Long, Summarized Data Sets</title>
 
-<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
-// v0.0.1
-// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
-
-document.addEventListener('DOMContentLoaded', function() {
-  const codeList = document.getElementsByClassName("sourceCode");
-  for (var i = 0; i < codeList.length; i++) {
-    var linkList = codeList[i].getElementsByTagName('a');
-    for (var j = 0; j < linkList.length; j++) {
-      if (linkList[j].innerHTML === "") {
-        linkList[j].setAttribute('aria-hidden', 'true');
-      }
-    }
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
   }
 });
 </script>
@@ -36,19 +33,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -68,7 +65,7 @@ pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-le
 div.sourceCode
   {   }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -154,9 +151,10 @@ code span.ot { color: #007020; }
 
 <header>
 <div class="inner">
-<h1 class="title toc-ignore">Disproportionate Impact (DI) Calculations on Long, Summarized Data Sets</h1>
+<h1 class="title toc-ignore">Disproportionate Impact (DI) Calculations
+on Long, Summarized Data Sets</h1>
 <h3 class="author">Vinh Nguyen</h3>
-<h3 class="date">2022-02-17</h3>
+<h3 class="date">2022-05-17</h3>
 </div>
 </header>
 
@@ -164,13 +162,19 @@ code span.ot { color: #007020; }
 <div id="TOC" class="toc">
 <div class="inner">
 <ul>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#load-disimpact-and-toy-data-set">Load <code>DisImpact</code> and toy data set</a></li>
-<li><a href="#select-relevant-rows">Select relevant rows</a></li>
-<li><a href="#execute-di_iterate_on_long-on-a-data-set">Execute <code>di_iterate_on_long</code> on a data set</a></li>
-<li><a href="#second-layer-of-disaggregation-intersectionality">Second layer of disaggregation / Intersectionality</a></li>
-<li><a href="#additional-information">Additional Information</a></li>
-<li><a href="#appendix-r-and-r-package-versions">Appendix: R and R Package Versions</a></li>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#load-disimpact-and-toy-data-set" id="toc-load-disimpact-and-toy-data-set">Load <code>DisImpact</code> and
+toy data set</a></li>
+<li><a href="#select-relevant-rows" id="toc-select-relevant-rows">Select
+relevant rows</a></li>
+<li><a href="#execute-di_iterate_on_long-on-a-data-set" id="toc-execute-di_iterate_on_long-on-a-data-set">Execute
+<code>di_iterate_on_long</code> on a data set</a></li>
+<li><a href="#second-layer-of-disaggregation-intersectionality" id="toc-second-layer-of-disaggregation-intersectionality">Second layer
+of disaggregation / Intersectionality</a></li>
+<li><a href="#custom-reference-groups" id="toc-custom-reference-groups">Custom Reference Groups</a></li>
+<li><a href="#additional-information" id="toc-additional-information">Additional Information</a></li>
+<li><a href="#appendix-r-and-r-package-versions" id="toc-appendix-r-and-r-package-versions">Appendix: R and R Package
+Versions</a></li>
 </ul>
 </div>
 </div>
@@ -180,40 +184,57 @@ code span.ot { color: #007020; }
     <section id="main-content">
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>Analysts typically work with raw or unitary data as many have access to either student information systems or data warehouses that store information at the student level. Most functions in the <code>DisImpact</code> package are designed with such data structures in mind. However, when analysts collaborate with other data providers or have limited access to data, the data provided are typically summarized or aggregated to protect student privacy. For example, the California Community Colleges Chancellor’s Office (CCCCO) <a href="https://www.calpassplus.org/LaunchBoard/Student-Success-Metrics.aspx">Student Success Metrics</a> (SSM) dashboard allows users to download the data that underlies the visualizations.</p>
-<p>This data set is summarized by cohort, outcome, time window, and value, meaning each row corresponds to a data point in a visualization within the dashboard. The <code>DisImpact</code> package allows one to calculate disproportionate impact (DI) for such a data structure using the <code>di_iterate_on_long</code> function, which is very similar to the <code>di_iterate</code> function illustrated in the <a href="./Scaling-DI-Calculations.html">Scaling DI Calculations</a> vignette.</p>
+<p>Analysts typically work with raw or unitary data as many have access
+to either student information systems or data warehouses that store
+information at the student level. Most functions in the
+<code>DisImpact</code> package are designed with such data structures in
+mind. However, when analysts collaborate with other data providers or
+have limited access to data, the data provided are typically summarized
+or aggregated to protect student privacy. For example, the California
+Community Colleges Chancellor’s Office (CCCCO) <a href="https://www.calpassplus.org/LaunchBoard/Student-Success-Metrics.aspx">Student
+Success Metrics</a> (SSM) dashboard allows users to download the data
+that underlies the visualizations.</p>
+<p>This data set is summarized by cohort, outcome, time window, and
+value, meaning each row corresponds to a data point in a visualization
+within the dashboard. The <code>DisImpact</code> package allows one to
+calculate disproportionate impact (DI) for such a data structure using
+the <code>di_iterate_on_long</code> function, which is very similar to
+the <code>di_iterate</code> function illustrated in the <a href="./Scaling-DI-Calculations.html">Scaling DI Calculations</a>
+vignette.</p>
 </div>
 <div id="load-disimpact-and-toy-data-set" class="section level1">
 <h1>Load <code>DisImpact</code> and toy data set</h1>
 <p>First, load the necessary packages.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(DisImpact)</span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(dplyr) <span class="co"># Ease in manipulations with data frames</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DisImpact)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr) <span class="co"># Ease in manipulations with data frames</span></span></code></pre></div>
 <p>Second, load a toy data set.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">data</span>(ssm_cohort) <span class="co"># provided from DisImpact</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">dim</span>(ssm_cohort)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(ssm_cohort) <span class="co"># provided from DisImpact</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(ssm_cohort)</span></code></pre></div>
 <pre><code>## [1] 5760   20</code></pre>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># head(ssm_cohort)</span></span></code></pre></div>
-<pre><code>## Warning: package &#39;knitr&#39; was built under R version 4.0.5</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># head(ssm_cohort)</span></span></code></pre></div>
 <table>
-<caption>A few rows from the <code>ssm_cohort</code> data set. The following variables are ommitted in this print out: <code>description</code>, <code>categoryLabel</code>, <code>source</code>.</caption>
+<caption>A few rows from the <code>ssm_cohort</code> data set. The
+following variables are ommitted in this print out:
+<code>description</code>, <code>categoryLabel</code>,
+<code>source</code>.</caption>
 <colgroup>
-<col width="6%"></col>
-<col width="9%"></col>
-<col width="6%"></col>
-<col width="4%"></col>
-<col width="20%"></col>
-<col width="5%"></col>
-<col width="3%"></col>
-<col width="5%"></col>
-<col width="3%"></col>
-<col width="8%"></col>
-<col width="2%"></col>
-<col width="2%"></col>
-<col width="3%"></col>
-<col width="4%"></col>
-<col width="5%"></col>
-<col width="4%"></col>
-<col width="1%"></col>
+<col width="6%" />
+<col width="9%" />
+<col width="6%" />
+<col width="4%" />
+<col width="20%" />
+<col width="5%" />
+<col width="3%" />
+<col width="5%" />
+<col width="3%" />
+<col width="8%" />
+<col width="2%" />
+<col width="2%" />
+<col width="3%" />
+<col width="4%" />
+<col width="5%" />
+<col width="4%" />
+<col width="1%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -353,26 +374,30 @@ code span.ot { color: #007020; }
 </tr>
 </tbody>
 </table>
-<p>To get a description of each variable, type <code>?ssm_cohort</code> in the R console.</p>
+<p>To get a description of each variable, type <code>?ssm_cohort</code>
+in the R console.</p>
 </div>
 <div id="select-relevant-rows" class="section level1">
 <h1>Select relevant rows</h1>
-<p>In the following code, we select relevant rows that correspond to the outcomes of interest (<code>categoryLabel</code>), the disaggregations of interest (<code>disagg1</code>), and all non-missing and non-FERPA-suppressed groups:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>d_relevant &lt;-<span class="st"> </span>ssm_cohort <span class="op">%&gt;%</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a><span class="st">  </span><span class="kw">filter</span>(</span>
-<span id="cb6-3"><a href="#cb6-3"></a>    categoryLabel <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF&#39;</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a>                       , <span class="st">&#39;Attained the Vision Goal Definition of Completion&#39;</span></span>
-<span id="cb6-5"><a href="#cb6-5"></a>                       , <span class="st">&#39;Earned an Associate Degree&#39;</span></span>
-<span id="cb6-6"><a href="#cb6-6"></a>                       , <span class="st">&#39;Transferred to a Four-Year Postsecondary Institution&#39;</span></span>
-<span id="cb6-7"><a href="#cb6-7"></a>                         )</span>
-<span id="cb6-8"><a href="#cb6-8"></a>    , disagg1 <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Foster Youth&#39;</span>, <span class="st">&#39;Veterans&#39;</span>)</span>
-<span id="cb6-9"><a href="#cb6-9"></a>    , disagg2 <span class="op">==</span><span class="st"> &#39;None&#39;</span> <span class="co"># There&#39;s also Gender</span></span>
-<span id="cb6-10"><a href="#cb6-10"></a>    , missingFlag <span class="op">==</span><span class="st"> </span><span class="dv">0</span></span>
-<span id="cb6-11"><a href="#cb6-11"></a>    , ferpaFlag <span class="op">==</span><span class="st"> </span><span class="dv">0</span></span>
-<span id="cb6-12"><a href="#cb6-12"></a>  )</span>
-<span id="cb6-13"><a href="#cb6-13"></a>d_relevant <span class="op">%&gt;%</span></span>
-<span id="cb6-14"><a href="#cb6-14"></a><span class="st">  </span><span class="kw">group_by</span>(disagg1, subgroup1) <span class="op">%&gt;%</span></span>
-<span id="cb6-15"><a href="#cb6-15"></a><span class="st">  </span>tally</span></code></pre></div>
+<p>In the following code, we select relevant rows that correspond to the
+outcomes of interest (<code>categoryLabel</code>), the disaggregations
+of interest (<code>disagg1</code>), and all non-missing and
+non-FERPA-suppressed groups:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>d_relevant <span class="ot">&lt;-</span> ssm_cohort <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    categoryLabel <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&#39;Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF&#39;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                       , <span class="st">&#39;Attained the Vision Goal Definition of Completion&#39;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>                       , <span class="st">&#39;Earned an Associate Degree&#39;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>                       , <span class="st">&#39;Transferred to a Four-Year Postsecondary Institution&#39;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>                         )</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    , disagg1 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Foster Youth&#39;</span>, <span class="st">&#39;Veterans&#39;</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    , disagg2 <span class="sc">==</span> <span class="st">&#39;None&#39;</span> <span class="co"># There&#39;s also Gender</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    , missingFlag <span class="sc">==</span> <span class="dv">0</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    , ferpaFlag <span class="sc">==</span> <span class="dv">0</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>d_relevant <span class="sc">%&gt;%</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(disagg1, subgroup1) <span class="sc">%&gt;%</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  tally</span></code></pre></div>
 <pre><code>## # A tibble: 13 x 3
 ## # Groups:   disagg1 [3]
 ##    disagg1      subgroup1                     n
@@ -390,23 +415,26 @@ code span.ot { color: #007020; }
 ## 11 Veterans     All Masked Values            12
 ## 12 Veterans     Not Veteran                   2
 ## 13 Veterans     Veteran                       1</code></pre>
-<p>In the following code, we select similar rows to the previous selection, but also allow for each group within the first level of disaggregation to also be disaggregated by gender (<code>disagg2</code>):</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>d_relevant_gender &lt;-<span class="st"> </span>ssm_cohort <span class="op">%&gt;%</span></span>
-<span id="cb8-2"><a href="#cb8-2"></a><span class="st">  </span><span class="kw">filter</span>(</span>
-<span id="cb8-3"><a href="#cb8-3"></a>    categoryLabel <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF&#39;</span></span>
-<span id="cb8-4"><a href="#cb8-4"></a>                       , <span class="st">&#39;Attained the Vision Goal Definition of Completion&#39;</span></span>
-<span id="cb8-5"><a href="#cb8-5"></a>                       , <span class="st">&#39;Earned an Associate Degree&#39;</span></span>
-<span id="cb8-6"><a href="#cb8-6"></a>                       , <span class="st">&#39;Transferred to a Four-Year Postsecondary Institution&#39;</span></span>
-<span id="cb8-7"><a href="#cb8-7"></a>                         )</span>
-<span id="cb8-8"><a href="#cb8-8"></a>    , disagg1 <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Foster Youth&#39;</span>, <span class="st">&#39;Veterans&#39;</span>)</span>
-<span id="cb8-9"><a href="#cb8-9"></a>    <span class="co"># , disagg2 == &#39;None&#39; # There&#39;s also Gender</span></span>
-<span id="cb8-10"><a href="#cb8-10"></a>    , disagg2 <span class="op">==</span><span class="st"> &#39;Gender&#39;</span></span>
-<span id="cb8-11"><a href="#cb8-11"></a>    , missingFlag <span class="op">==</span><span class="st"> </span><span class="dv">0</span></span>
-<span id="cb8-12"><a href="#cb8-12"></a>    , ferpaFlag <span class="op">==</span><span class="st"> </span><span class="dv">0</span></span>
-<span id="cb8-13"><a href="#cb8-13"></a>  )</span>
-<span id="cb8-14"><a href="#cb8-14"></a>d_relevant_gender <span class="op">%&gt;%</span></span>
-<span id="cb8-15"><a href="#cb8-15"></a><span class="st">  </span><span class="kw">group_by</span>(disagg1, subgroup1, disagg2, subgroup2) <span class="op">%&gt;%</span></span>
-<span id="cb8-16"><a href="#cb8-16"></a><span class="st">  </span>tally</span></code></pre></div>
+<p>In the following code, we select similar rows to the previous
+selection, but also allow for each group within the first level of
+disaggregation to also be disaggregated by gender
+(<code>disagg2</code>):</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>d_relevant_gender <span class="ot">&lt;-</span> ssm_cohort <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    categoryLabel <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&#39;Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF&#39;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                       , <span class="st">&#39;Attained the Vision Goal Definition of Completion&#39;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                       , <span class="st">&#39;Earned an Associate Degree&#39;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                       , <span class="st">&#39;Transferred to a Four-Year Postsecondary Institution&#39;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                         )</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    , disagg1 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Foster Youth&#39;</span>, <span class="st">&#39;Veterans&#39;</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># , disagg2 == &#39;None&#39; # There&#39;s also Gender</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    , disagg2 <span class="sc">==</span> <span class="st">&#39;Gender&#39;</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    , missingFlag <span class="sc">==</span> <span class="dv">0</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    , ferpaFlag <span class="sc">==</span> <span class="dv">0</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>d_relevant_gender <span class="sc">%&gt;%</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(disagg1, subgroup1, disagg2, subgroup2) <span class="sc">%&gt;%</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  tally</span></code></pre></div>
 <pre><code>## # A tibble: 21 x 5
 ## # Groups:   disagg1, subgroup1, disagg2 [12]
 ##    disagg1   subgroup1         disagg2 subgroup2            n
@@ -422,45 +450,98 @@ code span.ot { color: #007020; }
 ##  9 Ethnicity Two or More Races Gender  Male                13
 ## 10 Ethnicity White             Gender  Female              14
 ## # ... with 11 more rows</code></pre>
-<p>For an ethnicity group like Asian (or any group specified by the disaggregation variable <code>disagg1</code>), the data set <code>d_relevant</code> would have a row for the group, and the data set <code>d_relevant</code> would have multiple rows, one corresponding to each gender class.</p>
+<p>For an ethnicity group like Asian (or any group specified by the
+disaggregation variable <code>disagg1</code>), the data set
+<code>d_relevant</code> would have a row for the group, and the data set
+<code>d_relevant</code> would have multiple rows, one corresponding to
+each gender class.</p>
 </div>
 <div id="execute-di_iterate_on_long-on-a-data-set" class="section level1">
 <h1>Execute <code>di_iterate_on_long</code> on a data set</h1>
-<p>Let’s illustrate the <code>di_iterate_on_long</code> function with some key arguments:</p>
+<p>Let’s illustrate the <code>di_iterate_on_long</code> function with
+some key arguments:</p>
 <ul>
-<li><code>data</code>: A data frame for which to iterate DI calculations for a set of variables.</li>
-<li><code>num_var</code>: A variable name (character value) from <code>data</code> where the variable stores success counts (the numerator in success rates). Success rates are calculated by aggregating <code>num_var</code> and <code>denom_var</code> for each unique combination of values in <code>disagg_var_col</code>, <code>group_var_col</code>, <code>disagg_var_col_2</code>, <code>group_var_col_2</code>, <code>cohort_var_col</code>, and <code>summarize_by_vars</code>. If such combinations are unique (single row), then rows are not collapsed.</li>
-<li><code>denom_var</code>: A variable name (character value) from <code>data</code> where the variable stores the group size (the denominator in success rates).</li>
-<li><code>disagg_var_col</code>: A variable name (character value) from <code>data</code> where the variable stores the different disaggregation scenarios. The disaggregation variable could include such values as ‘Ethnicity’, ‘Age Group’, and ‘Foster Youth’, corresponding to three disaggregation scenarios.</li>
-<li><code>group_var_col</code>: A variable name (character value) from <code>data</code> where the variable stores the group name for each group within a level of disaggregation specified in <code>disagg_var_col</code>. For example, the group names could include ‘Asian’, ‘White’, ‘Black’, ‘Latinx’, ‘Native American’, and ‘Other’ for a disaggregation on ethnicity; ‘Under 18’, ‘18-21’, ‘22-25’, and ‘25+’ for an age group disaggregation; and ‘Yes’ and ‘No’ for a foster youth status disaggregation.</li>
-<li><code>disagg_var_col_2</code>: (Optional) A variable name (character value) from <code>data</code> where the variable stores an optional second disaggregation variable, which allows for the intersectionality of variables listed in <code>disagg_var_col</code> and <code>disagg_var_col_2</code>. The second disaggregation variable could describe something not in <code>disagg_var_col_2</code>, such as ‘Gender’, which would require all groups described in <code>group_var_col</code> to be broken out by gender.</li>
-<li><code>group_var_col_2</code>: (Optional) A variable name (character value) from <code>data</code> where the variable stores the group name for each group within a second level of disaggregation specified in <code>disagg_var_col_2</code>. For example, the group names could include ‘Male’, ‘Female’, ‘Non-binary’, and ‘Unknown’ if ‘Gender’ is a value in the variable <code>disagg_var_col_2</code>.</li>
-<li><code>cohort_var_col</code>: (Optional) A variable name (character value) from <code>data</code> where the variable stores the cohort label for the data described in each row.</li>
-<li><code>summarize_by_vars</code>: (Optional) A character vector of variable names in <code>data</code> for which <code>num_var</code> and <code>denom_var</code> are used for aggregation to calculate success rates for the dispropotionate impact (DI) analysis set up by <code>disagg_var_col</code>, <code>group_var_col</code>, <code>disagg_var_col_2</code>, and <code>group_var_col_2</code>. For example, <code>summarize_by_vars=c(&#39;Outcome&#39;)</code> could specify a single variable/column that describes the outcome or metric in <code>num_var</code>, where the outcome values might include ‘Completion of Transfer-Level Math’, ‘Completion of Transfer-Level English’,‘Transfer’, ‘Associate Degree’.</li>
+<li><code>data</code>: A data frame for which to iterate DI calculations
+for a set of variables.</li>
+<li><code>num_var</code>: A variable name (character value) from
+<code>data</code> where the variable stores success counts (the
+numerator in success rates). Success rates are calculated by aggregating
+<code>num_var</code> and <code>denom_var</code> for each unique
+combination of values in <code>disagg_var_col</code>,
+<code>group_var_col</code>, <code>disagg_var_col_2</code>,
+<code>group_var_col_2</code>, <code>cohort_var_col</code>, and
+<code>summarize_by_vars</code>. If such combinations are unique (single
+row), then rows are not collapsed.</li>
+<li><code>denom_var</code>: A variable name (character value) from
+<code>data</code> where the variable stores the group size (the
+denominator in success rates).</li>
+<li><code>disagg_var_col</code>: A variable name (character value) from
+<code>data</code> where the variable stores the different disaggregation
+scenarios. The disaggregation variable could include such values as
+‘Ethnicity’, ‘Age Group’, and ‘Foster Youth’, corresponding to three
+disaggregation scenarios.</li>
+<li><code>group_var_col</code>: A variable name (character value) from
+<code>data</code> where the variable stores the group name for each
+group within a level of disaggregation specified in
+<code>disagg_var_col</code>. For example, the group names could include
+‘Asian’, ‘White’, ‘Black’, ‘Latinx’, ‘Native American’, and ‘Other’ for
+a disaggregation on ethnicity; ‘Under 18’, ‘18-21’, ‘22-25’, and ‘25+’
+for an age group disaggregation; and ‘Yes’ and ‘No’ for a foster youth
+status disaggregation.</li>
+<li><code>disagg_var_col_2</code>: (Optional) A variable name (character
+value) from <code>data</code> where the variable stores an optional
+second disaggregation variable, which allows for the intersectionality
+of variables listed in <code>disagg_var_col</code> and
+<code>disagg_var_col_2</code>. The second disaggregation variable could
+describe something not in <code>disagg_var_col_2</code>, such as
+‘Gender’, which would require all groups described in
+<code>group_var_col</code> to be broken out by gender.</li>
+<li><code>group_var_col_2</code>: (Optional) A variable name (character
+value) from <code>data</code> where the variable stores the group name
+for each group within a second level of disaggregation specified in
+<code>disagg_var_col_2</code>. For example, the group names could
+include ‘Male’, ‘Female’, ‘Non-binary’, and ‘Unknown’ if ‘Gender’ is a
+value in the variable <code>disagg_var_col_2</code>.</li>
+<li><code>cohort_var_col</code>: (Optional) A variable name (character
+value) from <code>data</code> where the variable stores the cohort label
+for the data described in each row.</li>
+<li><code>summarize_by_vars</code>: (Optional) A character vector of
+variable names in <code>data</code> for which <code>num_var</code> and
+<code>denom_var</code> are used for aggregation to calculate success
+rates for the dispropotionate impact (DI) analysis set up by
+<code>disagg_var_col</code>, <code>group_var_col</code>,
+<code>disagg_var_col_2</code>, and <code>group_var_col_2</code>. For
+example, <code>summarize_by_vars=c(&#39;Outcome&#39;)</code> could specify a
+single variable/column that describes the outcome or metric in
+<code>num_var</code>, where the outcome values might include ‘Completion
+of Transfer-Level Math’, ‘Completion of Transfer-Level
+English’,‘Transfer’, ‘Associate Degree’.</li>
 </ul>
-<p>To see the details of these and other arguments, type <code>?di_iterate_on_long</code> in the R console.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Example 1: By outcome, cohort</span></span>
-<span id="cb10-2"><a href="#cb10-2"></a>di_summ_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">di_iterate_on_long</span>(<span class="dt">data=</span>d_relevant</span>
-<span id="cb10-3"><a href="#cb10-3"></a>                                , <span class="dt">num_var=</span><span class="st">&#39;value&#39;</span></span>
-<span id="cb10-4"><a href="#cb10-4"></a>                                , <span class="dt">denom_var=</span><span class="st">&#39;denom&#39;</span></span>
-<span id="cb10-5"><a href="#cb10-5"></a>                                , <span class="dt">disagg_var_col=</span><span class="st">&#39;disagg1&#39;</span></span>
-<span id="cb10-6"><a href="#cb10-6"></a>                                , <span class="dt">group_var_col=</span><span class="st">&#39;subgroup1&#39;</span></span>
-<span id="cb10-7"><a href="#cb10-7"></a>                                , <span class="dt">cohort_var_col=</span><span class="st">&#39;academicYear&#39;</span></span>
-<span id="cb10-8"><a href="#cb10-8"></a>                                , <span class="dt">summarize_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;categoryLabel&#39;</span>, <span class="st">&#39;cohort&#39;</span>)</span>
-<span id="cb10-9"><a href="#cb10-9"></a>                                , <span class="dt">ppg_reference_groups=</span><span class="st">&#39;all but current&#39;</span> <span class="co"># PPG-1</span></span>
-<span id="cb10-10"><a href="#cb10-10"></a>                                , <span class="dt">di_80_index_reference_groups=</span><span class="st">&#39;all but current&#39;</span> <span class="co"># Relative rates analogous to PPG-1 for reference group</span></span>
-<span id="cb10-11"><a href="#cb10-11"></a>                                  )</span></code></pre></div>
-<pre><code>## Joining, by = c(&quot;cohort&quot;, &quot;academicYear&quot;, &quot;categoryLabel&quot;, &quot;disagg1&quot;)</code></pre>
-<pre><code>## Joining, by = c(&quot;cohort&quot;, &quot;academicYear&quot;, &quot;categoryLabel&quot;, &quot;disagg1&quot;, &quot;subgroup1&quot;)</code></pre>
-<pre><code>## Joining, by = c(&quot;categoryLabel&quot;, &quot;cohort&quot;, &quot;disagg1&quot;, &quot;academicYear&quot;)</code></pre>
-<pre><code>## Joining, by = c(&quot;..scenario..&quot;, &quot;..group..&quot;)</code></pre>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="kw">nrow</span>(di_summ_<span class="dv">1</span>)</span></code></pre></div>
+<p>To see the details of these and other arguments, type
+<code>?di_iterate_on_long</code> in the R console.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example 1: By outcome, cohort</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>di_summ_1 <span class="ot">&lt;-</span> <span class="fu">di_iterate_on_long</span>(<span class="at">data=</span>d_relevant</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">num_var=</span><span class="st">&#39;value&#39;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">denom_var=</span><span class="st">&#39;denom&#39;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">disagg_var_col=</span><span class="st">&#39;disagg1&#39;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">group_var_col=</span><span class="st">&#39;subgroup1&#39;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">cohort_var_col=</span><span class="st">&#39;academicYear&#39;</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">summarize_by_vars=</span><span class="fu">c</span>(<span class="st">&#39;categoryLabel&#39;</span>, <span class="st">&#39;cohort&#39;</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">ppg_reference_groups=</span><span class="st">&#39;all but current&#39;</span> <span class="co"># PPG-1</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">di_80_index_reference_groups=</span><span class="st">&#39;all but current&#39;</span> <span class="co"># Relative rates analogous to PPG-1 for reference group</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                                  )</span></code></pre></div>
+<pre><code>## Joining, by = c(&quot;cohort&quot;, &quot;academicYear&quot;, &quot;categoryLabel&quot;, &quot;disagg1&quot;)
+## Joining, by = c(&quot;cohort&quot;, &quot;academicYear&quot;, &quot;categoryLabel&quot;, &quot;disagg1&quot;,
+## &quot;subgroup1&quot;)
+## Joining, by = c(&quot;categoryLabel&quot;, &quot;cohort&quot;, &quot;disagg1&quot;, &quot;academicYear&quot;)
+## Joining, by = c(&quot;..scenario..&quot;, &quot;..groupref..&quot;)</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(di_summ_1)</span></code></pre></div>
 <pre><code>## [1] 120</code></pre>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">nrow</span>(d_relevant)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(d_relevant)</span></code></pre></div>
 <pre><code>## [1] 120</code></pre>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>di_summ_<span class="dv">1</span> <span class="op">%&gt;%</span></span>
-<span id="cb19-2"><a href="#cb19-2"></a><span class="st">  </span>head <span class="op">%&gt;%</span></span>
-<span id="cb19-3"><a href="#cb19-3"></a><span class="st">  </span>as.data.frame</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>di_summ_1 <span class="sc">%&gt;%</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  head <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  as.data.frame</span></code></pre></div>
 <pre><code>##                                                                                            categoryLabel
 ## 1 Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF
 ## 2 Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF
@@ -517,29 +598,32 @@ code span.ot { color: #007020; }
 ## 4                             17                                  38
 ## 5                              0                                   0
 ## 6                              0                                   0</code></pre>
-<p>To calculate DI with cohort year collapsed, then one could omit the <code>cohort_var_col</code> argument for rows with common <code>disagg_var_col</code>, <code>group_var_col</code>, and those in <code>summarize_by_vars</code> to be aggregated or collapsed:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="co"># Example 2: by outcome, collapse cohort academic years</span></span>
-<span id="cb21-2"><a href="#cb21-2"></a>di_summ_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">di_iterate_on_long</span>(<span class="dt">data=</span>d_relevant</span>
-<span id="cb21-3"><a href="#cb21-3"></a>                                , <span class="dt">num_var=</span><span class="st">&#39;value&#39;</span></span>
-<span id="cb21-4"><a href="#cb21-4"></a>                                , <span class="dt">denom_var=</span><span class="st">&#39;denom&#39;</span></span>
-<span id="cb21-5"><a href="#cb21-5"></a>                                , <span class="dt">disagg_var_col=</span><span class="st">&#39;disagg1&#39;</span></span>
-<span id="cb21-6"><a href="#cb21-6"></a>                                , <span class="dt">group_var_col=</span><span class="st">&#39;subgroup1&#39;</span></span>
-<span id="cb21-7"><a href="#cb21-7"></a>                                <span class="co"># , cohort_var_col=&#39;academicYear&#39;</span></span>
-<span id="cb21-8"><a href="#cb21-8"></a>                                , <span class="dt">summarize_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;categoryLabel&#39;</span>, <span class="st">&#39;cohort&#39;</span>)</span>
-<span id="cb21-9"><a href="#cb21-9"></a>                                , <span class="dt">ppg_reference_groups=</span><span class="st">&#39;all but current&#39;</span></span>
-<span id="cb21-10"><a href="#cb21-10"></a>                                , <span class="dt">di_80_index_reference_groups=</span><span class="st">&#39;all but current&#39;</span></span>
-<span id="cb21-11"><a href="#cb21-11"></a>                                  )</span></code></pre></div>
-<pre><code>## Joining, by = c(&quot;cohort&quot;, &quot;categoryLabel&quot;, &quot;disagg1&quot;)</code></pre>
-<pre><code>## Joining, by = c(&quot;cohort&quot;, &quot;categoryLabel&quot;, &quot;disagg1&quot;, &quot;subgroup1&quot;)</code></pre>
-<pre><code>## Joining, by = c(&quot;categoryLabel&quot;, &quot;cohort&quot;, &quot;disagg1&quot;)</code></pre>
-<pre><code>## Joining, by = c(&quot;..scenario..&quot;, &quot;..group..&quot;)</code></pre>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="kw">nrow</span>(di_summ_<span class="dv">2</span>)</span></code></pre></div>
+<p>To calculate DI with cohort year collapsed, then one could omit the
+<code>cohort_var_col</code> argument for rows with common
+<code>disagg_var_col</code>, <code>group_var_col</code>, and those in
+<code>summarize_by_vars</code> to be aggregated or collapsed:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example 2: by outcome, collapse cohort academic years</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>di_summ_2 <span class="ot">&lt;-</span> <span class="fu">di_iterate_on_long</span>(<span class="at">data=</span>d_relevant</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">num_var=</span><span class="st">&#39;value&#39;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">denom_var=</span><span class="st">&#39;denom&#39;</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">disagg_var_col=</span><span class="st">&#39;disagg1&#39;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">group_var_col=</span><span class="st">&#39;subgroup1&#39;</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                                <span class="co"># , cohort_var_col=&#39;academicYear&#39;</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">summarize_by_vars=</span><span class="fu">c</span>(<span class="st">&#39;categoryLabel&#39;</span>, <span class="st">&#39;cohort&#39;</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">ppg_reference_groups=</span><span class="st">&#39;all but current&#39;</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">di_80_index_reference_groups=</span><span class="st">&#39;all but current&#39;</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>                                  )</span></code></pre></div>
+<pre><code>## Joining, by = c(&quot;cohort&quot;, &quot;categoryLabel&quot;, &quot;disagg1&quot;)
+## Joining, by = c(&quot;cohort&quot;, &quot;categoryLabel&quot;, &quot;disagg1&quot;, &quot;subgroup1&quot;)
+## Joining, by = c(&quot;categoryLabel&quot;, &quot;cohort&quot;, &quot;disagg1&quot;)
+## Joining, by = c(&quot;..scenario..&quot;, &quot;..groupref..&quot;)</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(di_summ_2)</span></code></pre></div>
 <pre><code>## [1] 43</code></pre>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="kw">nrow</span>(d_relevant)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(d_relevant)</span></code></pre></div>
 <pre><code>## [1] 120</code></pre>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>di_summ_<span class="dv">2</span> <span class="op">%&gt;%</span></span>
-<span id="cb30-2"><a href="#cb30-2"></a><span class="st">  </span>head <span class="op">%&gt;%</span></span>
-<span id="cb30-3"><a href="#cb30-3"></a><span class="st">  </span>as.data.frame</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>di_summ_2 <span class="sc">%&gt;%</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  head <span class="sc">%&gt;%</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  as.data.frame</span></code></pre></div>
 <pre><code>##                                                                                            categoryLabel
 ## 1 Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF
 ## 2 Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF
@@ -599,31 +683,39 @@ code span.ot { color: #007020; }
 </div>
 <div id="second-layer-of-disaggregation-intersectionality" class="section level1">
 <h1>Second layer of disaggregation / Intersectionality</h1>
-<p>Sometimes, users may want to incorporate a second layer of disaggregation / intersection with another a second variable (e.g., gender). The <a href="./Intersectionality.html">Intersectionality</a> vignette discusses this in some detail. One could do this using the second derived data set, <code>d_relevant_gender</code>, which contains summarized data with rows split out by gender:</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a><span class="co"># Example 3: by outcome, intersecting gender</span></span>
-<span id="cb32-2"><a href="#cb32-2"></a>di_summ_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw">di_iterate_on_long</span>(<span class="dt">data=</span>d_relevant_gender</span>
-<span id="cb32-3"><a href="#cb32-3"></a>                                , <span class="dt">num_var=</span><span class="st">&#39;value&#39;</span></span>
-<span id="cb32-4"><a href="#cb32-4"></a>                                , <span class="dt">denom_var=</span><span class="st">&#39;denom&#39;</span></span>
-<span id="cb32-5"><a href="#cb32-5"></a>                                , <span class="dt">disagg_var_col=</span><span class="st">&#39;disagg1&#39;</span></span>
-<span id="cb32-6"><a href="#cb32-6"></a>                                , <span class="dt">group_var_col=</span><span class="st">&#39;subgroup1&#39;</span></span>
-<span id="cb32-7"><a href="#cb32-7"></a>                                , <span class="dt">disagg_var_col_2=</span><span class="st">&#39;disagg2&#39;</span></span>
-<span id="cb32-8"><a href="#cb32-8"></a>                                , <span class="dt">group_var_col_2=</span><span class="st">&#39;subgroup2&#39;</span></span>
-<span id="cb32-9"><a href="#cb32-9"></a>                                , <span class="dt">cohort_var_col=</span><span class="st">&#39;academicYear&#39;</span></span>
-<span id="cb32-10"><a href="#cb32-10"></a>                                , <span class="dt">summarize_by_vars=</span><span class="kw">c</span>(<span class="st">&#39;categoryLabel&#39;</span>, <span class="st">&#39;cohort&#39;</span>)</span>
-<span id="cb32-11"><a href="#cb32-11"></a>                                , <span class="dt">ppg_reference_groups=</span><span class="st">&#39;overall&#39;</span></span>
-<span id="cb32-12"><a href="#cb32-12"></a>                                , <span class="dt">di_80_index_reference_groups=</span><span class="st">&#39;all but current&#39;</span></span>
-<span id="cb32-13"><a href="#cb32-13"></a>                                  )</span></code></pre></div>
-<pre><code>## Joining, by = c(&quot;cohort&quot;, &quot;academicYear&quot;, &quot;categoryLabel&quot;, &quot;disagg1&quot;, &quot;disagg2&quot;)</code></pre>
-<pre><code>## Joining, by = c(&quot;cohort&quot;, &quot;academicYear&quot;, &quot;categoryLabel&quot;, &quot;disagg1&quot;, &quot;subgroup1&quot;, &quot;disagg2&quot;, &quot;subgroup2&quot;)</code></pre>
-<pre><code>## Joining, by = c(&quot;categoryLabel&quot;, &quot;cohort&quot;, &quot;disagg1&quot;, &quot;disagg2&quot;, &quot;academicYear&quot;)</code></pre>
-<pre><code>## Joining, by = c(&quot;..scenario..&quot;, &quot;..group..&quot;)</code></pre>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a><span class="kw">nrow</span>(di_summ_<span class="dv">3</span>)</span></code></pre></div>
+<p>Sometimes, users may want to incorporate a second layer of
+disaggregation / intersection with another a second variable (e.g.,
+gender). The <a href="./Intersectionality.html">Intersectionality</a>
+vignette discusses this in some detail. One could do this using the
+second derived data set, <code>d_relevant_gender</code>, which contains
+summarized data with rows split out by gender:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example 3: by outcome, intersecting gender</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>di_summ_3 <span class="ot">&lt;-</span> <span class="fu">di_iterate_on_long</span>(<span class="at">data=</span>d_relevant_gender</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">num_var=</span><span class="st">&#39;value&#39;</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">denom_var=</span><span class="st">&#39;denom&#39;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">disagg_var_col=</span><span class="st">&#39;disagg1&#39;</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">group_var_col=</span><span class="st">&#39;subgroup1&#39;</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">disagg_var_col_2=</span><span class="st">&#39;disagg2&#39;</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">group_var_col_2=</span><span class="st">&#39;subgroup2&#39;</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">cohort_var_col=</span><span class="st">&#39;academicYear&#39;</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">summarize_by_vars=</span><span class="fu">c</span>(<span class="st">&#39;categoryLabel&#39;</span>, <span class="st">&#39;cohort&#39;</span>)</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">ppg_reference_groups=</span><span class="st">&#39;overall&#39;</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">di_80_index_reference_groups=</span><span class="st">&#39;all but current&#39;</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>                                  )</span></code></pre></div>
+<pre><code>## Joining, by = c(&quot;cohort&quot;, &quot;academicYear&quot;, &quot;categoryLabel&quot;, &quot;disagg1&quot;,
+## &quot;disagg2&quot;)
+## Joining, by = c(&quot;cohort&quot;, &quot;academicYear&quot;, &quot;categoryLabel&quot;, &quot;disagg1&quot;,
+## &quot;subgroup1&quot;, &quot;disagg2&quot;, &quot;subgroup2&quot;)
+## Joining, by = c(&quot;categoryLabel&quot;, &quot;cohort&quot;, &quot;disagg1&quot;, &quot;disagg2&quot;,
+## &quot;academicYear&quot;)
+## Joining, by = c(&quot;..scenario..&quot;, &quot;..groupref..&quot;)</code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(di_summ_3)</span></code></pre></div>
 <pre><code>## [1] 201</code></pre>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a><span class="kw">nrow</span>(d_relevant_gender)</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(d_relevant_gender)</span></code></pre></div>
 <pre><code>## [1] 201</code></pre>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a>di_summ_<span class="dv">3</span> <span class="op">%&gt;%</span></span>
-<span id="cb41-2"><a href="#cb41-2"></a><span class="st">  </span>head <span class="op">%&gt;%</span></span>
-<span id="cb41-3"><a href="#cb41-3"></a><span class="st">  </span>as.data.frame</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>di_summ_3 <span class="sc">%&gt;%</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  head <span class="sc">%&gt;%</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  as.data.frame</span></code></pre></div>
 <pre><code>##                                                                                            categoryLabel
 ## 1 Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF
 ## 2 Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF
@@ -681,17 +773,121 @@ code span.ot { color: #007020; }
 ## 5                              4                                  14
 ## 6                              0                                   0</code></pre>
 </div>
+<div id="custom-reference-groups" class="section level1">
+<h1>Custom Reference Groups</h1>
+<p>The function <code>di_iterate</code>, the workhorse function
+underlying the function <code>di_iterate_on_long</code>, defaults to the
+overall rate and the highest performing group rate as reference when
+determining disproportionate impact using the percentage point gap
+method and the 80% index method, respectively (function arguments
+default: <code>ppg_reference_groups=&quot;overall&quot;</code>,
+<code>di_80_index_reference_groups=&quot;hpg&quot;</code>).</p>
+<p>When using the <code>di_iterate_on_long</code> function, the user
+could specify <code>&#39;overall&#39;</code>, <code>&#39;hpg&#39;</code>, or
+<code>&#39;all but current&#39;</code> to override the default for the
+<code>ppg_reference_groups</code> and the
+<code>di_80_index_reference_groups</code> arguments. To speficy custom
+reference groups for comparison, the user could use the argument
+<code>custom_reference_group_flag_var</code> to specify a variable in
+the data set specified by <code>data</code> that indicates the
+rows/groups to be used as reference. The same groups will be used as
+reference for both the percentage point gap method and the 80% index
+method. The following is an illustration:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example 4: By outcome, cohort; custom reference groups</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>di_summ_4 <span class="ot">&lt;-</span> <span class="fu">di_iterate_on_long</span>(<span class="at">data=</span>d_relevant <span class="sc">%&gt;%</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">filter</span>(subgroup1 <span class="sc">!=</span> <span class="st">&#39;All Masked Values&#39;</span>) <span class="sc">%&gt;%</span> <span class="co"># some foster youth and vetans disaggregation have just a single All Masked Values row; removing these scenarios for purpose of illustration</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">mutate</span>(<span class="at">custom_reference=</span><span class="fu">ifelse</span>(subgroup1 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&#39;White&#39;</span>,<span class="st">&#39;Not Foster Youth&#39;</span>, <span class="st">&#39;Not Veteran&#39;</span>), <span class="dv">1</span>, <span class="dv">0</span>)) <span class="co"># create a variable that flags the reference groups</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">num_var=</span><span class="st">&#39;value&#39;</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">denom_var=</span><span class="st">&#39;denom&#39;</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">disagg_var_col=</span><span class="st">&#39;disagg1&#39;</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">group_var_col=</span><span class="st">&#39;subgroup1&#39;</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">cohort_var_col=</span><span class="st">&#39;academicYear&#39;</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">summarize_by_vars=</span><span class="fu">c</span>(<span class="st">&#39;categoryLabel&#39;</span>, <span class="st">&#39;cohort&#39;</span>)</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>                                , <span class="at">custom_reference_group_flag_var=</span><span class="st">&#39;custom_reference&#39;</span> <span class="co"># Specify variable/flag for custom reference groups</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>                                  )</span></code></pre></div>
+<pre><code>## Joining, by = c(&quot;cohort&quot;, &quot;academicYear&quot;, &quot;categoryLabel&quot;, &quot;disagg1&quot;)
+## Joining, by = c(&quot;cohort&quot;, &quot;academicYear&quot;, &quot;categoryLabel&quot;, &quot;disagg1&quot;,
+## &quot;subgroup1&quot;, &quot;custom_reference&quot;)
+## Joining, by = c(&quot;categoryLabel&quot;, &quot;cohort&quot;, &quot;disagg1&quot;, &quot;academicYear&quot;)
+## Joining, by = c(&quot;..scenario..&quot;, &quot;..groupref..&quot;)</code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(di_summ_4)</span></code></pre></div>
+<pre><code>## [1] 83</code></pre>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>di_summ_4 <span class="sc">%&gt;%</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  head <span class="sc">%&gt;%</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  as.data.frame</span></code></pre></div>
+<pre><code>##                                                                                            categoryLabel
+## 1 Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF
+## 2 Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF
+## 3 Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF
+## 4 Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF
+## 5 Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF
+## 6 Completed Both Transfer-Level Math and English Within the District in the First Year Aligned with SCFF
+##          cohort   disagg1 academicYear         subgroup1 custom_reference    n
+## 1 After 3 Years Ethnicity         2015             Asian                0  938
+## 2 After 3 Years Ethnicity         2015          Filipino                0   97
+## 3 After 3 Years Ethnicity         2015          Hispanic                0  903
+## 4 After 3 Years Ethnicity         2015 Two or More Races                0  162
+## 5 After 3 Years Ethnicity         2015             White                1 1178
+## 6 After 3 Years  Veterans         2015       Not Veteran                1 3385
+##   success        pct ppg_reference ppg_reference_group        moe     pct_lo
+## 1     115 0.12260128     0.1129032              Custom 0.03199813 0.09060315
+## 2      16 0.16494845     0.1129032              Custom 0.09950392 0.06544453
+## 3      69 0.07641196     0.1129032              Custom 0.03261236 0.04379960
+## 4      21 0.12962963     0.1129032              Custom 0.07699607 0.05263356
+## 5     133 0.11290323     0.1129032              Custom 0.03000000 0.08290323
+## 6     364 0.10753323     0.1075332              Custom 0.03000000 0.07753323
+##      pct_hi di_indicator_ppg success_needed_not_di_ppg
+## 1 0.1545994                0                         0
+## 2 0.2644524                0                         0
+## 3 0.1090243                1                         4
+## 4 0.2066257                0                         0
+## 5 0.1429032                0                         0
+## 6 0.1375332                0                         0
+##   success_needed_full_parity_ppg di_prop_index di_indicator_prop_index
+## 1                              0     1.1352740                       0
+## 2                              0     1.5274040                       0
+## 3                             33     0.7075661                       1
+## 4                              0     1.2003557                       0
+## 5                              0     1.0454711                       0
+## 6                              0     1.0000000                       0
+##   success_needed_not_di_prop_index success_needed_full_parity_prop_index
+## 1                                0                                     0
+## 2                                0                                     0
+## 3                               12                                    40
+## 4                                0                                     0
+## 5                                0                                     0
+## 6                                0                                     0
+##   di_80_index_reference_group di_80_index di_indicator_80_index
+## 1                      Custom   1.0858970                     0
+## 2                      Custom   1.4609720                     0
+## 3                      Custom   0.6767916                     1
+## 4                      Custom   1.1481481                     0
+## 5                      Custom   1.0000000                     0
+## 6                      Custom   1.0000000                     0
+##   success_needed_not_di_80_index success_needed_full_parity_80_index
+## 1                              0                                   0
+## 2                              0                                   0
+## 3                             13                                  33
+## 4                              0                                   0
+## 5                              0                                   0
+## 6                              0                                   0</code></pre>
+</div>
 <div id="additional-information" class="section level1">
 <h1>Additional Information</h1>
-<p>For additional illustrations of various parameter changes in <code>di_iterate_on_long</code>, please see the <a href="./Scaling-DI-Calculations.html">Scaling DI Calculations</a> vignette as the <code>di_iterate_on_long</code> function is very similar to <code>di_iterate</code> that’s applied to a unitary data set.</p>
+<p>For additional illustrations of various parameter changes in
+<code>di_iterate_on_long</code>, please see the <a href="./Scaling-DI-Calculations.html">Scaling DI Calculations</a>
+vignette as the <code>di_iterate_on_long</code> function is very similar
+to <code>di_iterate</code> that’s applied to a unitary data set.</p>
 </div>
 <div id="appendix-r-and-r-package-versions" class="section level1">
 <h1>Appendix: R and R Package Versions</h1>
-<p>This vignette was generated using an R session with the following packages. There may be some discrepancies when the reader replicates the code caused by version mismatch.</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a><span class="kw">sessionInfo</span>()</span></code></pre></div>
+<p>This vignette was generated using an R session with the following
+packages. There may be some discrepancies when the reader replicates the
+code caused by version mismatch.</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
 <pre><code>## R version 4.0.2 (2020-06-22)
 ## Platform: x86_64-w64-mingw32/x64 (64-bit)
-## Running under: Windows 10 x64 (build 17763)
+## Running under: Windows 10 x64 (build 19042)
 ## 
 ## Matrix products: default
 ## 
@@ -706,19 +902,19 @@ code span.ot { color: #007020; }
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] knitr_1.33           dplyr_1.0.6          DisImpact_0.0.9000  
+## [1] knitr_1.39           dplyr_1.0.8          DisImpact_0.0.17    
 ## [4] RevoUtils_11.0.2     RevoUtilsMath_11.0.0
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] rstudioapi_0.13   magrittr_2.0.1    tidyselect_1.1.1  R6_2.5.0         
-##  [5] rlang_0.4.11      fansi_0.5.0       highr_0.9         stringr_1.4.0    
-##  [9] tools_4.0.2       xfun_0.23         utf8_1.2.1        cli_3.1.0        
-## [13] jquerylib_0.1.4   htmltools_0.5.1.1 ellipsis_0.3.2    yaml_2.2.1       
-## [17] digest_0.6.27     tibble_3.1.2      lifecycle_1.0.0   crayon_1.4.1     
-## [21] tidyr_1.1.3       purrr_0.3.4       sass_0.4.0        prettydoc_0.4.1  
-## [25] vctrs_0.3.8       glue_1.4.2        evaluate_0.14     rmarkdown_2.9    
-## [29] stringi_1.4.6     compiler_4.0.2    bslib_0.2.5.1     pillar_1.6.1     
-## [33] generics_0.1.0    jsonlite_1.7.2    pkgconfig_2.0.3</code></pre>
+##  [1] rstudioapi_0.13  magrittr_2.0.2   tidyselect_1.1.2 R6_2.3.0        
+##  [5] rlang_1.0.1      fastmap_1.1.0    fansi_1.0.2      highr_0.9       
+##  [9] stringr_1.4.0    tools_4.0.2      xfun_0.30        utf8_1.2.2      
+## [13] cli_3.2.0        jquerylib_0.1.4  ellipsis_0.3.2   htmltools_0.5.2 
+## [17] yaml_2.3.5       digest_0.6.25    tibble_3.1.6     lifecycle_1.0.1 
+## [21] crayon_1.5.0     tidyr_1.2.0      purrr_0.3.4      sass_0.4.1      
+## [25] prettydoc_0.4.1  vctrs_0.3.8      glue_1.6.1       evaluate_0.15   
+## [29] rmarkdown_2.14   stringi_1.4.6    compiler_4.0.2   bslib_0.3.1     
+## [33] pillar_1.7.0     generics_0.1.2   jsonlite_1.5     pkgconfig_2.0.3</code></pre>
 </div>
     </section>
   </div>

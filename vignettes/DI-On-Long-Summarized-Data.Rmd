@@ -171,6 +171,32 @@ di_summ_3 %>%
   as.data.frame
 ```
 
+# Custom Reference Groups
+
+The function `di_iterate`, the workhorse function underlying the function `di_iterate_on_long`, defaults to the overall rate and the highest performing group rate as reference when determining disproportionate impact using the percentage point gap method and the 80% index method, respectively (function arguments default: `ppg_reference_groups="overall"`, `di_80_index_reference_groups="hpg"`).
+
+When using the `di_iterate_on_long` function, the user could specify `'overall'`, `'hpg'`, or `'all but current'` to override the default for the `ppg_reference_groups` and the `di_80_index_reference_groups` arguments.  To speficy custom reference groups for comparison, the user could use the argument `custom_reference_group_flag_var` to specify a variable in the data set specified by `data` that indicates the rows/groups to be used as reference.  The same groups will be used as reference for both the percentage point gap method and the 80% index method.  The following is an illustration:
+
+```{r warning=FALSE}
+# Example 4: By outcome, cohort; custom reference groups
+di_summ_4 <- di_iterate_on_long(data=d_relevant %>%
+                                  filter(subgroup1 != 'All Masked Values') %>% # some foster youth and vetans disaggregation have just a single All Masked Values row; removing these scenarios for purpose of illustration
+                                  mutate(custom_reference=ifelse(subgroup1 %in% c('White','Not Foster Youth', 'Not Veteran'), 1, 0)) # create a variable that flags the reference groups
+                                , num_var='value'
+                                , denom_var='denom'
+                                , disagg_var_col='disagg1'
+                                , group_var_col='subgroup1'
+                                , cohort_var_col='academicYear'
+                                , summarize_by_vars=c('categoryLabel', 'cohort')
+                                , custom_reference_group_flag_var='custom_reference' # Specify variable/flag for custom reference groups
+                                  )
+nrow(di_summ_4)
+
+di_summ_4 %>%
+  head %>%
+  as.data.frame
+```
+
 # Additional Information
 
 For additional illustrations of various parameter changes in `di_iterate_on_long`, please see the [Scaling DI Calculations](./Scaling-DI-Calculations.html) vignette as the `di_iterate_on_long` function is very similar to `di_iterate` that's applied to a unitary data set.
