@@ -1,6 +1,6 @@
 Package: DisImpact
 Title: Calculates Disproportionate Impact When Binary Success Data are Disaggregated by Subgroups
-Version: 0.0.9000
+Version: 0.0.17
 Authors@R: person("Vinh", "Nguyen", email = "nguyenvq714@gmail.com", role = c("aut", "cre"))
 Description: Implements methods for calculating disproportionate impact: the percentage point gap, proportionality index, and the 80% index.
  California Community Colleges Chancellor's Office (2017).  Percentage Point Gap Method. <https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Research/Files/PercentagePointGapMethod2017.ashx>.
@@ -12,7 +12,7 @@ URL: https://github.com/vinhdizzo/DisImpact
 BugReports: https://github.com/vinhdizzo/DisImpact/issues
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Suggests: knitr,
     rmarkdown,
     markdown,

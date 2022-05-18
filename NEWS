@@ -1,3 +1,5 @@
+* 0.0.17
+  - Added `custom_reference_group_flag_var` argument to function `di_iterate_on_long` as custom reference groups do not work with the `ppg_reference_groups` and `di_80_index_reference_groups` arguments.
 * 0.0.16
   - New function `di_iterate_on_long` allows for DI calculation on long, summarized data sets.
   - New vignette: Disproportionate Impact (DI) Calculations on Long, Summarized Data Sets
