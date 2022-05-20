@@ -25,6 +25,8 @@
 ##' @param di_80_index_cutoff Threshold used for determining disproportionate impact using the 80\% index; passed to \link[DisImpact]{di_80_index}; defaults to 0.80.
 ##' @param di_80_index_reference_groups A character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the 80\% index; defaults to \code{'hpg'} (highest performing group as reference), but could also be \code{'overall'} or \code{'all but current'}.
 ##' @param check_valid_reference Check whether \code{ppg_reference_groups} and \code{di_80_index_reference_groups} contain valid values; defaults to \code{TRUE}.
+##' @param parallel If \code{TRUE}, then perform calculations in parallel based on the scenarios specified by \code{scenario_repeat_by_vars}.  Defaults to \code{FALSE}.  Parallel execution is based on the \code{parallel} package included in base R, using \link[parallel]{parLapply} on Windows and \link[parallel]{mclapply} on UNIX/Mac.
+##' @param parallel_n_cores The number of CPU cores to use if \code{parallel=TRUE}.  Defaults to the maximum number on the system.
 ##' @return A summarized data set (data frame) consisting of:
 ##' \itemize{
 ##'   \item \code{success_variable} (elements of \code{success_vars}),
@@ -47,7 +49,7 @@
 ##' @importFrom purrr pmap
 ##' @importFrom tidyr unnest
 ##' @export
-di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenario_repeat_by_vars=NULL, exclude_scenario_df=NULL, weight_var=NULL, include_non_disagg_results=TRUE, ppg_reference_groups='overall', min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5, di_prop_index_cutoff=0.80, di_80_index_cutoff=0.80, di_80_index_reference_groups='hpg', check_valid_reference=TRUE) {
+di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenario_repeat_by_vars=NULL, exclude_scenario_df=NULL, weight_var=NULL, include_non_disagg_results=TRUE, ppg_reference_groups='overall', min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5, di_prop_index_cutoff=0.80, di_80_index_cutoff=0.80, di_80_index_reference_groups='hpg', check_valid_reference=TRUE, parallel=FALSE, parallel_n_cores=parallel::detectCores()) {
   stopifnot(length(group_vars) == length(ppg_reference_groups) | length(ppg_reference_groups) == 1)
   stopifnot(length(group_vars) == length(di_80_index_reference_groups) | length(di_80_index_reference_groups) == 1)
 
@@ -323,15 +325,53 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
     pmap(dScenarios %>% mutate(subset_idx=list(subset_idx)), iterate) %>%
       bind_rows
   } else {
-    dRepeatScenarios$df_results <- lapply(1:nrow(dRepeatScenarios)
-                                     , FUN=function(i) {
-                                       # data <- data %>% slice(dRepeatScenarios[i, ] %>% select(want_indices) %>% unlist)
-                                       # subset_idx <- dRepeatScenarios[i, ] %>% select(want_indices) %>% unlist
-                                       subset_idx <- dRepeatScenarios %>% slice(i) %>% select(want_indices) %>% unlist
-                                       pmap(dScenarios %>% mutate(subset_idx=list(subset_idx)), iterate) %>%
-                                         bind_rows
-                                     }
-                                     )
+    if (!parallel) {
+      dRepeatScenarios$df_results <- lapply(1:nrow(dRepeatScenarios)
+                                       , FUN=function(i) {
+                                         # data <- data %>% slice(dRepeatScenarios[i, ] %>% select(want_indices) %>% unlist)
+                                         # subset_idx <- dRepeatScenarios[i, ] %>% select(want_indices) %>% unlist
+                                         subset_idx <- dRepeatScenarios %>% slice(i) %>% select(want_indices) %>% unlist
+                                         pmap(dScenarios %>% mutate(subset_idx=list(subset_idx)), iterate) %>%
+                                           bind_rows
+                                       }
+                                       )
+    } else if (parallel & Sys.info()[['sysname']] != 'Windows'){
+      
+      cat(paste0('NOTE: Since `parallel=TRUE`, will attempt to use ', parallel_n_cores, ' CPU cores to execute ', nrow(dRepeatScenarios), ' scenarios in parallel.  The user could change the number of parallel cores with the `parallel_n_cores` argument.'))
+
+      dRepeatScenarios$df_results <- mclapply(1:nrow(dRepeatScenarios)
+                                       , FUN=function(i) {
+                                         # data <- data %>% slice(dRepeatScenarios[i, ] %>% select(want_indices) %>% unlist)
+                                         # subset_idx <- dRepeatScenarios[i, ] %>% select(want_indices) %>% unlist
+                                         subset_idx <- dRepeatScenarios %>% slice(i) %>% select(want_indices) %>% unlist
+                                         pmap(dScenarios %>% mutate(subset_idx=list(subset_idx)), iterate) %>%
+                                           bind_rows
+                                       }
+                                       , mc.cores=parallel_n_cores
+                                       )
+    } else if (parallel & Sys.info()[['sysname']] == 'Windows') {
+      
+      cat(paste0('NOTE: Since `parallel=TRUE`, will attempt to use ', parallel_n_cores, ' CPU cores to execute ', nrow(dRepeatScenarios), ' scenarios in parallel.  The user could change the number of parallel cores with the `parallel_n_cores` argument.'))
+
+      cl <- makeCluster(parallel_n_cores)
+      clusterEvalQ(cl, library(dplyr))
+      clusterEvalQ(cl, library(tidyr))
+      clusterEvalQ(cl, library(purrr))
+      clusterExport(cl, varlist=c('dRepeatScenarios', 'data', ls('package:DisImpact')), envir=environment())
+
+            dRepeatScenarios$df_results <- parLapply(cl, 1:nrow(dRepeatScenarios)
+                                       , fun=function(i) {
+                                         # data <- data %>% slice(dRepeatScenarios[i, ] %>% select(want_indices) %>% unlist)
+                                         # subset_idx <- dRepeatScenarios[i, ] %>% select(want_indices) %>% unlist
+                                         subset_idx <- dRepeatScenarios %>% slice(i) %>% select(want_indices) %>% unlist
+                                         pmap(dScenarios %>% mutate(subset_idx=list(subset_idx)), iterate) %>%
+                                           bind_rows
+                                       }
+                                       )
+      
+      stopCluster(cl=cl)
+    }
+    
     # CRAN: no visible binding for global variable
     df_results <- NULL
     
