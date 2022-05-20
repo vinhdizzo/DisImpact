@@ -44,7 +44,7 @@
 ##' di_iterate(data=student_equity, success_vars=c('Transfer')
 ##'   , group_vars=c('Ethnicity', 'Gender'), cohort_vars=c('Cohort')
 ##'   , ppg_reference_groups='overall')
-##' @import dplyr
+##' @import dplyr, parallel
 ##' @importFrom tidyselect everything one_of
 ##' @importFrom purrr pmap
 ##' @importFrom tidyr unnest
@@ -380,3 +380,4 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
       unnest(df_results)
   }
 }
+
