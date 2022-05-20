@@ -21,7 +21,9 @@ di_iterate(
   di_prop_index_cutoff = 0.8,
   di_80_index_cutoff = 0.8,
   di_80_index_reference_groups = "hpg",
-  check_valid_reference = TRUE
+  check_valid_reference = TRUE,
+  parallel = FALSE,
+  parallel_n_cores = parallel::detectCores()
 )
 }
 \arguments{
@@ -64,6 +66,10 @@ Each combination of these variables (eg, full time, first time college students 
 \item{di_80_index_reference_groups}{A character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the 80\% index; defaults to \code{'hpg'} (highest performing group as reference), but could also be \code{'overall'} or \code{'all but current'}.}
 
 \item{check_valid_reference}{Check whether \code{ppg_reference_groups} and \code{di_80_index_reference_groups} contain valid values; defaults to \code{TRUE}.}
+
+\item{parallel}{If \code{TRUE}, then perform calculations in parallel based on the scenarios specified by \code{scenario_repeat_by_vars}.  Defaults to \code{FALSE}.  Parallel execution is based on the \code{parallel} package included in base R, using \link[parallel]{parLapply} on Windows and \link[parallel]{mclapply} on UNIX/Mac.}
+
+\item{parallel_n_cores}{The number of CPU cores to use if \code{parallel=TRUE}.  Defaults to the maximum number on the system.}
 }
 \value{
 A summarized data set (data frame) consisting of:
