@@ -6,7 +6,7 @@ Description: Implements methods for calculating disproportionate impact: the per
  California Community Colleges Chancellor's Office (2017).  Percentage Point Gap Method. <https://www.cccco.edu/-/media/CCCCO-Website/About-Us/Divisions/Digital-Innovation-and-Infrastructure/Research/Files/PercentagePointGapMethod2017.ashx>.
  California Community Colleges Chancellor's Office (2014).  Guidelines for Measuring Disproportionate Impact in Equity Plans. <https://www.cccco.edu/-/media/CCCCO-Website/Files/DII/guidelines-for-measuring-disproportionate-impact-in-equity-plans-tfa-ada.pdf>.
 Depends: R (>= 3.4.0)
-Imports: dplyr (>= 0.8.5), rlang, tidyselect, purrr, tidyr, parallel
+Imports: dplyr (>= 0.8.5), rlang, tidyselect, purrr, tidyr, parallel, fst
 License: GPL-3
 URL: https://github.com/vinhdizzo/DisImpact
 BugReports: https://github.com/vinhdizzo/DisImpact/issues

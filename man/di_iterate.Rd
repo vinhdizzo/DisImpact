@@ -23,7 +23,8 @@ di_iterate(
   di_80_index_reference_groups = "hpg",
   check_valid_reference = TRUE,
   parallel = FALSE,
-  parallel_n_cores = parallel::detectCores()
+  parallel_n_cores = parallel::detectCores(),
+  parallel_split_to_disk = FALSE
 )
 }
 \arguments{
@@ -70,6 +71,8 @@ Each combination of these variables (eg, full time, first time college students 
 \item{parallel}{If \code{TRUE}, then perform calculations in parallel based on the scenarios specified by \code{scenario_repeat_by_vars}.  Defaults to \code{FALSE}.  Parallel execution is based on the \code{parallel} package included in base R, using \link[parallel]{parLapply} on Windows and \link[parallel]{mclapply} on UNIX/Mac.}
 
 \item{parallel_n_cores}{The number of CPU cores to use if \code{parallel=TRUE}.  Defaults to the maximum number on the system.}
+
+\item{parallel_split_to_disk}{Use disk when parallelizing since data set is probably large.}
 }
 \value{
 A summarized data set (data frame) consisting of:
