@@ -456,6 +456,21 @@ Since `di_iterate` disaggregates on many variables and subpopulations, it is not
 ##   filter(FERPA_Block == 0)
 ```
 
+# Suppress / disable "`Joining, by`" messages
+
+The `di_iterate` function joins various data sets using `dplyr` in the course of calculating DI.  As such, the implicit join's are reported in the R console by various lines starting with `Joining, by =`.  For runs with many scenarios, this may be overwhelming.  To suppress these messages, the user could wrap / pipe the `di_iterate` call with / to the `suppressMessages` function:
+
+```{r}
+df_di_summary <- di_iterate(data=student_equity
+                          , success_vars=c('Math', 'English', 'Transfer')
+                          , group_vars=c('Ethnicity', 'Gender')
+                          , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                          , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                            ) %>%
+  suppressMessages
+```
+
+
 # Appendix: R and R Package Versions
 
 This vignette was generated using an R session with the following packages.  There may be some discrepancies when the reader replicates the code caused by version mismatch.
