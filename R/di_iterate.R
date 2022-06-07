@@ -204,7 +204,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
                                    slice(i) %>% 
                                    select(one_of(vars_specific)) %>%
                                    left_join(data %>% mutate(row_index=row_number())) %>%
-
+                                   suppressMessages %>% # Source of many "Joining, by", so just remove them
                                    filter(!is.na(row_index)) %>% # No match
                                    group_by_at(vars(one_of(vars_specific))) %>%
                                    summarize(want_indices=list(row_index), n_rows=n()) %>%
