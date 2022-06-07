@@ -489,8 +489,8 @@ When the data set specified by `data` is very large in size, R or the system cou
 
 ```{r}
 # Create a very large student data set
-n_college <- 200
-student_equity_big <- do.call('rbind', replicate(n_college, student_equity, simplify=FALSE)) # repeat student_equity data set 200 times
+n_college <- 400
+student_equity_big <- do.call('rbind', replicate(n_college, student_equity, simplify=FALSE)) # repeat student_equity data set n_college times
 student_equity_big$college <- rep(paste0('College ', 1:n_college), each=nrow(student_equity)) # College Name
 dim(student_equity_big)
 table(student_equity_big$college)
@@ -504,10 +504,10 @@ big_di_summary <- di_iterate(data=student_equity_big
                           , success_vars=c('Math', 'English', 'Transfer')
                           , group_vars=c('Ethnicity', 'Gender')
                           , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
-                          , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                          , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status', 'college') # Add college
                           , parallel=TRUE
                           # , parallel_n_cores=4 # when not specified, use the max number of cores
-                          , parallel_save_to_disk=TRUE
+                          , parallel_split_to_disk=TRUE
                             )
 
 ```

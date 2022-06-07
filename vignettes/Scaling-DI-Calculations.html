@@ -1762,11 +1762,11 @@ multiple times in memory. This method is more robust, but increases
 execution time caused by I/O overhead. Here is a sample scenario for the
 user to illustrate on their own system:</p>
 <div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a very large student data set</span></span>
-<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>n_college <span class="ot">&lt;-</span> <span class="dv">200</span></span>
-<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>student_equity_big <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">&#39;rbind&#39;</span>, <span class="fu">replicate</span>(n_college, student_equity, <span class="at">simplify=</span><span class="cn">FALSE</span>)) <span class="co"># repeat student_equity data set 200 times</span></span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>n_college <span class="ot">&lt;-</span> <span class="dv">400</span></span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>student_equity_big <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">&#39;rbind&#39;</span>, <span class="fu">replicate</span>(n_college, student_equity, <span class="at">simplify=</span><span class="cn">FALSE</span>)) <span class="co"># repeat student_equity data set n_college times</span></span>
 <span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>student_equity_big<span class="sc">$</span>college <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">paste0</span>(<span class="st">&#39;College &#39;</span>, <span class="dv">1</span><span class="sc">:</span>n_college), <span class="at">each=</span><span class="fu">nrow</span>(student_equity)) <span class="co"># College Name</span></span>
 <span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(student_equity_big)</span></code></pre></div>
-<pre><code>## [1] 4000000      25</code></pre>
+<pre><code>## [1] 8000000      25</code></pre>
 <div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(student_equity_big<span class="sc">$</span>college)</span></code></pre></div>
 <pre><code>## 
 ##   College 1  College 10 College 100 College 101 College 102 College 103 
@@ -1807,36 +1807,102 @@ user to illustrate on their own system:</p>
 ##       20000       20000       20000       20000       20000       20000 
 ## College 197 College 198 College 199   College 2  College 20 College 200 
 ##       20000       20000       20000       20000       20000       20000 
-##  College 21  College 22  College 23  College 24  College 25  College 26 
+## College 201 College 202 College 203 College 204 College 205 College 206 
 ##       20000       20000       20000       20000       20000       20000 
-##  College 27  College 28  College 29   College 3  College 30  College 31 
+## College 207 College 208 College 209  College 21 College 210 College 211 
 ##       20000       20000       20000       20000       20000       20000 
-##  College 32  College 33  College 34  College 35  College 36  College 37 
+## College 212 College 213 College 214 College 215 College 216 College 217 
 ##       20000       20000       20000       20000       20000       20000 
-##  College 38  College 39   College 4  College 40  College 41  College 42 
+## College 218 College 219  College 22 College 220 College 221 College 222 
 ##       20000       20000       20000       20000       20000       20000 
-##  College 43  College 44  College 45  College 46  College 47  College 48 
+## College 223 College 224 College 225 College 226 College 227 College 228 
 ##       20000       20000       20000       20000       20000       20000 
-##  College 49   College 5  College 50  College 51  College 52  College 53 
+## College 229  College 23 College 230 College 231 College 232 College 233 
 ##       20000       20000       20000       20000       20000       20000 
-##  College 54  College 55  College 56  College 57  College 58  College 59 
+## College 234 College 235 College 236 College 237 College 238 College 239 
 ##       20000       20000       20000       20000       20000       20000 
-##   College 6  College 60  College 61  College 62  College 63  College 64 
+##  College 24 College 240 College 241 College 242 College 243 College 244 
 ##       20000       20000       20000       20000       20000       20000 
-##  College 65  College 66  College 67  College 68  College 69   College 7 
+## College 245 College 246 College 247 College 248 College 249  College 25 
 ##       20000       20000       20000       20000       20000       20000 
-##  College 70  College 71  College 72  College 73  College 74  College 75 
+## College 250 College 251 College 252 College 253 College 254 College 255 
 ##       20000       20000       20000       20000       20000       20000 
-##  College 76  College 77  College 78  College 79   College 8  College 80 
+## College 256 College 257 College 258 College 259  College 26 College 260 
 ##       20000       20000       20000       20000       20000       20000 
-##  College 81  College 82  College 83  College 84  College 85  College 86 
+## College 261 College 262 College 263 College 264 College 265 College 266 
 ##       20000       20000       20000       20000       20000       20000 
-##  College 87  College 88  College 89   College 9  College 90  College 91 
+## College 267 College 268 College 269  College 27 College 270 College 271 
 ##       20000       20000       20000       20000       20000       20000 
-##  College 92  College 93  College 94  College 95  College 96  College 97 
+## College 272 College 273 College 274 College 275 College 276 College 277 
 ##       20000       20000       20000       20000       20000       20000 
-##  College 98  College 99 
-##       20000       20000</code></pre>
+## College 278 College 279  College 28 College 280 College 281 College 282 
+##       20000       20000       20000       20000       20000       20000 
+## College 283 College 284 College 285 College 286 College 287 College 288 
+##       20000       20000       20000       20000       20000       20000 
+## College 289  College 29 College 290 College 291 College 292 College 293 
+##       20000       20000       20000       20000       20000       20000 
+## College 294 College 295 College 296 College 297 College 298 College 299 
+##       20000       20000       20000       20000       20000       20000 
+##   College 3  College 30 College 300 College 301 College 302 College 303 
+##       20000       20000       20000       20000       20000       20000 
+## College 304 College 305 College 306 College 307 College 308 College 309 
+##       20000       20000       20000       20000       20000       20000 
+##  College 31 College 310 College 311 College 312 College 313 College 314 
+##       20000       20000       20000       20000       20000       20000 
+## College 315 College 316 College 317 College 318 College 319  College 32 
+##       20000       20000       20000       20000       20000       20000 
+## College 320 College 321 College 322 College 323 College 324 College 325 
+##       20000       20000       20000       20000       20000       20000 
+## College 326 College 327 College 328 College 329  College 33 College 330 
+##       20000       20000       20000       20000       20000       20000 
+## College 331 College 332 College 333 College 334 College 335 College 336 
+##       20000       20000       20000       20000       20000       20000 
+## College 337 College 338 College 339  College 34 College 340 College 341 
+##       20000       20000       20000       20000       20000       20000 
+## College 342 College 343 College 344 College 345 College 346 College 347 
+##       20000       20000       20000       20000       20000       20000 
+## College 348 College 349  College 35 College 350 College 351 College 352 
+##       20000       20000       20000       20000       20000       20000 
+## College 353 College 354 College 355 College 356 College 357 College 358 
+##       20000       20000       20000       20000       20000       20000 
+## College 359  College 36 College 360 College 361 College 362 College 363 
+##       20000       20000       20000       20000       20000       20000 
+## College 364 College 365 College 366 College 367 College 368 College 369 
+##       20000       20000       20000       20000       20000       20000 
+##  College 37 College 370 College 371 College 372 College 373 College 374 
+##       20000       20000       20000       20000       20000       20000 
+## College 375 College 376 College 377 College 378 College 379  College 38 
+##       20000       20000       20000       20000       20000       20000 
+## College 380 College 381 College 382 College 383 College 384 College 385 
+##       20000       20000       20000       20000       20000       20000 
+## College 386 College 387 College 388 College 389  College 39 College 390 
+##       20000       20000       20000       20000       20000       20000 
+## College 391 College 392 College 393 College 394 College 395 College 396 
+##       20000       20000       20000       20000       20000       20000 
+## College 397 College 398 College 399   College 4  College 40 College 400 
+##       20000       20000       20000       20000       20000       20000 
+##  College 41  College 42  College 43  College 44  College 45  College 46 
+##       20000       20000       20000       20000       20000       20000 
+##  College 47  College 48  College 49   College 5  College 50  College 51 
+##       20000       20000       20000       20000       20000       20000 
+##  College 52  College 53  College 54  College 55  College 56  College 57 
+##       20000       20000       20000       20000       20000       20000 
+##  College 58  College 59   College 6  College 60  College 61  College 62 
+##       20000       20000       20000       20000       20000       20000 
+##  College 63  College 64  College 65  College 66  College 67  College 68 
+##       20000       20000       20000       20000       20000       20000 
+##  College 69   College 7  College 70  College 71  College 72  College 73 
+##       20000       20000       20000       20000       20000       20000 
+##  College 74  College 75  College 76  College 77  College 78  College 79 
+##       20000       20000       20000       20000       20000       20000 
+##   College 8  College 80  College 81  College 82  College 83  College 84 
+##       20000       20000       20000       20000       20000       20000 
+##  College 85  College 86  College 87  College 88  College 89   College 9 
+##       20000       20000       20000       20000       20000       20000 
+##  College 90  College 91  College 92  College 93  College 94  College 95 
+##       20000       20000       20000       20000       20000       20000 
+##  College 96  College 97  College 98  College 99 
+##       20000       20000       20000       20000</code></pre>
 <div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Not run: user test on their own system</span></span>
 <span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Parallel execution + writing to disk</span></span>
@@ -1844,10 +1910,10 @@ user to illustrate on their own system:</p>
 <span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">success_vars=</span><span class="fu">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</span>
 <span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">group_vars=</span><span class="fu">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</span>
 <span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">cohort_vars=</span><span class="fu">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</span>
-<span id="cb88-8"><a href="#cb88-8" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">scenario_repeat_by_vars=</span><span class="fu">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>)</span>
+<span id="cb88-8"><a href="#cb88-8" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">scenario_repeat_by_vars=</span><span class="fu">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>, <span class="st">&#39;college&#39;</span>) <span class="co"># Add college</span></span>
 <span id="cb88-9"><a href="#cb88-9" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">parallel=</span><span class="cn">TRUE</span></span>
 <span id="cb88-10"><a href="#cb88-10" aria-hidden="true" tabindex="-1"></a>                          <span class="co"># , parallel_n_cores=4 # when not specified, use the max number of cores</span></span>
-<span id="cb88-11"><a href="#cb88-11" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">parallel_save_to_disk=</span><span class="cn">TRUE</span></span>
+<span id="cb88-11"><a href="#cb88-11" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">parallel_split_to_disk=</span><span class="cn">TRUE</span></span>
 <span id="cb88-12"><a href="#cb88-12" aria-hidden="true" tabindex="-1"></a>                            )</span></code></pre></div>
 </div>
 <div id="appendix-r-and-r-package-versions" class="section level1">
