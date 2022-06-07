@@ -1904,17 +1904,19 @@ user to illustrate on their own system:</p>
 ##  College 96  College 97  College 98  College 99 
 ##       20000       20000       20000       20000</code></pre>
 <div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Not run: user test on their own system</span></span>
-<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Parallel execution + writing to disk</span></span>
-<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>big_di_summary <span class="ot">&lt;-</span> <span class="fu">di_iterate</span>(<span class="at">data=</span>student_equity_big</span>
-<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">success_vars=</span><span class="fu">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</span>
-<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">group_vars=</span><span class="fu">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</span>
-<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">cohort_vars=</span><span class="fu">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</span>
-<span id="cb88-8"><a href="#cb88-8" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">scenario_repeat_by_vars=</span><span class="fu">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>, <span class="st">&#39;college&#39;</span>) <span class="co"># Add college</span></span>
-<span id="cb88-9"><a href="#cb88-9" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">parallel=</span><span class="cn">TRUE</span></span>
-<span id="cb88-10"><a href="#cb88-10" aria-hidden="true" tabindex="-1"></a>                          <span class="co"># , parallel_n_cores=4 # when not specified, use the max number of cores</span></span>
-<span id="cb88-11"><a href="#cb88-11" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">parallel_split_to_disk=</span><span class="cn">TRUE</span></span>
-<span id="cb88-12"><a href="#cb88-12" aria-hidden="true" tabindex="-1"></a>                            )</span></code></pre></div>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a><span class="co"># User should try to increase n_college to 800 or another large number if the system has a lot of memory</span></span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a><span class="co"># User should wrap following call with system.time() to time execution: parallel=FALSE, then parallel=TRUE, then parallel=TRUE and parallel_split_to_disk=TRUE</span></span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Parallel execution + writing to disk</span></span>
+<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a>big_di_summary <span class="ot">&lt;-</span> <span class="fu">di_iterate</span>(<span class="at">data=</span>student_equity_big</span>
+<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">success_vars=</span><span class="fu">c</span>(<span class="st">&#39;Math&#39;</span>, <span class="st">&#39;English&#39;</span>, <span class="st">&#39;Transfer&#39;</span>)</span>
+<span id="cb88-8"><a href="#cb88-8" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">group_vars=</span><span class="fu">c</span>(<span class="st">&#39;Ethnicity&#39;</span>, <span class="st">&#39;Gender&#39;</span>)</span>
+<span id="cb88-9"><a href="#cb88-9" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">cohort_vars=</span><span class="fu">c</span>(<span class="st">&#39;Cohort_Math&#39;</span>, <span class="st">&#39;Cohort_English&#39;</span>, <span class="st">&#39;Cohort&#39;</span>)</span>
+<span id="cb88-10"><a href="#cb88-10" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">scenario_repeat_by_vars=</span><span class="fu">c</span>(<span class="st">&#39;Ed_Goal&#39;</span>, <span class="st">&#39;College_Status&#39;</span>, <span class="st">&#39;college&#39;</span>) <span class="co"># Add college</span></span>
+<span id="cb88-11"><a href="#cb88-11" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">parallel=</span><span class="cn">TRUE</span></span>
+<span id="cb88-12"><a href="#cb88-12" aria-hidden="true" tabindex="-1"></a>                          <span class="co"># , parallel_n_cores=4 # when not specified, use the max number of cores</span></span>
+<span id="cb88-13"><a href="#cb88-13" aria-hidden="true" tabindex="-1"></a>                          , <span class="at">parallel_split_to_disk=</span><span class="cn">TRUE</span></span>
+<span id="cb88-14"><a href="#cb88-14" aria-hidden="true" tabindex="-1"></a>                            )</span></code></pre></div>
 </div>
 <div id="appendix-r-and-r-package-versions" class="section level1">
 <h1>Appendix: R and R Package Versions</h1>

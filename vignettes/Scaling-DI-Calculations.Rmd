@@ -498,6 +498,8 @@ table(student_equity_big$college)
 
 ```{r eval=FALSE}
 # Not run: user test on their own system
+# User should try to increase n_college to 800 or another large number if the system has a lot of memory
+# User should wrap following call with system.time() to time execution: parallel=FALSE, then parallel=TRUE, then parallel=TRUE and parallel_split_to_disk=TRUE
 
 # Parallel execution + writing to disk
 big_di_summary <- di_iterate(data=student_equity_big
