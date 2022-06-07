@@ -403,7 +403,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
     }
     
     # CRAN: no visible binding for global variable
-    df_results <- NULL
+    df_results <- split_filename <- NULL
     
     dRepeatScenarios %>%
       select(-want_indices, -parallel_split_to_disk, -split_filename) %>%
