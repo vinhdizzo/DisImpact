@@ -369,7 +369,9 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
                                        }
                                        , mc.cores=parallel_n_cores
                                        )
-      file.remove(dRepeatScenarios$split_filename)
+      if (parallel_split_to_disk) {
+        file.remove(dRepeatScenarios$split_filename)
+      }
     } else if (parallel & Sys.info()[['sysname']] == 'Windows') {
       
       message(paste0('NOTE: Since `parallel=TRUE`, will attempt to use ', parallel_n_cores, ' CPU cores to execute ', nrow(dRepeatScenarios), ' scenarios in parallel.  The user could change the number of parallel cores with the `parallel_n_cores` argument.'))
@@ -395,7 +397,9 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
                                        )
       
       stopCluster(cl=cl)
-      file.remove(dRepeatScenarios$split_filename)
+      if (parallel_split_to_disk) {
+        file.remove(dRepeatScenarios$split_filename)
+      }
     }
     
     # CRAN: no visible binding for global variable
