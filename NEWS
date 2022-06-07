@@ -1,5 +1,6 @@
 * 0.0.18
   - Added `parallel`, `parallel_n_cores`, and `parallel_split_to_disk` parameters to function `di_iterate` for parallel computations, and updated vignette to illustrate the feature
+  - Added `suppressMessages` call in key `di_terate` step to reduce dplyr "Joining, by" messages
 * 0.0.17
   - Added `custom_reference_group_flag_var` argument to function `di_iterate_on_long` as custom reference groups do not work with the `ppg_reference_groups` and `di_80_index_reference_groups` arguments.
 * 0.0.16
