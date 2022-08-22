@@ -1,3 +1,5 @@
+* 0.0.19
+  - Scaling DI vignette: added explanation of how to use `exclude_scenario_df` parameter for `di_iterate`
 * 0.0.18
   - Added `parallel`, `parallel_n_cores`, and `parallel_split_to_disk` parameters to function `di_iterate` for parallel computations, and updated vignette to illustrate the feature
   - Added `suppressMessages` call in key `di_terate` step to reduce dplyr "Joining, by" messages
