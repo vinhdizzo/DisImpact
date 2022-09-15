@@ -187,7 +187,11 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg',
              , reference_type!='numeric' ~ if(sum(group==reference_type, na.rm=TRUE) > 0) {success[group==reference_type & !is.na(group)] / n[group==reference_type & !is.na(group)]} else {NA_real_}
              , reference_type=='numeric' ~ reference_numeric
              )
-             , reference_group=reference_type
+             # , reference_group=reference_type # Change to next line for ver. 0.0.20 and after so that 'hpg' returns the actual group
+             , reference_group=case_when(
+                 reference_type == 'hpg' ~ group[pct == max(pct)][1]
+               , TRUE ~ reference_type
+               )
              ) %>%
       ungroup
   } else {
