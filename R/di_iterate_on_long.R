@@ -89,7 +89,8 @@ di_iterate_on_long <- function(data, num_var, denom_var, disagg_var_col, group_v
     di_results <- di_iterate(
       data=data %>%
         left_join(lu_scenarios) %>%
-        left_join(lu_groups)
+        left_join(lu_groups) %>%
+        suppressMessages # Source of many "Joining, by", so just remove them
       , success_vars=num_var
       , weight_var=denom_var
       # , group_vars=group_var_col
@@ -105,7 +106,8 @@ di_iterate_on_long <- function(data, num_var, denom_var, disagg_var_col, group_v
     di_results <- di_iterate(
       data=data %>%
         left_join(lu_scenarios) %>%
-        left_join(lu_groups)
+        left_join(lu_groups) %>%
+        suppressMessages # Source of many "Joining, by", so just remove them
       , success_vars=num_var
       , weight_var=denom_var
       # , group_vars=group_var_col
@@ -121,13 +123,14 @@ di_iterate_on_long <- function(data, num_var, denom_var, disagg_var_col, group_v
   cohort <- group <- success_variable <- cohort_variable <- disaggregation <- ..scenario.. <- ..group.. <- ..groupref.. <- NULL
   
   d_results <- lu_scenarios %>%
-    left_join(lu_groups) %>% 
+    left_join(lu_groups) %>%
     left_join(di_results %>%
               rename(..scenario..=cohort) %>%
               # rename(..group..=group) %>%
               rename(..groupref..=group) %>% 
               select(-success_variable, -cohort_variable, -disaggregation)
               ) %>%
+    suppressMessages %>% # Source of many "Joining, by", so just remove them
     # select(-..scenario.., -..group..)
     select(-..scenario.., -..group.., -..groupref..)
   # names(d_results)[names(d_results) == 'group'] <- group_var_col
