@@ -30,7 +30,7 @@ A suggested workflow is to:
 
 Using this workflow, one could scale up DI calculations and rapidly develop dashboards with the ability to disaggregate and highlight equity gaps / disproportionate impact for many disaggregation variables, many outcomes, and many scenarios / student populations.
 
-The `DisImpact` package offers the `di_iterate` function that allows one to accomplish step 2 in the suggested workflow.
+The `DisImpact` package offers the `di_iterate` function that allows one to accomplish step 2 in the suggested workflow.  As of version 0.0.20, the functions `di_iterate_sql` and `di_iterate_dt` were added to support DI calculations on data stored on a database table / [parquet](https://parquet.apache.org/) file and a [data.table](https://CRAN.R-project.org/package=data.table) object, respectively.  These two functions were added to substantially reduce the time needed for DI calculations when there are many scenarios to iterate through, and when the data of interest is *larger-than-memory* (and hence, stored on a parquet file).
 
 # Load `DisImpact` and toy data set
 
@@ -154,7 +154,7 @@ df_di_summary %>%
   filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Math', disaggregation=='- None') %>%
   as.data.frame
 ```
-```{r, fig.width=9, fig.height=5}
+```{r no_disagg, fig.width=9, fig.height=5}
 library(ggplot2)
 library(forcats)
 library(scales)
@@ -184,7 +184,7 @@ df_di_summary %>%
   select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
   as.data.frame
 ```
-```{r, fig.width=9, fig.height=5}
+```{r disagg_ethnicity, fig.width=9, fig.height=5}
 # Disaggregation: Ethnicity
 df_di_summary %>%
   filter(Ed_Goal=='- All', College_Status=='- All', success_variable=='Math', disaggregation=='Ethnicity') %>%
@@ -210,7 +210,7 @@ df_di_summary %>%
   select(cohort, group, n, pct, di_indicator_ppg, di_indicator_prop_index, di_indicator_80_index) %>%
   as.data.frame
 ```
-```{r, fig.width=9, fig.height=5}
+```{r disagg_ethnicity-deg_transf, fig.width=9, fig.height=5}
 # Disaggregation: Ethnicity; Deg/Transfer
 df_di_summary %>%
   filter(Ed_Goal=='Deg/Transfer', College_Status=='- All', success_variable=='Math', disaggregation=='Ethnicity') %>%
@@ -235,7 +235,7 @@ df_di_summary %>%
   filter(Ed_Goal=='Deg/Transfer', College_Status=='- All', success_variable=='English', disaggregation=='Gender') %>%
   as.data.frame
 ```
-```{r, fig.width=9, fig.height=5}
+```{r disagg_gender-deg_transf_eng, fig.width=9, fig.height=5}
 # Disaggregation: Gender; Deg/Transfer; English
 df_di_summary %>%
   filter(Ed_Goal=='Deg/Transfer', College_Status=='- All', success_variable=='English', disaggregation=='Gender') %>%
@@ -546,22 +546,194 @@ dim(student_equity_big)
 table(student_equity_big$college)
 ```
 
-```{r eval=FALSE}
+```{R}
 # Not run: user test on their own system
 # User should try to increase n_college to 800 or another large number if the system has a lot of memory
-# User should wrap following call with system.time() to time execution: parallel=FALSE, then parallel=TRUE, then parallel=TRUE and parallel_split_to_disk=TRUE
 
-# Parallel execution + writing to disk
+# Non-parallel
+system.time({
 big_di_summary <- di_iterate(data=student_equity_big
                           , success_vars=c('Math', 'English', 'Transfer')
                           , group_vars=c('Ethnicity', 'Gender')
                           , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
                           , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status', 'college') # Add college
-                          , parallel=TRUE
+                          # , parallel=TRUE
                           # , parallel_n_cores=4 # when not specified, use the max number of cores
+                          # , parallel_split_to_disk=TRUE
+                            )
+})
+dim(big_di_summary)
+
+# Parallel execution
+system.time({
+big_di_summary2 <- di_iterate(data=student_equity_big
+                          , success_vars=c('Math', 'English', 'Transfer')
+                          , group_vars=c('Ethnicity', 'Gender')
+                          , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                          , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status', 'college') # Add college
+                          , parallel=TRUE
+                          , parallel_n_cores=4 # when not specified, use the max number of cores
+                          # , parallel_split_to_disk=TRUE
+                            )
+})
+dim(big_di_summary2)
+
+# Parallel execution; pre-save files to disk (fst files) and import each when needed
+system.time({
+big_di_summary3 <- di_iterate(data=student_equity_big
+                          , success_vars=c('Math', 'English', 'Transfer')
+                          , group_vars=c('Ethnicity', 'Gender')
+                          , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                          , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status', 'college') # Add college
+                          , parallel=TRUE
+                          , parallel_n_cores=4 # when not specified, use the max number of cores
                           , parallel_split_to_disk=TRUE
                             )
+})
+dim(big_di_summary3)
 
+big_di_summary2 %>% head %>% as.data.frame
+```
+
+# `di_iterate_dt`: efficient in-memory DI calculations using `data.table`
+
+`di_iterate` is a robust function, but can be highly inefficient if the user is iterating across many iterations (when a variable specified in `scenario_repeat_by_vars` has high cardinality, such as a `'college'` or `'major'` variable).  One way to speed things up is to use the `di_iterate_dt` function that leverages the [data.table](https://CRAN.R-project.org/package=data.table) and the [collapse](https://CRAN.R-project.org/package=collapse) packages for efficient aggregation.  Let's illustrate with an example:
+
+```{r}
+library(data.table) # Needs to be >= 1.14.3; to update, run: data.table::update_dev_pkg()
+# Convert
+dt_student_equity_big <- as.data.table(student_equity_big)
+
+# Non-parallel
+system.time({
+  results_dt <- di_iterate_dt(dt=dt_student_equity_big
+                            , success_vars=c('Math', 'English', 'Transfer')
+                            , group_vars=c('Ethnicity', 'Gender')
+                            , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                            , scenario_repeat_by_vars=c('college', 'Ed_Goal', 'College_Status')
+                              )
+})
+
+# Results stored as a data.table
+results_dt
+results_dt %>% as.data.frame %>% head
+
+
+# Parallel: 4 cores
+system.time({
+  results_dt2 <- di_iterate_dt(dt=dt_student_equity_big
+                            , success_vars=c('Math', 'English', 'Transfer')
+                            , group_vars=c('Ethnicity', 'Gender')
+                            , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                            , scenario_repeat_by_vars=c('college', 'Ed_Goal', 'College_Status')
+                            , parallel=TRUE
+                            , parallel_n_cores=4
+                              )
+})
+results_dt2
+```
+
+As can be seen in the elapsed time for each run, there is significant decrease in the elapsed time when using `di_iterate_dt`.
+
+For users not familiar with `data.table`, it is better to convert the results to a traditional data frame using `as.data.frame` for further manipulations or export.
+
+# `di_iterate_sql`: DI calculations on a database table using the database's SQL engine, especially useful for larger-than-memory data
+
+`di_iterate` and `di_iterate_dt` both operate on data ingested into R (e.g., stored as data frames or data tables in memory).  The function `di_iterate_sql` allows the user to operate on data stored in a database table, by generating SQL queries in R and executing those queries on the database engine.  This is useful for two reasons:
+
+1. It allows the user to operate on tables that are too large to be ingested into R.
+2. It off-loads the computations onto the database engine (so calculations are not leveraging the user's system's resources).
+
+Let's illustrate this with a [SQLite](https://www.sqlite.org/) database:
+
+```{r}
+library(DBI) # Connect and query databases
+library(RSQLite) # SQLite database for demonstration
+
+# Connect to DB
+lite_db_file <- tempfile(pattern='sqlite_', fileext='.db') # temporary disk file sqlite on-disk database file
+lite_db <- dbConnect(drv=SQLite(), lite_db_file) # Connect to file
+
+# Copy data over to database
+dbWriteTable(conn=lite_db, name='student_equity_big', value=student_equity_big)
+
+# Calculate; return data
+## Note: not using scenario_repeat_by_vars for illustration
+system.time({
+results_lite <- di_iterate_sql(db_conn=lite_db
+                             , db_table_name='student_equity_big'
+                             , success_vars=c('Math', 'English', 'Transfer')
+                             , group_vars=c('Ethnicity', 'Gender')
+                             , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                             , mssql_flag=FALSE # Not MS SQL Server
+                             , return_what='data'
+                             , drop_staging_table=TRUE # remove the intermediate results table in DB
+                               )
+})
+dim(results_lite)
+results_lite %>% head %>% as.data.frame
+
+# Generate a list of queries for user to run on own
+list_queries <- di_iterate_sql(db_conn=lite_db
+                             , db_table_name='student_equity_big'
+                             , success_vars=c('Math', 'English', 'Transfer')
+                             , group_vars=c('Ethnicity', 'Gender')
+                             , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                             , mssql_flag=FALSE # Not MS SQL Server
+                             , return_what='SQL' # Changed from 'data' to 'SQL'
+                               )
+length(list_queries)
+cat(list_queries[[1]]) # print
+cat(list_queries[[2]]) # print
+# User could do what they want with these queries
+```
+
+Please note that `di_iterate_sql` is usually not faster than `di_iterate` or `di_iterate_dt`, especially for large data sets or for when there are many scenarios to iterate across (think `scenario_repeat_by_vars`).
+
+For `di_iterate_sql` to be fast, one should leverage [duckdb](https://CRAN.R-project.org/package=duckdb) as the database engine for aggregation (DI calculations) and [parquet](https://parquet.apache.org/) files for data storage.  Here is an example to illustrate `duckdb`'s computational powers:
+
+```{r}
+library(duckdb) # Fast columnar-based database system that supports parquet files as tables
+library(arrow) # To create parquet files using write_parquet
+
+# DuckDB connection (in memory)
+duck_db <- dbConnect(duckdb(), dbdir=':memory:')
+
+# Save data as parquet file
+student_equity_big_parquet_path <- tempfile(pattern='student_equity_big_', fileext='.parquet') # temporary disk file
+write_parquet(x=student_equity_big, sink=student_equity_big_parquet_path)
+
+# Calculate
+student_equity_big_parquet_path
+student_equity_big_parquet_path_quote <- paste0("'", student_equity_big_parquet_path, "'")
+student_equity_big_parquet_path_quote # Path to parquet file, that needs to be surrounded by a single quote in order to work with duckdb
+
+system.time({
+  results_duck <- di_iterate_sql(db_conn=duck_db
+                               , db_table_name=student_equity_big_parquet_path_quote
+                               , success_vars=c('Math', 'English', 'Transfer')
+                               , group_vars=c('Ethnicity', 'Gender')
+                               , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                               , scenario_repeat_by_vars=c('college', 'Ed_Goal', 'College_Status')
+                               )
+})
+dim(results_duck)
+
+# Parallel
+system.time({
+  results_duck2 <- di_iterate_sql(db_conn=duck_db
+                               , db_table_name=student_equity_big_parquet_path_quote
+                               , success_vars=c('Math', 'English', 'Transfer')
+                               , group_vars=c('Ethnicity', 'Gender')
+                               , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                               , scenario_repeat_by_vars=c('college', 'Ed_Goal', 'College_Status')
+                               , parallel=TRUE
+                               , parallel_n_cores=4
+                               )
+})
+dim(results_duck)
+
+results_duck %>% head %>% as.data.frame
 ```
 
 # Appendix: R and R Package Versions
