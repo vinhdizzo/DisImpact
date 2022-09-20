@@ -7,26 +7,33 @@
     + di_calc_dt
     + di_iterate
   - Scaling DI vignette: updated to reflect demonstrate new functions
+
 * 0.0.19
   - Scaling DI vignette: added explanation of how to use `exclude_scenario_df` parameter for `di_iterate`
+
 * 0.0.18
   - Added `parallel`, `parallel_n_cores`, and `parallel_split_to_disk` parameters to function `di_iterate` for parallel computations, and updated vignette to illustrate the feature
   - Added `suppressMessages` call in key `di_terate` step to reduce dplyr "Joining, by" messages
+
 * 0.0.17
   - Added `custom_reference_group_flag_var` argument to function `di_iterate_on_long` as custom reference groups do not work with the `ppg_reference_groups` and `di_80_index_reference_groups` arguments.
+
 * 0.0.16
   - New function `di_iterate_on_long` allows for DI calculation on long, summarized data sets.
   - New vignette: Disproportionate Impact (DI) Calculations on Long, Summarized Data Sets
   - New data set: ssm_cohort
+
 * 0.0.15
   - student_equity toy data set: added EthnicityFlag_* variables that are more granular than Ethnicity, where students could be assigned to more than 1 group; also modified to force DI in Pacific Islanders
   - Added a Multi-Ethnicity vignette / tutorial
   - Added an Intersectionality vignette / tutorial
   - Changed: prettydoc vignette engine instead of html_document
   - Vignettes: stop creating png files manually
+
 * 0.0.14
   - di_ppg, di_80_index, di_prop_index: return success_needed_not_di, success_needed_full_parity
   - di_iterate: return success_needed_not_di_ppg, success_needed_full_parity_ppg, success_needed_not_di_prop_index, success_needed_full_parity_prop_index, success_needed_not_di_80_index, success_needed_full_parity_80_index
+
 * 0.0.13
   - di_iterate: check if various specified variables are in data
   - di_iterate: fixed the use of exclude_scenario_df (used to returned cases meant to be excluded)
@@ -35,21 +42,26 @@
   - di_80_index bug fix: remove NA when reference group passed and group contains NA (multiple rows returned before)
   - di_80_index: add 'hpg' as the default argument instead of NA so users could understand this better
   - di_iterate: use 'hpg' as default for di_80_index_reference_groups
+
 * 0.0.12
   - Updated Scaling DI vignette
   - di_iterate: check if weight_var exist when specified
+
 * 0.0.11
   - Added `check_valid_reference` argument for `di_iterate`.
+
 * 0.0.10
   - Deprecated `di_ppg_iterate` for `di_iterate`.
   - Updated `di_prop_index` to use a cutoff for determining DI (returning `di_indicator`).
   - Updated `di_ppg`, `di_prop_index`, and `di_80_index` with additional arguments
   - Added a new vignette to describe how to scale DI calculations using `di_iterate`.
   - Fixed `di_ppg_iterate`: since it now uses weight, the calculated references were wrong when a manual reference group was specified.
+
 * 0.0.9
   - Updated `di_ppg_iterate`: remove rows with missing value for success_var, implemented inside `iterate` function within `di_ppg_iterate`.
   - Updated `di_ppg_iterate`: addition of the `weight_var` parameter; if this isn't specified (data set at the individual level), then summarize the input data set to use weights in order to more efficiently calculate DI in multiple iterations.
   - Updated `di_ppg_iterate`: specify columns when using `unnest`.
+
 * 0.0.8
   - Updated `di_ppg_iterate` to filter out scenarios when there are no matched rows when `repeat_by_vars` is used.
 
