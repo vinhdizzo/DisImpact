@@ -244,12 +244,13 @@ di_calc_dt <- function(dt, success_var, group_var, cohort_var='', weight_var=NUL
       , di_indicator_80_index
       , success_needed_not_di_80_index
       , success_needed_full_parity_80_index
+      , filter_subset=filter_subset
     )
   # , env=list(success_var=I(success_var), cohort_var=I(cohort_var), group_var=I(group_var))
   , env=substitute_list
-  ] # %>%
-    # suppressWarnings # following warning caused by setnames
-  # Invalid .internal.selfref detected and fixed by taking a (shallow) copy of the data.table so that := can add this new column by reference. At an earlier point, this data.table has been copied by R (or was created manually using structure() or similar). Avoid names<- and attr<- which in R currently (and oddly) may copy the whole data.table. Use set* syntax instead to avoid copying: ?set, ?setnames and ?setattr. If this message doesn't help, please report your use case to the data.table issue tracker so the root cause can be fixed or this message improved.
+  ][
+  , filter_subset:=ifelse(filter_subset=='TRUE', '', filter_subset)
+  ][]
 }
 
 ##' Iteratively calculate disproportionate impact via the percentage point gap (PPG), proportionality index, and 80\% index methods for many success variables, disaggregation variables, and scenarios, using \link[data.table]{data.table} and \link[collapse]{collapse}.
@@ -479,5 +480,14 @@ di_iterate_dt <- function(dt, success_vars, group_vars, cohort_vars=NULL, scenar
   }
 
   # Results
+  if (!is.null(scenario_repeat_by_vars)) {
+    # Merge scenario variables
+    d_results <- as.data.table(dRepeatScenarios0)[
+      d_results
+    , on='filter_subset'
+    ][
+    , filter_subset:=NULL
+    ][]
+  }
   return(d_results)  
 }
