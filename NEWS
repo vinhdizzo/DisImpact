@@ -1,3 +1,12 @@
+* 0.0.20
+  - `di_ppg` (and hence, `di_iterate`) change:
+    + When `reference='hpg'`, the returned `reference_group` column (`di_ppg`) and `ppg_reference_group` column (`di_iterate`) will now show the reference group name (highest performing group) instead of 'hpg'
+  - New functions:
+    + di_calc_sql
+    + di_iterate_sql
+    + di_calc_dt
+    + di_iterate
+  - Scaling DI vignette: updated to reflect demonstrate new functions
 * 0.0.19
   - Scaling DI vignette: added explanation of how to use `exclude_scenario_df` parameter for `di_iterate`
 * 0.0.18
