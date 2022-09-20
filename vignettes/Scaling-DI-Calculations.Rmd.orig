@@ -738,6 +738,9 @@ system.time({
 dim(results_duck)
 
 results_duck %>% head %>% as.data.frame
+
+# Disconnect
+dbDisconnect(duck_db, shutdown=TRUE)
 ```
 
 # Appendix: R and R Package Versions
