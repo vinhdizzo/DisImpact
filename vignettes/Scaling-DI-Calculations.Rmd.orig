@@ -13,6 +13,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r}
+knitr::opts_chunk$set(fig.path="./scaling-di-") # save images in vignette folder
+```
+
 # Introduction
 
 It is often desirable to visualize student success data with the ability to disaggregate by multiple group variables to highlight equity gaps and disproportionate impact (DI) in an interactive dashboard (e.g., Tableau or Power BI).  It is certainly feasible to calculate disproportionate impact on the fly in standard dashboard tools, but doing so:
