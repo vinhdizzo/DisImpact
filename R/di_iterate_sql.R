@@ -222,7 +222,7 @@ di_calc_sql <- function(db_table_name, success_var, group_var, cohort_var='', we
       -- , '{di_80_index_reference_group}' as di_80_index_reference_group
       , case
         when '{di_80_index_reference_group}' = 'hpg' then c.hpg_subgroup -- like di_iterate ver. 0.0.19
-        when '{di_80_index_reference_group}' in ('overall', 'all but current') then '{ppg_reference_group}'
+        when '{di_80_index_reference_group}' in ('overall', 'all but current') then '{di_80_index_reference_group}'
         else f.di_80_index_reference_group
         end as di_80_index_reference_group
       , case
