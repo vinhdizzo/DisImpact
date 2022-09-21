@@ -124,7 +124,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
 
   if (is.null(cohort_vars)) {
     cohort_vars <- '_cohort_'
-    data[[cohort_vars]] <- '- All'
+    data[[cohort_vars]] <- ''
   } else {
     # Check valid cohort_vars
     for (i in seq_along(cohort_vars)) {
@@ -344,6 +344,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
     subset_idx <- 1:nrow(data)
     pmap(dScenarios %>% mutate(subset_idx=list(subset_idx), parallel_split_to_disk=FALSE, split_filename='NOT_USED'), iterate) %>%
       bind_rows %>%
+      mutate(cohort_variable=ifelse(cohort_variable=='_cohort_', '', cohort_variable)) %>% 
       arrange(success_variable, cohort_variable, cohort, disaggregation, group) %>%
       return
   } else {
@@ -410,6 +411,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
     dRepeatScenarios %>%
       select(-want_indices, -parallel_split_to_disk, -split_filename) %>%
       unnest(df_results) %>%
+      mutate(cohort_variable=ifelse(cohort_variable=='_cohort_', '', cohort_variable)) %>% 
       arrange(across(one_of(c(scenario_repeat_by_vars, 'success_variable', 'cohort_variable', 'cohort', 'disaggregation', 'group')))) %>%
       return
   }
