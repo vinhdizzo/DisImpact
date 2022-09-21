@@ -1,35 +1,5 @@
-##' Calculate disproportionate impact via the percentage point gap (PPG), proportionality index, and 80\% index methods for data stored in a \link[data.table]{data.table} object.  This is the workhorse function leveraged by the \link[DisImpact]{di_iterate_dt} function.
-##' 
-##' @title Calculates disproportionate impact using multiple methods for data stored in a \link[data.table]{data.table} object.
-##' @param dt A data frame of class \link[data.table]{data.table}.  If the object is not a data table, one could surround the object with \link[data.table]{as.data.table}.
-##' @param success_var A character value specifying the success variable name. 
-##' @param group_var A character value specifying the group (disaggregation) variable name.
-##' @param cohort_var (Optional) A character value specifying the cohort variable.  If not specified, then a single cohort is assumed (defaults to an empty string, \code{''}).
-##' @param weight_var (Optional) A character variable specifying the weight variable if the input data set is summarized (i.e.,  the the success variables specified in \code{success_vars} contain count of successes).  Weight here corresponds to the denominator when calculating the success rate.  Defaults to \code{NULL} for an input data set where each row describes an individual.
-##' @param ppg_reference_group Either \code{'overall'}, \code{'hpg'}, \code{'all but current'}, or a character value specifying a group from \code{group_var} to be used as the reference group for comparison using percentage point gap method.
-##' @param min_moe The minimum margin of error to be used in the PPG calculation; see \link[DisImpact]{di_ppg}.
-##' @param use_prop_in_moe (\code{TRUE} or \code{FALSE}) Whether the estimated proportions should be used in the margin of error calculation by the PPG; see \link[DisImpact]{di_ppg}.
-##' @param prop_sub_0 Default is 0.50; see \link[DisImpact]{di_ppg}.
-##' @param prop_sub_1 Default is 0.50; see \link[DisImpact]{di_ppg}.
-##' @param di_prop_index_cutoff Threshold used for determining disproportionate impact using the proportionality index; see \link[DisImpact]{di_prop_index}; defaults to 0.80.
-##' @param di_80_index_cutoff Threshold used for determining disproportionate impact using the 80\% index; see \link[DisImpact]{di_80_index}; defaults to 0.80.
-##' @param di_80_index_reference_group Either \code{'overall'}, \code{'hpg'}, \code{'all but current'}, or a character value specifying a group from \code{group_var} to be used as the reference group for comparison using 80\% index.
-##' @param filter_subset A character value such as \code{"Ethnicity == 'White' & Gender == 'M'"} used in the \code{i} argument (filtering rows via \code{dt[i, j, by]}) to filter data in \code{dt}.  The character value is parsed using \code{eval(parse(text=filter_subset))}.  Defaults to \code{''} for no filtering.
-##' @return A \link[data.table]{data.table} object with summarized results.
-##' @importFrom data.table is.data.table as.data.table setnames setkeyv .N `:=` fcase
-##' @importFrom collapse fgroup_by get_vars fsum qDT
-##' @export
 di_calc_dt <- function(dt, success_var, group_var, cohort_var='', weight_var=NULL, ppg_reference_group='overall', min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5, di_prop_index_cutoff=0.8, di_80_index_cutoff=0.8, di_80_index_reference_group='hpg', filter_subset='') {
-
-  # Need data.table >= 1.14.3
-  if(requireNamespace("data.table", quietly=TRUE) &&
-    utils::packageVersion("data.table") < "1.14.3") {
-    stop("`di_calc_dt` requires data.table version 1.14.3 or higher.  Please execute the following to update data.table to the current development version:\n\ndata.table::update_dev_pkg()")
-  }
-  
-  # Following for CRAN: no visible binding for global variable
-  weight__ <- success <- weight <- pct <- pct_ppg <- cohort <- moe <- ppg_reference <- hpg_subgroup <- overall_rate <- hpg_rate <- all_but_current_rate <- di_80_index_specific_group_rate <- di_80_index_reference <- pct_hi <- pct_lo <- di_indicator_prop_index <- cohort_success_total <- pct_group <- pct_success <- success_var_value <- cohort_var_value <- group_var_value <- group <- ppg_reference_group_name <- di_indicator_ppg <- success_needed_not_di_ppg <- success_needed_full_parity_ppg <- success_needed_not_di_prop_index <- success_needed_full_parity_prop_index <- di_80_index_reference_group_name <- di_indicator_80_index <- success_needed_not_di_80_index <- success_needed_full_parity_80_index <- . <- NULL
-  
+ 
   if (is.null(weight_var)) {
     weight_var <- '.N' # for data.table
     weight_var <- 'weight__' # for collapse
@@ -244,64 +214,18 @@ di_calc_dt <- function(dt, success_var, group_var, cohort_var='', weight_var=NUL
       , di_indicator_80_index
       , success_needed_not_di_80_index
       , success_needed_full_parity_80_index
-      , filter_subset=filter_subset
     )
   # , env=list(success_var=I(success_var), cohort_var=I(cohort_var), group_var=I(group_var))
   , env=substitute_list
-  ][
-  , filter_subset:=ifelse(filter_subset=='TRUE', '', filter_subset)
-  ][]
+  ] # %>%
+    # suppressWarnings # following warning caused by setnames
+  # Invalid .internal.selfref detected and fixed by taking a (shallow) copy of the data.table so that := can add this new column by reference. At an earlier point, this data.table has been copied by R (or was created manually using structure() or similar). Avoid names<- and attr<- which in R currently (and oddly) may copy the whole data.table. Use set* syntax instead to avoid copying: ?set, ?setnames and ?setattr. If this message doesn't help, please report your use case to the data.table issue tracker so the root cause can be fixed or this message improved.
 }
 
-##' Iteratively calculate disproportionate impact via the percentage point gap (PPG), proportionality index, and 80\% index methods for many success variables, disaggregation variables, and scenarios, using \link[data.table]{data.table} and \link[collapse]{collapse}.
-##'
-##' Iteratively calculate disproportionate impact via the percentage point gap (PPG), proportionality index, and 80\% index methods for all combinations of \code{success_vars}, \code{group_vars}, and \code{cohort_vars}, for each combination of subgroups specified by \code{scenario_repeat_by_vars}, using \link[data.table]{data.table} and \link[collapse]{collapse}.
-##' @title Iteratively calculate disproportionate impact using multiple method for many variables, using \link[data.table]{data.table} and \link[collapse]{collapse}.
-##' @param dt A data frame of class \link[data.table]{data.table}.  If the object is not a data table, one could surround the object with \link[data.table]{as.data.table}.
-##' @param success_vars A character vector of success variable names to iterate across.
-##' @param group_vars A character vector of group (disaggregation) variable names to iterate across.
-##' @param cohort_vars (Optional) A character vector of the same length as \code{success_vars} to indicate the cohort variable to be used for each variable specified in \code{success_vars}.  A vector of length 1 could be specified, in which case the same cohort variable is used for each success variable.  If not specified, then a single cohort is assumed for all success variables (defaults to \code{NULL}).
-##' @param scenario_repeat_by_vars (Optional) A character vector of variables to repeat DI calculations for across all combination of these variables.  For example, the following variables could be specified:
-##' \itemize{
-##'   \item Ed Goal: Degree/Transfer, Shot-term Career, Non-credit
-##'   \item First time college student: Yes, No
-##'   \item Full-time status: Yes, No
-##' }
-##' Each combination of these variables (eg, full time, first time college students with an ed goal of degree/transfer as one combination) would constitute an iteration / sample for which to calculate disproportionate impact for outcomes listed in \code{success_vars} and for the disaggregation variables listed in \code{group_vars}. The overall rate of success for full time, first time college students with an ed goal of degree/transfer would just include these students and not others.  Each variable specified is also collapsed to an '- All' group so that the combinations also reflect all students of a particular category.  The total number of combinations for the previous example would be (+1 representing the all category): (3 + 1) x (2 + 1) x (2 + 1) = 36.
-##' @param exclude_scenario_df (Optional) A data frame with variables that match \code{scenario_repeat_by_vars} for specifying the combinations to exclude from DI calculations.  Following the example specified above, one could choose to exclude part-time non-credit students from consideration.
-##' @param weight_var (Optional) A character variable specifying the weight variable if the input data set is summarized (i.e., the the success variables specified in \code{success_vars} contain count of successes).  Weight here corresponds to the denominator when calculating the success rate.  Defaults to \code{NULL} for an input data set where each row describes an individual.
-##' @param include_non_disagg_results A logical variable specifying whether or not the non-disaggregated results should be returned; defaults to \code{TRUE}.  When \code{TRUE}, a new variable \code{`- None`} is added to the data set with a single data value \code{'- All'}, and this variable is added to \code{group_vars} as a disaggregation/group variable.  The user would want these results returned to review non-disaggregated results.
-##' @param ppg_reference_groups Either \code{'overall'}, \code{'hpg'}, \code{'all but current'}, or a character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the percentage point gap method.
-##' @param min_moe The minimum margin of error to be used in the PPG calculation; see \link[DisImpact]{di_ppg}.
-##' @param use_prop_in_moe (\code{TRUE} or \code{FALSE}) Whether the estimated proportions should be used in the margin of error calculation by the PPG; see \link[DisImpact]{di_ppg}. 
-##' @param prop_sub_0 Default is 0.50; see \link[DisImpact]{di_ppg}.
-##' @param prop_sub_1 Default is 0.50; see \link[DisImpact]{di_ppg}.
-##' @param di_prop_index_cutoff Threshold used for determining disproportionate impact using the proportionality index; see \link[DisImpact]{di_prop_index}; defaults to 0.80.
-##' @param di_80_index_cutoff Threshold used for determining disproportionate impact using the 80\% index; see \link[DisImpact]{di_80_index}; defaults to 0.80.
-##' @param di_80_index_reference_groups Either \code{'overall'}, \code{'hpg'}, \code{'all but current'}, or a character vector of the same length as \code{group_vars} that indicates the reference group value for each group variable in \code{group_vars} when determining disproportionate impact using the 80\% index.
-##' @param check_valid_reference (\code{TRUE} or \code{FALSE}) Check whether \code{ppg_reference_groups} and \code{di_80_index_reference_groups} contain valid values; defaults to \code{TRUE}.
-##' @param parallel If \code{TRUE}, then perform calculations in parallel.  Defaults to \code{FALSE}.  Parallel execution is based on the \code{parallel} package included in base R, using \link[parallel]{parLapply} on Windows and \link[parallel]{mclapply} on POSIX-based systems (Linux/Mac).
-##' @param parallel_n_cores The number of CPU cores to use if \code{parallel=TRUE}.  Defaults to half of the maximum number of CPU cores on the system.
-##' @return A summarized data set of class \link[data.table]{data.table}, with variables as described in \link[DisImpact]{di_iterate}.
-##' @importFrom data.table is.data.table as.data.table setnames setkeyv .N `:=` fcase .SD rbindlist
-##' @importFrom collapse fgroup_by get_vars fsum qDT fnobs
-##' @importFrom sets set_power
-##' @importFrom stringr str_detect str_replace_all
-##' @import dplyr
-##' @import parallel
-##' @export
+
 di_iterate_dt <- function(dt, success_vars, group_vars, cohort_vars=NULL, scenario_repeat_by_vars=NULL, exclude_scenario_df=NULL, weight_var=NULL, include_non_disagg_results=TRUE, ppg_reference_groups='overall', min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5, di_prop_index_cutoff=0.8, di_80_index_cutoff=0.8, di_80_index_reference_groups='hpg', check_valid_reference=TRUE, parallel=FALSE, parallel_n_cores=parallel::detectCores() / 2) {
 
-  # Need data.table >= 1.14.3
-  if(requireNamespace("data.table", quietly=TRUE) &&
-    utils::packageVersion("data.table") < "1.14.3") {
-    stop("`di_calc_dt` requires data.table version 1.14.3 or higher.  Please execute the following to update data.table to the current development version:\n\ndata.table::update_dev_pkg()")
-  }
-
-  # Following for CRAN: no visible binding for global variable
-  weight <- success_var <- cohort_var <- filter_subset <- NULL
-  
-  if (!is.data.table(dt)) {
+  if (!any(class(dt) %in% 'data.table')) {
     stop("`dt` should be an object of class data.table.  Consider wrapping the object around `as.data.table` after loading the `data.table` package.")
   }
   
@@ -374,8 +298,7 @@ di_iterate_dt <- function(dt, success_vars, group_vars, cohort_vars=NULL, scenar
     ] %>%
       fgroup_by(c(success_vars, group_vars, cohort_vars, scenario_repeat_by_vars, paste0(success_vars, '_NA_FLAG'))) %>%
       get_vars('weight') %>% 
-      fnobs %>%
-      qDT # to not have data.table warning without having to use suppressWarnings https://github.com/SebKrantz/collapse/issues/319#issuecomment-1249527808
+      fnobs
     
     weight_var <- 'weight'
   } else {
@@ -385,13 +308,12 @@ di_iterate_dt <- function(dt, success_vars, group_vars, cohort_vars=NULL, scenar
     ] %>%
       fgroup_by(c(success_vars, group_vars, cohort_vars, scenario_repeat_by_vars, paste0(success_vars, '_NA_FLAG'))) %>%
       get_vars(weight_var) %>%
-      fsum %>%
-      qDT # to not have data.table warning without having to use suppressWarnings https://github.com/SebKrantz/collapse/issues/319#issuecomment-1249527808
+      fsum
   }
-  dt_summ[, c(success_vars) := lapply(.SD, function(x) x * weight), .SDcols=success_vars] # weigh numerator
   
   if (include_non_disagg_results) {
-    dt_summ[, '- None' := '- All']
+    dt_summ[, '- None' := '- All'] %>%
+      suppressWarnings # warning caused by use of collapse package (fsum)
     group_vars <- c(group_vars, '- None')
     
     if (length(ppg_reference_groups) > 1) {
@@ -454,7 +376,7 @@ di_iterate_dt <- function(dt, success_vars, group_vars, cohort_vars=NULL, scenar
       full_join(dRepeatScenarios0 %>% select(filter_subset), by=character())
 
     # Speed up data.table with keys
-    keyvars_list <- lapply(as.list(set_power(c(scenario_repeat_by_vars))), unlist)
+    keyvars_list <- lapply(as.list(sets::set_power(c(scenario_repeat_by_vars))), unlist)
     keyvars_list <- keyvars_list[2:length(keyvars_list)] # drop first NULL
     for (i in 1:length(keyvars_list)) {
       setkeyv(dt_summ, keyvars_list[[i]])
@@ -482,16 +404,5 @@ di_iterate_dt <- function(dt, success_vars, group_vars, cohort_vars=NULL, scenar
   }
 
   # Results
-  if (!is.null(scenario_repeat_by_vars)) {
-    # Merge scenario variables
-    d_results <- as.data.table(dRepeatScenarios0)[
-      d_results
-    , on='filter_subset'
-    ]
-  }
-  d_results[
-    , filter_subset:=NULL
-    ][]
-  setorderv(d_results, c(scenario_repeat_by_vars, 'success_variable', 'cohort_variable', 'cohort', 'disaggregation', 'group')) # reorder
   return(d_results)  
 }

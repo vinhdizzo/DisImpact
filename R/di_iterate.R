@@ -343,7 +343,9 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
   if (is.null(scenario_repeat_by_vars)) {
     subset_idx <- 1:nrow(data)
     pmap(dScenarios %>% mutate(subset_idx=list(subset_idx), parallel_split_to_disk=FALSE, split_filename='NOT_USED'), iterate) %>%
-      bind_rows
+      bind_rows %>%
+      arrange(success_variable, cohort_variable, cohort, disaggregation, group) %>%
+      return
   } else {
     if (!parallel) {
       dRepeatScenarios$df_results <- lapply(1:nrow(dRepeatScenarios)
@@ -407,7 +409,9 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
     
     dRepeatScenarios %>%
       select(-want_indices, -parallel_split_to_disk, -split_filename) %>%
-      unnest(df_results)
+      unnest(df_results) %>%
+      arrange(across(one_of(c(scenario_repeat_by_vars, 'success_variable', 'cohort_variable', 'cohort', 'disaggregation', 'group')))) %>%
+      return
   }
 }
 

@@ -27,6 +27,7 @@ di_calc_sql <- function(db_table_name, success_var, group_var, cohort_var='', we
 
   ## # Following removed to change cohort_var default to '' (blank); used to be cohort_var="'- All'"
   cohort_var_no_quote <- str_replace_all(cohort_var, fixed("'"), "") # '- All' when no cohort specified
+  group_var_no_quote <- str_replace_all(group_var, fixed('"'), '') # '"- None"' for non-disagg results
   
   query <- "
   -- create table foo as -- create table for sqlite, duckdb (parquet), postgres, MySQL; not SQL Server
@@ -268,7 +269,8 @@ di_calc_sql <- function(db_table_name, success_var, group_var, cohort_var='', we
   , cast('{cohort_var}' as varchar(255)) as cohort_variable
   -- , cast('{cohort_var_no_quote}' as varchar(255)) as cohort_variable
   , cast(a.cohort as varchar(255)) as cohort
-  , cast('{group_var}' as varchar(255)) as disaggregation
+  -- , cast('{group_var}' as varchar(255)) as disaggregation
+  , cast('{group_var_no_quote}' as varchar(255)) as disaggregation
   , cast(a.subgroup as varchar(255)) as \"group\"
   , a.weight as n
   , a.success
@@ -692,5 +694,5 @@ group by
     clusterEvalQ(cl, dbDisconnect(conn=db_conn_remote))
   }
 
-  return(d_results)
+  return(d_results %>% arrange(across(one_of(c(scenario_repeat_by_vars, 'success_variable', 'cohort_variable', 'cohort', 'disaggregation', 'group')))))
 }
