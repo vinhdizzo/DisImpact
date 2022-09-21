@@ -344,14 +344,14 @@ di_iterate_dt <- function(dt, success_vars, group_vars, cohort_vars=NULL, scenar
   }
   
   # Create summary table first
-  if (!is.null(cohort_vars)) {
+  if (length(cohort_vars)==1 && cohort_vars=='') {
     dt_summ <- dt[
-    , c(success_vars, group_vars, cohort_vars, scenario_repeat_by_vars, weight_var)
+    , c(success_vars, group_vars, scenario_repeat_by_vars, weight_var)
     , with=FALSE
     ]
   } else {
     dt_summ <- dt[
-    , c(success_vars, group_vars, scenario_repeat_by_vars, weight_var)
+    , c(success_vars, group_vars, cohort_vars, scenario_repeat_by_vars, weight_var)
     , with=FALSE
     ]
   }
@@ -379,7 +379,7 @@ di_iterate_dt <- function(dt, success_vars, group_vars, cohort_vars=NULL, scenar
     , paste0(success_vars, '_NA_FLAG') := lapply(.SD, function(x) is.na(x) * 1)
     , .SDcols=success_vars
     ] %>%
-      fgroup_by(c(success_vars, group_vars, cohort_vars, scenario_repeat_by_vars, paste0(success_vars, '_NA_FLAG'))) %>%
+      fgroup_by(c(success_vars, group_vars, if (length(cohort_vars)==1 && cohort_vars=='') NULL else cohort_vars, scenario_repeat_by_vars, paste0(success_vars, '_NA_FLAG'))) %>%
       get_vars('weight') %>% 
       fnobs %>%
       qDT # to not have data.table warning without having to use suppressWarnings https://github.com/SebKrantz/collapse/issues/319#issuecomment-1249527808
@@ -390,7 +390,7 @@ di_iterate_dt <- function(dt, success_vars, group_vars, cohort_vars=NULL, scenar
     , paste0(success_vars, '_NA_FLAG') := lapply(.SD, function(x) is.na(x) * 1)
     , .SDcols=success_vars
     ] %>%
-      fgroup_by(c(success_vars, group_vars, cohort_vars, scenario_repeat_by_vars, paste0(success_vars, '_NA_FLAG'))) %>%
+      fgroup_by(c(success_vars, group_vars, if (length(cohort_vars)==1 && cohort_vars=='') NULL else cohort_vars, scenario_repeat_by_vars, paste0(success_vars, '_NA_FLAG'))) %>%
       get_vars(weight_var) %>%
       fsum %>%
       qDT # to not have data.table warning without having to use suppressWarnings https://github.com/SebKrantz/collapse/issues/319#issuecomment-1249527808
