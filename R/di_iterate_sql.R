@@ -25,8 +25,10 @@
 ##' @export
 di_calc_sql <- function(db_table_name, success_var, group_var, cohort_var='', weight_var=1, ppg_reference_group='overall', min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5, di_prop_index_cutoff=0.8, di_80_index_cutoff=0.8, di_80_index_reference_group='hpg', before_with_statement='', after_with_statement='', end_of_select_statement='', where_statement='', select_statement_add='') {
 
-  ## # Following removed to change cohort_var default to '' (blank); used to be cohort_var="'- All'"
-  cohort_var_no_quote <- str_replace_all(cohort_var, fixed("'"), "") # '- All' when no cohort specified
+  if (cohort_var == '') {
+    cohort_var <- "''"
+  }
+  cohort_var_no_quote <- str_replace_all(cohort_var, fixed("'"), "")  
   group_var_no_quote <- str_replace_all(group_var, fixed('"'), '') # '"- None"' for non-disagg results
   
   query <- "
@@ -266,8 +268,8 @@ di_calc_sql <- function(db_table_name, success_var, group_var, cohort_var='', we
   select
   {select_statement_add}
   cast('{success_var}' as varchar(255)) as success_variable
-  , cast('{cohort_var}' as varchar(255)) as cohort_variable
-  -- , cast('{cohort_var_no_quote}' as varchar(255)) as cohort_variable
+  -- , cast('{cohort_var}' as varchar(255)) as cohort_variable
+  , cast('{cohort_var_no_quote}' as varchar(255)) as cohort_variable
   , cast(a.cohort as varchar(255)) as cohort
   -- , cast('{group_var}' as varchar(255)) as disaggregation
   , cast('{group_var_no_quote}' as varchar(255)) as disaggregation
@@ -470,14 +472,14 @@ from
 
   # Cohort
   if (is.null(cohort_vars)) {
-    cohort_vars <- "'- All'"
+    cohort_vars <- ''
   }
   if (length(cohort_vars) != 1 & length(cohort_vars) != length(success_vars)) {
     stop('`cohort_vars` must be of length 1 or the same length as `success_vars` (each success variable corresponds to a cohort variable).')
   }
   
   # Create summary table first
-  s_group_by_vars <- paste0(c(scenario_repeat_by_vars, group_vars, cohort_vars), collapse=', ')
+  s_group_by_vars <- paste0(c(scenario_repeat_by_vars, group_vars, if (length(cohort_vars)==1 && cohort_vars =='') NULL else cohort_vars), collapse=', ')
   s_calc_missing_flags <- paste0(', case when ', success_vars, ' is null then 1 else 0 end as ', success_vars, '_NA_FLAG', collapse='\n')
   s_missing_flag_vars <- paste0(', ', success_vars, '_NA_FLAG', collapse='\n')
   s_success_vars <- paste0(', ', success_vars, collapse='\n')
