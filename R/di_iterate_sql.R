@@ -30,6 +30,13 @@ di_calc_sql <- function(db_table_name, success_var, group_var, cohort_var='', we
   }
   cohort_var_no_quote <- str_replace_all(cohort_var, fixed("'"), "")  
   group_var_no_quote <- str_replace_all(group_var, fixed('"'), '') # '"- None"' for non-disagg results
+
+  # Remove missing
+  if (where_statement == '') {
+    where_statement <- glue(' where {success_var} is not null')
+  } else {
+    where_statement <- paste0(where_statement, glue(' and {success_var} is not null'))
+  }
   
   query <- "
   -- create table foo as -- create table for sqlite, duckdb (parquet), postgres, MySQL; not SQL Server
