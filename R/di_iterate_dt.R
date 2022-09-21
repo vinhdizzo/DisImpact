@@ -344,10 +344,17 @@ di_iterate_dt <- function(dt, success_vars, group_vars, cohort_vars=NULL, scenar
   }
   
   # Create summary table first
-  dt_summ <- dt[
-  , c(success_vars, group_vars, cohort_vars, scenario_repeat_by_vars, weight_var)
-  , with=FALSE
-  ]
+  if (!is.null(cohort_vars)) {
+    dt_summ <- dt[
+    , c(success_vars, group_vars, cohort_vars, scenario_repeat_by_vars, weight_var)
+    , with=FALSE
+    ]
+  } else {
+    dt_summ <- dt[
+    , c(success_vars, group_vars, scenario_repeat_by_vars, weight_var)
+    , with=FALSE
+    ]
+  }
 
   ## ## Check for weight variable
   ## if (is.null(weight_var)) {
