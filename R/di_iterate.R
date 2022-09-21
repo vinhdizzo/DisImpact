@@ -99,9 +99,9 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
       ppg_reference_groups <- c(ppg_reference_groups, 'overall')
     } # else leave as is (overall, hpg, all but current to be used)
     if (length(di_80_index_reference_groups) > 1) {
-      di_80_index_reference_groups <- c(di_80_index_reference_groups, NA) # Adding last NA for non-disaggregated results
+      di_80_index_reference_groups <- c(di_80_index_reference_groups, 'overall')
     } else if (length(di_80_index_reference_groups) == 1 & !(is.na(di_80_index_reference_groups) | di_80_index_reference_groups %in% c('hpg', 'overall', 'all but current'))) {
-      di_80_index_reference_groups <- c(di_80_index_reference_groups, NA)
+      di_80_index_reference_groups <- c(di_80_index_reference_groups, 'overall')
     } # else leave as is (overall, hpg, all but current to be used)
   }
   
