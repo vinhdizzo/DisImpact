@@ -83,7 +83,7 @@ di_calc_dt <- function(dt, success_var, group_var, cohort_var='', weight_var=NUL
       , group=group_var
       , pct=success / weight
       , pct_ppg=fcase(
-          !use_prop_in_moe, 0.5
+          !rep(use_prop_in_moe, .N), 0.5
         , (success / weight) == 0, prop_sub_0
         , (success / weight) == 1, prop_sub_1
         , rep(TRUE, .N), success / weight
