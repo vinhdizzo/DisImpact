@@ -119,7 +119,7 @@ di_80_index <- function(success, group, cohort, weight, data, di_80_index_cutoff
            ) %>% 
     ungroup %>%
     mutate(success_needed_not_di=ifelse(di_indicator==1, ceiling((di_80_index_cutoff * reference - pct) * n), 0)
-           , success_needed_full_parity=ifelse(pct < reference, ceiling((reference - pct) * n), 0)
+           , success_needed_full_parity=ifelse(pct < reference, ceiling((reference - pct) * n), 0) %>% coalesce(0)
     ) %>% 
     arrange(cohort, group)
 
