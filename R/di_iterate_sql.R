@@ -208,8 +208,8 @@ di_calc_sql <- function(db_table_name, success_var, group_var, cohort_var='', we
       , a.pct + a.moe as pct_hi
       -- , '{ppg_reference_group}' as ppg_reference_group
       , case
-        -- when '{ppg_reference_group}' = 'hpg' then c.hpg_subgroup
-        when '{ppg_reference_group}' = 'hpg' then '{ppg_reference_group}' -- like di_iterate
+        when '{ppg_reference_group}' = 'hpg' then c.hpg_subgroup
+        -- when '{ppg_reference_group}' = 'hpg' then '{ppg_reference_group}' -- like di_iterate ver. 0.0.19
         when '{ppg_reference_group}' in ('overall', 'all but current') then '{ppg_reference_group}'
         else e.ppg_reference_group
         end as ppg_reference_group

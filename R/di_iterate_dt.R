@@ -125,8 +125,8 @@ di_calc_dt <- function(dt, success_var, group_var, cohort_var='', weight_var=NUL
         , default=NA
       )
     , ppg_reference_group_name = fcase(
-        # rep(ppg_reference_group, .N) == 'hpg', group_var[pct == max(pct)][1] ## hpg_subgroup
-        rep(ppg_reference_group, .N) == 'hpg', ppg_reference_group ## like di_iterate ver. 0.0.19
+        rep(ppg_reference_group, .N) == 'hpg', group_var[pct == max(pct)][1] ## hpg_subgroup
+        # rep(ppg_reference_group, .N) == 'hpg', ppg_reference_group ## like di_iterate ver. 0.0.19
       , rep(ppg_reference_group, .N) %in% c('overall', 'all but current'), ppg_reference_group
       , default=ppg_reference_group # specific group
       )
