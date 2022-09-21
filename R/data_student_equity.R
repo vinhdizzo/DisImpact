@@ -103,3 +103,7 @@
 ## usethis::use_data(student_equity, overwrite=TRUE)
 ## openxlsx::write.xlsx(x=student_equity, file='~/Downloads/student_equity.xlsx')
 
+## # Parquet files: external data in ./inst/extdata
+## # File used by tinytest
+## library(arrow)
+## write_parquet(x=student_equity, sink='./inst/extdata/student_equity.parquet')
