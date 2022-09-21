@@ -1,6 +1,0 @@
-library(dplyr)
-library(readxl)
-library(readr)
-library(DisImpact)
-
-d1 <- read_csv('StudentSuccessMetrics_After3Years_IrvineValleyCollege.csv', guess_max=Inf)
