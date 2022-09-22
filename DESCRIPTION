@@ -19,5 +19,6 @@ Suggests: knitr,
     prettydoc,
     ggplot2,
     forcats,
-    scales
+    scales,
+    tinytest
 VignetteBuilder: knitr
