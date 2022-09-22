@@ -283,7 +283,7 @@ di_calc_dt <- function(dt, success_var, group_var, cohort_var='', weight_var=NUL
 ##' @param parallel If \code{TRUE}, then perform calculations in parallel.  Defaults to \code{FALSE}.  Parallel execution is based on the \code{parallel} package included in base R, using \link[parallel]{parLapply} on Windows and \link[parallel]{mclapply} on POSIX-based systems (Linux/Mac).
 ##' @param parallel_n_cores The number of CPU cores to use if \code{parallel=TRUE}.  Defaults to half of the maximum number of CPU cores on the system.
 ##' @return A summarized data set of class \link[data.table]{data.table}, with variables as described in \link[DisImpact]{di_iterate}.
-##' @importFrom data.table is.data.table as.data.table setnames setkeyv .N `:=` fcase .SD rbindlist
+##' @importFrom data.table is.data.table as.data.table setnames setkeyv .N `:=` fcase .SD rbindlist setorderv
 ##' @importFrom collapse fgroup_by get_vars fsum qDT fnobs
 ##' @importFrom sets set_power
 ##' @importFrom stringr str_detect str_replace_all
