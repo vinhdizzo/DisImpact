@@ -13,7 +13,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r}
+```{r echo=FALSE}
 knitr::opts_chunk$set(fig.path="./scaling-di-") # save images in vignette folder
 ```
 
@@ -601,11 +601,11 @@ big_di_summary2 %>% head %>% as.data.frame
 
 # `di_iterate_dt`: efficient in-memory DI calculations using `data.table`
 
-`di_iterate` is a robust function, but can be highly inefficient if the user is iterating across many iterations (when a variable specified in `scenario_repeat_by_vars` has high cardinality, such as a `'college'` or `'major'` variable).  One way to speed things up is to use the `di_iterate_dt` function that leverages the [data.table](https://CRAN.R-project.org/package=data.table) and the [collapse](https://CRAN.R-project.org/package=collapse) packages for efficient aggregation.  Let's illustrate with an example:
+`di_iterate` is a robust function, but can be highly inefficient if the user is iterating across many iterations (when a variable specified in `scenario_repeat_by_vars` has high cardinality, such as a `'college'` or `'major'` variable).  One way to speed things up is to use the `di_iterate_dt` function that leverages the [data.table](https://CRAN.R-project.org/package=data.table) and the [collapse](https://CRAN.R-project.org/package=collapse) packages for efficient aggregation.  Let's illustrate how one would use `di_iterate_dt` with an example:
 
 ```{r}
 library(data.table) # Needs to be >= 1.14.3; to update, run: data.table::update_dev_pkg()
-# Convert
+# Convert data to a data.table
 dt_student_equity_big <- as.data.table(student_equity_big)
 
 # Non-parallel
@@ -618,10 +618,10 @@ system.time({
                               )
 })
 
-# Results stored as a data.table
+# Results are stored as a data.table
 results_dt
+# One could convert to a data frame as well using as.data.frame
 results_dt %>% as.data.frame %>% head
-
 
 # Parallel: 4 cores
 system.time({
@@ -634,21 +634,26 @@ system.time({
                             , parallel_n_cores=4
                               )
 })
-results_dt2
 ```
 
 As can be seen in the elapsed time for each run, there is significant decrease in the elapsed time when using `di_iterate_dt`.
 
-For users not familiar with `data.table`, it is better to convert the results to a traditional data frame using `as.data.frame` for further manipulations or export.
+For users not familiar with `data.table`, the recommended workflow for using `di_iterate_dt` is as follow:
+
+1. Import the student-level data set as a `data.table` object, either by
+  - Ingesting the file into R as one would normally do (e.g., using `read_csv` from the `readr` package), then converting the data frame into a data table object using `as.data.table`: `my_data_dt <- as.data.table(my_data)`; or
+  - Ingesting the raw data into R by using `data.table`'s `fread` function.
+2. Run `results <- di_iterate_dt(dt=my_data_dt, ...)` as one would similarly run `results <- di_iterate(data=my_data, ...)`.
+3. Convert the results to a data frame for further manipulation using `dplyr`: `results_df <- as.data.frame(results)`.
 
 # `di_iterate_sql`: DI calculations on a database table using the database's SQL engine, especially useful for larger-than-memory data
 
 `di_iterate` and `di_iterate_dt` both operate on data ingested into R (e.g., stored as data frames or data tables in memory).  The function `di_iterate_sql` allows the user to operate on data stored in a database table, by generating SQL queries in R and executing those queries on the database engine.  This is useful for two reasons:
 
-1. It allows the user to operate on tables that are too large to be ingested into R.
-2. It off-loads the computations onto the database engine (so calculations are not leveraging the user's system's resources).
+1. it allows the user to operate on tables that are too large to be ingested into R; and
+2. it off-loads the computations onto the database engine (so calculations are not leveraging the user's system's resources or R).
 
-Let's illustrate this with a [SQLite](https://www.sqlite.org/) database:
+Let's illustrate `di_iterate_sql` with a [SQLite](https://www.sqlite.org/) database:
 
 ```{r}
 library(DBI) # Connect and query databases
@@ -662,13 +667,13 @@ lite_db <- dbConnect(drv=SQLite(), lite_db_file) # Connect to file
 dbWriteTable(conn=lite_db, name='student_equity_big', value=student_equity_big)
 
 # Calculate; return data
-## Note: not using scenario_repeat_by_vars for illustration
 system.time({
 results_lite <- di_iterate_sql(db_conn=lite_db
                              , db_table_name='student_equity_big'
                              , success_vars=c('Math', 'English', 'Transfer')
                              , group_vars=c('Ethnicity', 'Gender')
                              , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                             , scenario_repeat_by_vars=c('college', 'Ed_Goal', 'College_Status')
                              , mssql_flag=FALSE # Not MS SQL Server
                              , return_what='data'
                              , drop_staging_table=TRUE # remove the intermediate results table in DB
@@ -677,18 +682,20 @@ results_lite <- di_iterate_sql(db_conn=lite_db
 dim(results_lite)
 results_lite %>% head %>% as.data.frame
 
-# Generate a list of queries for user to run on own
+# Or, we could generate a list of queries for the user to run on own
 list_queries <- di_iterate_sql(db_conn=lite_db
                              , db_table_name='student_equity_big'
                              , success_vars=c('Math', 'English', 'Transfer')
                              , group_vars=c('Ethnicity', 'Gender')
                              , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                             , scenario_repeat_by_vars=c('college', 'Ed_Goal', 'College_Status')
                              , mssql_flag=FALSE # Not MS SQL Server
                              , return_what='SQL' # Changed from 'data' to 'SQL'
                                )
 length(list_queries)
-cat(list_queries[[1]]) # print
-cat(list_queries[[2]]) # print
+cat(list_queries[[1]]) # print 1st query: create pre-summary table first
+cat(list_queries[[2]]) # print 2nd query: create results table, calculate, and insert data
+cat(list_queries[[3]]) # print 3rd query: calculat, and insert data
 # User could do what they want with these queries
 ```
 
@@ -707,11 +714,12 @@ duck_db <- dbConnect(duckdb(), dbdir=':memory:')
 student_equity_big_parquet_path <- tempfile(pattern='student_equity_big_', fileext='.parquet') # temporary disk file
 write_parquet(x=student_equity_big, sink=student_equity_big_parquet_path)
 
-# Calculate
+# Path to parquet file
 student_equity_big_parquet_path
 student_equity_big_parquet_path_quote <- paste0("'", student_equity_big_parquet_path, "'")
 student_equity_big_parquet_path_quote # Path to parquet file, that needs to be surrounded by a single quote in order to work with duckdb
 
+# Calculate
 system.time({
   results_duck <- di_iterate_sql(db_conn=duck_db
                                , db_table_name=student_equity_big_parquet_path_quote
@@ -739,8 +747,22 @@ dim(results_duck)
 
 results_duck %>% head %>% as.data.frame
 
-# Disconnect
+# Disconnect from database
 dbDisconnect(duck_db, shutdown=TRUE)
+```
+
+As can be seen, `di_iterate_sql` is very fast when the database engine is `duckdb`.
+
+Please note that for student-level data stored as a single table in a traditional database platform (e.g., MS SQL Server, MySQL, PostgreSQL, etc.), the user could leverage the [odbc](https://CRAN.R-project.org/package=odbc) package in conjunction with the [DBI](https://CRAN.R-project.org/package=DBI) package to connect to these databases.  Here are some sample code that illustrates the steps needed:
+
+```{r eval=FALSE}
+library(DBI)
+library(odbc) # connect to databases using odbc
+
+# DB connection using DBI package
+db_conn <- dbConnect(odbc(), dsn='Name of my Data Source Name', uid='my_username', pwd='my_password')
+
+results <- di_iterate_sql(db_conn=db_conn, db_table_name='table_of_student_data', ...)
 ```
 
 # Appendix: R and R Package Versions

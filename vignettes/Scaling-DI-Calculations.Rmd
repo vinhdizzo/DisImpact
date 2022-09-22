@@ -1,7 +1,7 @@
 ---
 title: "Scaling Disproportionate Impact (DI) Calculations for Interactive Visualizations"
 author: "Vinh Nguyen"
-date: "2022-09-20"
+date: "2022-09-22"
 output:
   prettydoc::html_pretty:
     theme: architect
@@ -124,62 +124,55 @@ df_di_summary %>% head %>% as.data.frame # first few rows
 ```
 
 ```
-##        Ed_Goal     College_Status success_variable cohort_variable cohort
-## 1 Deg/Transfer First-time College             Math     Cohort_Math   2017
-## 2 Deg/Transfer First-time College             Math     Cohort_Math   2017
-## 3 Deg/Transfer First-time College             Math     Cohort_Math   2017
-## 4 Deg/Transfer First-time College             Math     Cohort_Math   2017
-## 5 Deg/Transfer First-time College             Math     Cohort_Math   2017
-## 6 Deg/Transfer First-time College             Math     Cohort_Math   2017
-##   disaggregation           group   n success       pct ppg_reference
-## 1      Ethnicity           Asian 776     692 0.8917526     0.8427699
-## 2      Ethnicity           Black 235     185 0.7872340     0.8427699
-## 3      Ethnicity        Hispanic 474     347 0.7320675     0.8427699
-## 4      Ethnicity Multi-Ethnicity 117      99 0.8461538     0.8427699
-## 5      Ethnicity Native American  30      28 0.9333333     0.8427699
-## 6      Ethnicity           White 823     718 0.8724180     0.8427699
-##   ppg_reference_group        moe    pct_lo    pct_hi di_indicator_ppg
-## 1             overall 0.03517995 0.8565726 0.9269325                0
-## 2             overall 0.06392815 0.7233059 0.8511622                0
-## 3             overall 0.04501289 0.6870546 0.7770804                1
-## 4             overall 0.09060103 0.7555528 0.9367549                0
-## 5             overall 0.17892270 0.7544106 1.1122560                0
-## 6             overall 0.03416065 0.8382573 0.9065786                0
-##   success_needed_not_di_ppg success_needed_full_parity_ppg di_prop_index
-## 1                         0                              0     1.0581211
-## 2                         0                             14     0.9341032
-## 3                        32                             53     0.8686446
-## 4                         0                              0     1.0040153
-## 5                         0                              0     1.1074593
-## 6                         0                              0     1.0351794
-##   di_indicator_prop_index success_needed_not_di_prop_index
-## 1                       0                                0
-## 2                       0                                0
-## 3                       0                                0
-## 4                       0                                0
-## 5                       0                                0
-## 6                       0                                0
-##   success_needed_full_parity_prop_index di_80_index_reference_group di_80_index
-## 1                                     0             Native American   0.9554492
-## 2                                    15             Native American   0.8434650
-## 3                                    66             Native American   0.7843580
-## 4                                     0             Native American   0.9065934
-## 5                                     0             Native American   1.0000000
-## 6                                     0             Native American   0.9347336
-##   di_indicator_80_index success_needed_not_di_80_index
-## 1                     0                              0
-## 2                     0                              0
-## 3                     1                              7
-## 4                     0                              0
-## 5                     0                              0
-## 6                     0                              0
-##   success_needed_full_parity_80_index
-## 1                                  33
-## 2                                  35
-## 3                                  96
-## 4                                  11
-## 5                                   0
-## 6                                  51
+##   Ed_Goal College_Status success_variable cohort_variable cohort disaggregation
+## 1   - All          - All          English  Cohort_English   2017         - None
+## 2   - All          - All          English  Cohort_English   2017      Ethnicity
+## 3   - All          - All          English  Cohort_English   2017      Ethnicity
+## 4   - All          - All          English  Cohort_English   2017      Ethnicity
+## 5   - All          - All          English  Cohort_English   2017      Ethnicity
+## 6   - All          - All          English  Cohort_English   2017      Ethnicity
+##             group    n success       pct ppg_reference ppg_reference_group
+## 1           - All 5520    4183 0.7577899     0.7577899             overall
+## 2           Asian 1689    1430 0.8466548     0.7577899             overall
+## 3           Black  559     361 0.6457961     0.7577899             overall
+## 4        Hispanic 1056     621 0.5880682     0.7577899             overall
+## 5 Multi-Ethnicity  282     207 0.7340426     0.7577899             overall
+## 6 Native American   54      35 0.6481481     0.7577899             overall
+##          moe    pct_lo    pct_hi di_indicator_ppg success_needed_not_di_ppg
+## 1 0.03000000 0.7277899 0.7877899                0                         0
+## 2 0.03000000 0.8166548 0.8766548                0                         0
+## 3 0.04144958 0.6043465 0.6872456                1                        40
+## 4 0.03015742 0.5579108 0.6182256                1                       148
+## 5 0.05835815 0.6756844 0.7924007                0                         0
+## 6 0.13336111 0.5147870 0.7815093                0                         0
+##   success_needed_full_parity_ppg di_prop_index di_indicator_prop_index
+## 1                              0     1.0000000                       0
+## 2                              0     1.1172686                       0
+## 3                             63     0.8522100                       0
+## 4                            180     0.7760307                       1
+## 5                              7     0.9686624                       0
+## 6                              6     0.8553138                       0
+##   success_needed_not_di_prop_index success_needed_full_parity_prop_index
+## 1                                0                                     0
+## 2                                0                                     0
+## 3                                0                                    70
+## 4                               23                                   222
+## 5                                0                                     8
+## 6                                0                                     6
+##   di_80_index_reference_group di_80_index di_indicator_80_index
+## 1                       - All   1.0000000                     0
+## 2                       Asian   1.0000000                     0
+## 3                       Asian   0.7627619                     1
+## 4                       Asian   0.6945784                     1
+## 5                       Asian   0.8669915                     0
+## 6                       Asian   0.7655400                     1
+##   success_needed_not_di_80_index success_needed_full_parity_80_index
+## 1                              0                                   0
+## 2                              0                                   0
+## 3                             18                                 113
+## 4                             95                                 274
+## 5                              0                                  32
+## 6                              2                                  11
 ```
 
 The variables `di_indicator_ppg`, `di_indicator_prop_index`, and `di_indicator_80_index` are DI flags using the three methods.  For additional explanations on other variables/columns in the returned data set, type `?di_iterate` in the R console to bring up the documentation.
@@ -230,14 +223,14 @@ df_di_summary %>%
 
 |Ed_Goal |College_Status |success_variable |cohort_variable | cohort|disaggregation |group |     n| success|       pct| ppg_reference|ppg_reference_group |       moe|    pct_lo|    pct_hi| di_indicator_ppg| success_needed_not_di_ppg| success_needed_full_parity_ppg| di_prop_index| di_indicator_prop_index| success_needed_not_di_prop_index| success_needed_full_parity_prop_index|di_80_index_reference_group | di_80_index| di_indicator_80_index| success_needed_not_di_80_index| success_needed_full_parity_80_index|
 |:-------|:--------------|:----------------|:---------------|------:|:--------------|:-----|-----:|-------:|---------:|-------------:|:-------------------|---------:|---------:|---------:|----------------:|-------------------------:|------------------------------:|-------------:|-----------------------:|--------------------------------:|-------------------------------------:|:---------------------------|-----------:|---------------------:|------------------------------:|-----------------------------------:|
-|- All   |- All          |Math             |Cohort_Math     |   2017|- None         |- All |  4398|    3722| 0.8462938|     0.8462938|overall             | 0.0300000| 0.8162938| 0.8762938|                0|                         0|                              0|             1|                       0|                                0|                                     0|- All                       |           1|                     0|                              0|                                   0|
-|- All   |- All          |Math             |Cohort_Math     |   2018|- None         |- All |  7295|    6193| 0.8489376|     0.8489376|overall             | 0.0300000| 0.8189376| 0.8789376|                0|                         0|                              0|             1|                       0|                                0|                                     0|- All                       |           1|                     0|                              0|                                   0|
-|- All   |- All          |Math             |Cohort_Math     |   2019|- None         |- All |  4456|    3807| 0.8543537|     0.8543537|overall             | 0.0300000| 0.8243537| 0.8843537|                0|                         0|                              0|             1|                       0|                                0|                                     0|- All                       |           1|                     0|                              0|                                   0|
-|- All   |- All          |Math             |Cohort_Math     |   2020|- None         |- All |  1780|    1505| 0.8455056|     0.8455056|overall             | 0.0300000| 0.8155056| 0.8755056|                0|                         0|                              0|             1|                       0|                                0|                                     0|- All                       |           1|                     0|                              0|                                   0|
 |- All   |- All          |English          |Cohort_English  |   2017|- None         |- All |  5520|    4183| 0.7577899|     0.7577899|overall             | 0.0300000| 0.7277899| 0.7877899|                0|                         0|                              0|             1|                       0|                                0|                                     0|- All                       |           1|                     0|                              0|                                   0|
 |- All   |- All          |English          |Cohort_English  |   2018|- None         |- All |  8543|    6532| 0.7646026|     0.7646026|overall             | 0.0300000| 0.7346026| 0.7946026|                0|                         0|                              0|             1|                       0|                                0|                                     0|- All                       |           1|                     0|                              0|                                   0|
 |- All   |- All          |English          |Cohort_English  |   2019|- None         |- All |  3866|    2938| 0.7599586|     0.7599586|overall             | 0.0300000| 0.7299586| 0.7899586|                0|                         0|                              0|             1|                       0|                                0|                                     0|- All                       |           1|                     0|                              0|                                   0|
 |- All   |- All          |English          |Cohort_English  |   2020|- None         |- All |   913|     678| 0.7426068|     0.7426068|overall             | 0.0324333| 0.7101735| 0.7750401|                0|                         0|                              0|             1|                       0|                                0|                                     0|- All                       |           1|                     0|                              0|                                   0|
+|- All   |- All          |Math             |Cohort_Math     |   2017|- None         |- All |  4398|    3722| 0.8462938|     0.8462938|overall             | 0.0300000| 0.8162938| 0.8762938|                0|                         0|                              0|             1|                       0|                                0|                                     0|- All                       |           1|                     0|                              0|                                   0|
+|- All   |- All          |Math             |Cohort_Math     |   2018|- None         |- All |  7295|    6193| 0.8489376|     0.8489376|overall             | 0.0300000| 0.8189376| 0.8789376|                0|                         0|                              0|             1|                       0|                                0|                                     0|- All                       |           1|                     0|                              0|                                   0|
+|- All   |- All          |Math             |Cohort_Math     |   2019|- None         |- All |  4456|    3807| 0.8543537|     0.8543537|overall             | 0.0300000| 0.8243537| 0.8843537|                0|                         0|                              0|             1|                       0|                                0|                                     0|- All                       |           1|                     0|                              0|                                   0|
+|- All   |- All          |Math             |Cohort_Math     |   2020|- None         |- All |  1780|    1505| 0.8455056|     0.8455056|overall             | 0.0300000| 0.8155056| 0.8755056|                0|                         0|                              0|             1|                       0|                                0|                                     0|- All                       |           1|                     0|                              0|                                   0|
 |- All   |- All          |Transfer         |Cohort          |   2017|- None         |- All | 10000|    5140| 0.5140000|     0.5140000|overall             | 0.0300000| 0.4840000| 0.5440000|                0|                         0|                              0|             1|                       0|                                0|                                     0|- All                       |           1|                     0|                              0|                                   0|
 |- All   |- All          |Transfer         |Cohort          |   2018|- None         |- All | 10000|    5388| 0.5388000|     0.5388000|overall             | 0.0300000| 0.5088000| 0.5688000|                0|                         0|                              0|             1|                       0|                                0|                                     0|- All                       |           1|                     0|                              0|                                   0|
 
@@ -315,6 +308,13 @@ df_di_summary %>%
 
 ```r
 library(ggplot2)
+```
+
+```
+## Need help? Try Stackoverflow: https://stackoverflow.com/tags/ggplot2
+```
+
+```r
 library(forcats)
 library(scales)
 
@@ -1225,7 +1225,7 @@ big_di_summary <- di_iterate(data=student_equity_big
 
 ```
 ##    user  system elapsed 
-## 1251.40   44.78 1297.17
+## 1230.67   44.30 1275.25
 ```
 
 ```r
@@ -1257,7 +1257,7 @@ big_di_summary2 <- di_iterate(data=student_equity_big
 
 ```
 ##    user  system elapsed 
-##   61.17    6.70  436.92
+##   61.27    2.69  431.61
 ```
 
 ```r
@@ -1285,12 +1285,27 @@ big_di_summary3 <- di_iterate(data=student_equity_big
 
 ```
 ## NOTE: Since `parallel_split_to_disk=TRUE`, writing out 1809 intermediate data sets for use in parallel execution.
+```
+
+```
+## Warning: package 'fstcore' was built under R version 4.0.5
+```
+
+```
+## fstcore package v0.9.12
+```
+
+```
+## (OpenMP detected, using 12 threads)
+```
+
+```
 ## NOTE: Since `parallel=TRUE`, will attempt to use 4 CPU cores to execute 1809 scenarios in parallel.  The user could change the number of parallel cores with the `parallel_n_cores` argument.
 ```
 
 ```
 ##    user  system elapsed 
-##   69.59    8.18  465.02
+##   67.89    5.46  445.38
 ```
 
 ```r
@@ -1306,72 +1321,92 @@ big_di_summary2 %>% head %>% as.data.frame
 ```
 
 ```
-##        Ed_Goal     College_Status   college success_variable cohort_variable
-## 1 Deg/Transfer First-time College College 1             Math     Cohort_Math
-## 2 Deg/Transfer First-time College College 1             Math     Cohort_Math
-## 3 Deg/Transfer First-time College College 1             Math     Cohort_Math
-## 4 Deg/Transfer First-time College College 1             Math     Cohort_Math
-## 5 Deg/Transfer First-time College College 1             Math     Cohort_Math
-## 6 Deg/Transfer First-time College College 1             Math     Cohort_Math
-##   cohort disaggregation           group   n success       pct ppg_reference
-## 1   2017      Ethnicity           Asian 776     692 0.8917526     0.8427699
-## 2   2017      Ethnicity           Black 235     185 0.7872340     0.8427699
-## 3   2017      Ethnicity        Hispanic 474     347 0.7320675     0.8427699
-## 4   2017      Ethnicity Multi-Ethnicity 117      99 0.8461538     0.8427699
-## 5   2017      Ethnicity Native American  30      28 0.9333333     0.8427699
-## 6   2017      Ethnicity           White 823     718 0.8724180     0.8427699
-##   ppg_reference_group        moe    pct_lo    pct_hi di_indicator_ppg
-## 1             overall 0.03517995 0.8565726 0.9269325                0
-## 2             overall 0.06392815 0.7233059 0.8511622                0
-## 3             overall 0.04501289 0.6870546 0.7770804                1
-## 4             overall 0.09060103 0.7555528 0.9367549                0
-## 5             overall 0.17892270 0.7544106 1.1122560                0
-## 6             overall 0.03416065 0.8382573 0.9065786                0
+##   Ed_Goal College_Status college success_variable cohort_variable cohort
+## 1   - All          - All   - All          English  Cohort_English   2017
+## 2   - All          - All   - All          English  Cohort_English   2017
+## 3   - All          - All   - All          English  Cohort_English   2017
+## 4   - All          - All   - All          English  Cohort_English   2017
+## 5   - All          - All   - All          English  Cohort_English   2017
+## 6   - All          - All   - All          English  Cohort_English   2017
+##   disaggregation           group       n success       pct ppg_reference
+## 1         - None           - All 1104000  836600 0.7577899     0.7577899
+## 2      Ethnicity           Asian  337800  286000 0.8466548     0.7577899
+## 3      Ethnicity           Black  111800   72200 0.6457961     0.7577899
+## 4      Ethnicity        Hispanic  211200  124200 0.5880682     0.7577899
+## 5      Ethnicity Multi-Ethnicity   56400   41400 0.7340426     0.7577899
+## 6      Ethnicity Native American   10800    7000 0.6481481     0.7577899
+##   ppg_reference_group  moe    pct_lo    pct_hi di_indicator_ppg
+## 1             overall 0.03 0.7277899 0.7877899                0
+## 2             overall 0.03 0.8166548 0.8766548                0
+## 3             overall 0.03 0.6157961 0.6757961                1
+## 4             overall 0.03 0.5580682 0.6180682                1
+## 5             overall 0.03 0.7040426 0.7640426                0
+## 6             overall 0.03 0.6181481 0.6781481                1
 ##   success_needed_not_di_ppg success_needed_full_parity_ppg di_prop_index
-## 1                         0                              0     1.0581211
-## 2                         0                             14     0.9341032
-## 3                        32                             53     0.8686446
-## 4                         0                              0     1.0040153
-## 5                         0                              0     1.1074593
-## 6                         0                              0     1.0351794
+## 1                         0                              0     1.0000000
+## 2                         0                              0     1.1172686
+## 3                      9167                          12521     0.8522100
+## 4                     29510                          35846     0.7760307
+## 5                         0                           1340     0.9686624
+## 6                       861                           1185     0.8553138
 ##   di_indicator_prop_index success_needed_not_di_prop_index
 ## 1                       0                                0
 ## 2                       0                                0
 ## 3                       0                                0
-## 4                       0                                0
+## 4                       1                             4530
 ## 5                       0                                0
 ## 6                       0                                0
 ##   success_needed_full_parity_prop_index di_80_index_reference_group di_80_index
-## 1                                     0             Native American   0.9554492
-## 2                                    15             Native American   0.8434650
-## 3                                    66             Native American   0.7843580
-## 4                                     0             Native American   0.9065934
-## 5                                     0             Native American   1.0000000
-## 6                                     0             Native American   0.9347336
+## 1                                     0                       - All   1.0000000
+## 2                                     0                       Asian   1.0000000
+## 3                                 13932                       Asian   0.7627619
+## 4                                 44325                       Asian   0.6945784
+## 5                                  1412                       Asian   0.8669915
+## 6                                  1196                       Asian   0.7655400
 ##   di_indicator_80_index success_needed_not_di_80_index
 ## 1                     0                              0
 ## 2                     0                              0
-## 3                     1                              7
-## 4                     0                              0
+## 3                     1                           3525
+## 4                     1                          18851
 ## 5                     0                              0
-## 6                     0                              0
+## 6                     1                            316
 ##   success_needed_full_parity_80_index
-## 1                                  33
-## 2                                  35
-## 3                                  96
-## 4                                  11
-## 5                                   0
-## 6                                  51
+## 1                                   0
+## 2                                   0
+## 3                               22457
+## 4                               54614
+## 5                                6352
+## 6                                2144
 ```
 
 # `di_iterate_dt`: efficient in-memory DI calculations using `data.table`
 
-`di_iterate` is a robust function, but can be highly inefficient if the user is iterating across many iterations (when a variable specified in `scenario_repeat_by_vars` has high cardinality, such as a `'college'` or `'major'` variable).  One way to speed things up is to use the `di_iterate_dt` function that leverages the [data.table](https://CRAN.R-project.org/package=data.table) and the [collapse](https://CRAN.R-project.org/package=collapse) packages for efficient aggregation.  Let's illustrate with an example:
+`di_iterate` is a robust function, but can be highly inefficient if the user is iterating across many iterations (when a variable specified in `scenario_repeat_by_vars` has high cardinality, such as a `'college'` or `'major'` variable).  One way to speed things up is to use the `di_iterate_dt` function that leverages the [data.table](https://CRAN.R-project.org/package=data.table) and the [collapse](https://CRAN.R-project.org/package=collapse) packages for efficient aggregation.  Let's illustrate how one would use `di_iterate_dt` with an example:
 
 
 ```r
 library(data.table) # Needs to be >= 1.14.3; to update, run: data.table::update_dev_pkg()
-# Convert
+```
+
+```
+## Warning: package 'data.table' was built under R version 4.3.0
+```
+
+```
+## data.table 1.14.3 IN DEVELOPMENT built 2022-07-20 18:26:12 UTC; root using 6 threads (see ?getDTthreads).  Latest news: r-datatable.com
+## **********
+## This development version of data.table was built more than 4 weeks ago. Please update: data.table::update_dev_pkg()
+## **********
+## 
+## Attaching package: 'data.table'
+## 
+## The following objects are masked from 'package:dplyr':
+## 
+##     between, first, last
+```
+
+```r
+# Convert data to a data.table
 dt_student_equity_big <- as.data.table(student_equity_big)
 
 # Non-parallel
@@ -1387,162 +1422,183 @@ system.time({
 
 ```
 ##    user  system elapsed 
-##  179.91   11.55  194.93
+##  181.26   12.36  196.68
 ```
 
 ```r
-# Results stored as a data.table
+# Results are stored as a data.table
 results_dt
 ```
 
 ```
-##         success_variable cohort_variable cohort disaggregation           group
-##                   <char>          <char>  <num>         <char>          <char>
-##      1:             Math     Cohort_Math   2017      Ethnicity           Asian
-##      2:             Math     Cohort_Math   2017      Ethnicity           Black
-##      3:             Math     Cohort_Math   2017      Ethnicity        Hispanic
-##      4:             Math     Cohort_Math   2017      Ethnicity Multi-Ethnicity
-##      5:             Math     Cohort_Math   2017      Ethnicity Native American
-##     ---                                                                       
-## 180494:         Transfer          Cohort   2018         - None           - All
-## 180495:         Transfer          Cohort   2017         - None           - All
-## 180496:         Transfer          Cohort   2018         - None           - All
-## 180497:         Transfer          Cohort   2017         - None           - All
-## 180498:         Transfer          Cohort   2018         - None           - All
-##               n success        pct ppg_reference ppg_reference_group        moe
-##           <int>   <num>      <num>         <num>              <char>      <num>
-##      1:     776      24 0.03092784    0.05336049             overall 0.03517995
-##      2:     235      24 0.10212766    0.05336049             overall 0.06392815
-##      3:     474      25 0.05274262    0.05336049             overall 0.04501289
-##      4:     117      17 0.14529915    0.05336049             overall 0.09060103
-##      5:      30      14 0.46666667    0.05336049             overall 0.17892270
-##     ---                                                                        
-## 180494:   10000     404 0.04040000    0.04040000             overall 0.03000000
-## 180495:   10000     391 0.03910000    0.03910000             overall 0.03000000
-## 180496:   10000     404 0.04040000    0.04040000             overall 0.03000000
-## 180497: 2000000   78200 0.03910000    0.03910000             overall 0.03000000
-## 180498: 2000000   80800 0.04040000    0.04040000             overall 0.03000000
-##               pct_lo     pct_hi di_indicator_ppg success_needed_not_di_ppg
-##                <num>      <num>            <num>                     <num>
-##      1: -0.004252115 0.06610778                0                         0
-##      2:  0.038199508 0.16605581                0                         0
-##      3:  0.007729725 0.09775551                0                         0
-##      4:  0.054698113 0.23590018                0                         0
-##      5:  0.287743965 0.64558937                0                         0
+##            college Ed_Goal College_Status success_variable cohort_variable
+##             <char>  <char>         <char>           <char>          <char>
+##      1:      - All   - All          - All          English  Cohort_English
+##      2:      - All   - All          - All          English  Cohort_English
+##      3:      - All   - All          - All          English  Cohort_English
+##      4:      - All   - All          - All          English  Cohort_English
+##      5:      - All   - All          - All          English  Cohort_English
 ##     ---                                                                   
-## 180494:  0.010400000 0.07040000                0                         0
-## 180495:  0.009100000 0.06910000                0                         0
-## 180496:  0.010400000 0.07040000                0                         0
-## 180497:  0.009100000 0.06910000                0                         0
-## 180498:  0.010400000 0.07040000                0                         0
+## 180494: College 99   Other          Other         Transfer          Cohort
+## 180495: College 99   Other          Other         Transfer          Cohort
+## 180496: College 99   Other          Other         Transfer          Cohort
+## 180497: College 99   Other          Other         Transfer          Cohort
+## 180498: College 99   Other          Other         Transfer          Cohort
+##         cohort disaggregation           group       n success       pct
+##          <num>         <char>          <char>   <int>   <num>     <num>
+##      1:   2017         - None           - All 1104000  836600 0.7577899
+##      2:   2017      Ethnicity           Asian  337800  286000 0.8466548
+##      3:   2017      Ethnicity           Black  111800   72200 0.6457961
+##      4:   2017      Ethnicity        Hispanic  211200  124200 0.5880682
+##      5:   2017      Ethnicity Multi-Ethnicity   56400   41400 0.7340426
+##     ---                                                                
+## 180494:   2018      Ethnicity Native American       6       4 0.6666667
+## 180495:   2018      Ethnicity           White     201     136 0.6766169
+## 180496:   2018         Gender          Female     267     157 0.5880150
+## 180497:   2018         Gender            Male     296     172 0.5810811
+## 180498:   2018         Gender           Other       7       3 0.4285714
+##         ppg_reference ppg_reference_group        moe     pct_lo    pct_hi
+##                 <num>              <char>      <num>      <num>     <num>
+##      1:     0.7577899             overall 0.03000000 0.72778986 0.7877899
+##      2:     0.7577899             overall 0.03000000 0.81665483 0.8766548
+##      3:     0.7577899             overall 0.03000000 0.61579606 0.6757961
+##      4:     0.7577899             overall 0.03000000 0.55806818 0.6180682
+##      5:     0.7577899             overall 0.03000000 0.70404255 0.7640426
+##     ---                                                                  
+## 180494:     0.5824561             overall 0.40008332 0.26658334 1.0667500
+## 180495:     0.5824561             overall 0.06912387 0.60749305 0.7457408
+## 180496:     0.5824561             overall 0.05997503 0.52803996 0.6479900
+## 180497:     0.5824561             overall 0.05696134 0.52411974 0.6380424
+## 180498:     0.5824561             overall 0.37040518 0.05816625 0.7989766
+##         di_indicator_ppg success_needed_not_di_ppg
+##                    <num>                     <num>
+##      1:                0                         0
+##      2:                0                         0
+##      3:                1                      9167
+##      4:                1                     29510
+##      5:                0                         0
+##     ---                                           
+## 180494:                0                         0
+## 180495:                0                         0
+## 180496:                0                         0
+## 180497:                0                         0
+## 180498:                0                         0
 ##         success_needed_full_parity_ppg di_prop_index di_indicator_prop_index
 ##                                  <num>         <num>                   <num>
-##      1:                             18     0.5796018                       1
-##      2:                              0     1.9139191                       0
-##      3:                              1     0.9884208                       0
-##      4:                              0     2.7229725                       0
-##      5:                              0     8.7455471                       0
+##      1:                              0     1.0000000                       0
+##      2:                              0     1.1172686                       0
+##      3:                          12521     0.8522100                       0
+##      4:                          35846     0.7760307                       1
+##      5:                           1340     0.9686624                       0
 ##     ---                                                                     
-## 180494:                              0     1.0000000                       0
-## 180495:                              0     1.0000000                       0
-## 180496:                              0     1.0000000                       0
-## 180497:                              0     1.0000000                       0
-## 180498:                              0     1.0000000                       0
+## 180494:                              0     1.1445783                       0
+## 180495:                              0     1.1616616                       0
+## 180496:                              0     1.0095438                       0
+## 180497:                              1     0.9976392                       0
+## 180498:                              2     0.7358003                       1
 ##         success_needed_not_di_prop_index success_needed_full_parity_prop_index
 ##                                    <num>                                 <num>
-##      1:                               13                                    26
+##      1:                                0                                     0
 ##      2:                                0                                     0
-##      3:                                0                                     1
-##      4:                                0                                     0
-##      5:                                0                                     0
+##      3:                                0                                 13932
+##      4:                             4530                                 44325
+##      5:                                0                                  1412
 ##     ---                                                                       
 ## 180494:                                0                                     0
 ## 180495:                                0                                     0
 ## 180496:                                0                                     0
-## 180497:                                0                                     0
-## 180498:                                0                                     0
+## 180497:                                0                                     1
+## 180498:                                1                                     2
 ##         di_80_index_reference_group di_80_index di_indicator_80_index
 ##                              <char>       <num>                 <num>
-##      1:             Native American  0.06627393                     1
-##      2:             Native American  0.21884498                     1
-##      3:             Native American  0.11301989                     1
-##      4:             Native American  0.31135531                     1
-##      5:             Native American  1.00000000                     0
+##      1:                       - All   1.0000000                     0
+##      2:                       Asian   1.0000000                     0
+##      3:                       Asian   0.7627619                     1
+##      4:                       Asian   0.6945784                     1
+##      5:                       Asian   0.8669915                     0
 ##     ---                                                              
-## 180494:                       - All  1.00000000                     0
-## 180495:                       - All  1.00000000                     0
-## 180496:                       - All  1.00000000                     0
-## 180497:                       - All  1.00000000                     0
-## 180498:                       - All  1.00000000                     0
+## 180494:                       Asian   0.9203980                     0
+## 180495:                       Asian   0.9341353                     0
+## 180496:                      Female   1.0000000                     0
+## 180497:                      Female   0.9882080                     0
+## 180498:                      Female   0.7288444                     1
 ##         success_needed_not_di_80_index success_needed_full_parity_80_index
 ##                                  <num>                               <num>
-##      1:                            266                                 339
-##      2:                             64                                  86
-##      3:                            152                                 197
-##      4:                             27                                  38
-##      5:                              0                                   0
+##      1:                              0                                   0
+##      2:                              0                                   0
+##      3:                           3525                               22457
+##      4:                          18851                               54614
+##      5:                              0                                6352
 ##     ---                                                                   
-## 180494:                              0                                   0
-## 180495:                              0                                   0
+## 180494:                              0                                   1
+## 180495:                              0                                  10
 ## 180496:                              0                                   0
-## 180497:                              0                                   0
-## 180498:                              0                                   0
+## 180497:                              0                                   3
+## 180498:                              1                                   2
 ```
 
 ```r
+# One could convert to a data frame as well using as.data.frame
 results_dt %>% as.data.frame %>% head
 ```
 
 ```
-##   success_variable cohort_variable cohort disaggregation           group   n
-## 1             Math     Cohort_Math   2017      Ethnicity           Asian 776
-## 2             Math     Cohort_Math   2017      Ethnicity           Black 235
-## 3             Math     Cohort_Math   2017      Ethnicity        Hispanic 474
-## 4             Math     Cohort_Math   2017      Ethnicity Multi-Ethnicity 117
-## 5             Math     Cohort_Math   2017      Ethnicity Native American  30
-## 6             Math     Cohort_Math   2017      Ethnicity           White 823
-##   success        pct ppg_reference ppg_reference_group        moe       pct_lo
-## 1      24 0.03092784    0.05336049             overall 0.03517995 -0.004252115
-## 2      24 0.10212766    0.05336049             overall 0.06392815  0.038199508
-## 3      25 0.05274262    0.05336049             overall 0.04501289  0.007729725
-## 4      17 0.14529915    0.05336049             overall 0.09060103  0.054698113
-## 5      14 0.46666667    0.05336049             overall 0.17892270  0.287743965
-## 6      27 0.03280680    0.05336049             overall 0.03416065 -0.001353848
-##       pct_hi di_indicator_ppg success_needed_not_di_ppg
-## 1 0.06610778                0                         0
-## 2 0.16605581                0                         0
-## 3 0.09775551                0                         0
-## 4 0.23590018                0                         0
-## 5 0.64558937                0                         0
-## 6 0.06696746                0                         0
-##   success_needed_full_parity_ppg di_prop_index di_indicator_prop_index
-## 1                             18     0.5796018                       1
-## 2                              0     1.9139191                       0
-## 3                              1     0.9884208                       0
-## 4                              0     2.7229725                       0
-## 5                              0     8.7455471                       0
-## 6                             17     0.6148145                       1
-##   success_needed_not_di_prop_index success_needed_full_parity_prop_index
-## 1                               13                                    26
-## 2                                0                                     0
-## 3                                0                                     1
-## 4                                0                                     0
-## 5                                0                                     0
-## 6                               12                                    26
-##   di_80_index_reference_group di_80_index di_indicator_80_index
-## 1             Native American  0.06627393                     1
-## 2             Native American  0.21884498                     1
-## 3             Native American  0.11301989                     1
-## 4             Native American  0.31135531                     1
-## 5             Native American  1.00000000                     0
-## 6             Native American  0.07030030                     1
-##   success_needed_not_di_80_index success_needed_full_parity_80_index
-## 1                            266                                 339
-## 2                             64                                  86
-## 3                            152                                 197
-## 4                             27                                  38
-## 5                              0                                   0
-## 6                            281                                 358
+##   college Ed_Goal College_Status success_variable cohort_variable cohort
+## 1   - All   - All          - All          English  Cohort_English   2017
+## 2   - All   - All          - All          English  Cohort_English   2017
+## 3   - All   - All          - All          English  Cohort_English   2017
+## 4   - All   - All          - All          English  Cohort_English   2017
+## 5   - All   - All          - All          English  Cohort_English   2017
+## 6   - All   - All          - All          English  Cohort_English   2017
+##   disaggregation           group       n success       pct ppg_reference
+## 1         - None           - All 1104000  836600 0.7577899     0.7577899
+## 2      Ethnicity           Asian  337800  286000 0.8466548     0.7577899
+## 3      Ethnicity           Black  111800   72200 0.6457961     0.7577899
+## 4      Ethnicity        Hispanic  211200  124200 0.5880682     0.7577899
+## 5      Ethnicity Multi-Ethnicity   56400   41400 0.7340426     0.7577899
+## 6      Ethnicity Native American   10800    7000 0.6481481     0.7577899
+##   ppg_reference_group  moe    pct_lo    pct_hi di_indicator_ppg
+## 1             overall 0.03 0.7277899 0.7877899                0
+## 2             overall 0.03 0.8166548 0.8766548                0
+## 3             overall 0.03 0.6157961 0.6757961                1
+## 4             overall 0.03 0.5580682 0.6180682                1
+## 5             overall 0.03 0.7040426 0.7640426                0
+## 6             overall 0.03 0.6181481 0.6781481                1
+##   success_needed_not_di_ppg success_needed_full_parity_ppg di_prop_index
+## 1                         0                              0     1.0000000
+## 2                         0                              0     1.1172686
+## 3                      9167                          12521     0.8522100
+## 4                     29510                          35846     0.7760307
+## 5                         0                           1340     0.9686624
+## 6                       861                           1185     0.8553138
+##   di_indicator_prop_index success_needed_not_di_prop_index
+## 1                       0                                0
+## 2                       0                                0
+## 3                       0                                0
+## 4                       1                             4530
+## 5                       0                                0
+## 6                       0                                0
+##   success_needed_full_parity_prop_index di_80_index_reference_group di_80_index
+## 1                                     0                       - All   1.0000000
+## 2                                     0                       Asian   1.0000000
+## 3                                 13932                       Asian   0.7627619
+## 4                                 44325                       Asian   0.6945784
+## 5                                  1412                       Asian   0.8669915
+## 6                                  1196                       Asian   0.7655400
+##   di_indicator_80_index success_needed_not_di_80_index
+## 1                     0                              0
+## 2                     0                              0
+## 3                     1                           3525
+## 4                     1                          18851
+## 5                     0                              0
+## 6                     1                            316
+##   success_needed_full_parity_80_index
+## 1                                   0
+## 2                                   0
+## 3                               22457
+## 4                               54614
+## 5                                6352
+## 6                                2144
 ```
 
 ```r
@@ -1561,125 +1617,39 @@ system.time({
 
 ```
 ##    user  system elapsed 
-##   15.20    7.25   80.61
-```
-
-```r
-results_dt2
-```
-
-```
-##         success_variable cohort_variable cohort disaggregation           group
-##                   <char>          <char>  <num>         <char>          <char>
-##      1:             Math     Cohort_Math   2017      Ethnicity           Asian
-##      2:             Math     Cohort_Math   2017      Ethnicity           Black
-##      3:             Math     Cohort_Math   2017      Ethnicity        Hispanic
-##      4:             Math     Cohort_Math   2017      Ethnicity Multi-Ethnicity
-##      5:             Math     Cohort_Math   2017      Ethnicity Native American
-##     ---                                                                       
-## 180494:         Transfer          Cohort   2018         - None           - All
-## 180495:         Transfer          Cohort   2017         - None           - All
-## 180496:         Transfer          Cohort   2018         - None           - All
-## 180497:         Transfer          Cohort   2017         - None           - All
-## 180498:         Transfer          Cohort   2018         - None           - All
-##               n success        pct ppg_reference ppg_reference_group        moe
-##           <int>   <num>      <num>         <num>              <char>      <num>
-##      1:     776      24 0.03092784    0.05336049             overall 0.03517995
-##      2:     235      24 0.10212766    0.05336049             overall 0.06392815
-##      3:     474      25 0.05274262    0.05336049             overall 0.04501289
-##      4:     117      17 0.14529915    0.05336049             overall 0.09060103
-##      5:      30      14 0.46666667    0.05336049             overall 0.17892270
-##     ---                                                                        
-## 180494:   10000     404 0.04040000    0.04040000             overall 0.03000000
-## 180495:   10000     391 0.03910000    0.03910000             overall 0.03000000
-## 180496:   10000     404 0.04040000    0.04040000             overall 0.03000000
-## 180497: 2000000   78200 0.03910000    0.03910000             overall 0.03000000
-## 180498: 2000000   80800 0.04040000    0.04040000             overall 0.03000000
-##               pct_lo     pct_hi di_indicator_ppg success_needed_not_di_ppg
-##                <num>      <num>            <num>                     <num>
-##      1: -0.004252115 0.06610778                0                         0
-##      2:  0.038199508 0.16605581                0                         0
-##      3:  0.007729725 0.09775551                0                         0
-##      4:  0.054698113 0.23590018                0                         0
-##      5:  0.287743965 0.64558937                0                         0
-##     ---                                                                   
-## 180494:  0.010400000 0.07040000                0                         0
-## 180495:  0.009100000 0.06910000                0                         0
-## 180496:  0.010400000 0.07040000                0                         0
-## 180497:  0.009100000 0.06910000                0                         0
-## 180498:  0.010400000 0.07040000                0                         0
-##         success_needed_full_parity_ppg di_prop_index di_indicator_prop_index
-##                                  <num>         <num>                   <num>
-##      1:                             18     0.5796018                       1
-##      2:                              0     1.9139191                       0
-##      3:                              1     0.9884208                       0
-##      4:                              0     2.7229725                       0
-##      5:                              0     8.7455471                       0
-##     ---                                                                     
-## 180494:                              0     1.0000000                       0
-## 180495:                              0     1.0000000                       0
-## 180496:                              0     1.0000000                       0
-## 180497:                              0     1.0000000                       0
-## 180498:                              0     1.0000000                       0
-##         success_needed_not_di_prop_index success_needed_full_parity_prop_index
-##                                    <num>                                 <num>
-##      1:                               13                                    26
-##      2:                                0                                     0
-##      3:                                0                                     1
-##      4:                                0                                     0
-##      5:                                0                                     0
-##     ---                                                                       
-## 180494:                                0                                     0
-## 180495:                                0                                     0
-## 180496:                                0                                     0
-## 180497:                                0                                     0
-## 180498:                                0                                     0
-##         di_80_index_reference_group di_80_index di_indicator_80_index
-##                              <char>       <num>                 <num>
-##      1:             Native American  0.06627393                     1
-##      2:             Native American  0.21884498                     1
-##      3:             Native American  0.11301989                     1
-##      4:             Native American  0.31135531                     1
-##      5:             Native American  1.00000000                     0
-##     ---                                                              
-## 180494:                       - All  1.00000000                     0
-## 180495:                       - All  1.00000000                     0
-## 180496:                       - All  1.00000000                     0
-## 180497:                       - All  1.00000000                     0
-## 180498:                       - All  1.00000000                     0
-##         success_needed_not_di_80_index success_needed_full_parity_80_index
-##                                  <num>                               <num>
-##      1:                            266                                 339
-##      2:                             64                                  86
-##      3:                            152                                 197
-##      4:                             27                                  38
-##      5:                              0                                   0
-##     ---                                                                   
-## 180494:                              0                                   0
-## 180495:                              0                                   0
-## 180496:                              0                                   0
-## 180497:                              0                                   0
-## 180498:                              0                                   0
+##   15.97    7.26   81.72
 ```
 
 As can be seen in the elapsed time for each run, there is significant decrease in the elapsed time when using `di_iterate_dt`.
 
-For users not familiar with `data.table`, it is better to convert the results to a traditional data frame using `as.data.frame` for further manipulations or export.
+For users not familiar with `data.table`, the recommended workflow for using `di_iterate_dt` is as follow:
+
+1. Import the student-level data set as a `data.table` object, either by
+  - Ingesting the file into R as one would normally do (e.g., using `read_csv` from the `readr` package), then converting the data frame into a data table object using `as.data.table`: `my_data_dt <- as.data.table(my_data)`; or
+  - Ingesting the raw data into R by using `data.table`'s `fread` function.
+2. Run `results <- di_iterate_dt(dt=my_data_dt, ...)` as one would similarly run `results <- di_iterate(data=my_data, ...)`.
+3. Convert the results to a data frame for further manipulation using `dplyr`: `results_df <- as.data.frame(results)`.
 
 # `di_iterate_sql`: DI calculations on a database table using the database's SQL engine, especially useful for larger-than-memory data
 
 `di_iterate` and `di_iterate_dt` both operate on data ingested into R (e.g., stored as data frames or data tables in memory).  The function `di_iterate_sql` allows the user to operate on data stored in a database table, by generating SQL queries in R and executing those queries on the database engine.  This is useful for two reasons:
 
-1. It allows the user to operate on tables that are too large to be ingested into R.
-2. It off-loads the computations onto the database engine (so calculations are not leveraging the user's system's resources).
+1. it allows the user to operate on tables that are too large to be ingested into R; and
+2. it off-loads the computations onto the database engine (so calculations are not leveraging the user's system's resources or R).
 
-Let's illustrate this with a [SQLite](https://www.sqlite.org/) database:
+Let's illustrate `di_iterate_sql` with a [SQLite](https://www.sqlite.org/) database:
 
 
 ```r
 library(DBI) # Connect and query databases
 library(RSQLite) # SQLite database for demonstration
+```
 
+```
+## Warning: package 'RSQLite' was built under R version 4.0.5
+```
+
+```r
 # Connect to DB
 lite_db_file <- tempfile(pattern='sqlite_', fileext='.db') # temporary disk file sqlite on-disk database file
 lite_db <- dbConnect(drv=SQLite(), lite_db_file) # Connect to file
@@ -1688,13 +1658,13 @@ lite_db <- dbConnect(drv=SQLite(), lite_db_file) # Connect to file
 dbWriteTable(conn=lite_db, name='student_equity_big', value=student_equity_big)
 
 # Calculate; return data
-## Note: not using scenario_repeat_by_vars for illustration
 system.time({
 results_lite <- di_iterate_sql(db_conn=lite_db
                              , db_table_name='student_equity_big'
                              , success_vars=c('Math', 'English', 'Transfer')
                              , group_vars=c('Ethnicity', 'Gender')
                              , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                             , scenario_repeat_by_vars=c('college', 'Ed_Goal', 'College_Status')
                              , mssql_flag=FALSE # Not MS SQL Server
                              , return_what='data'
                              , drop_staging_table=TRUE # remove the intermediate results table in DB
@@ -1704,7 +1674,7 @@ results_lite <- di_iterate_sql(db_conn=lite_db
 
 ```
 ##    user  system elapsed 
-##    8.06    2.11   10.19
+##  278.69  319.07  599.11
 ```
 
 ```r
@@ -1712,7 +1682,7 @@ dim(results_lite)
 ```
 
 ```
-## [1] 100  25
+## [1] 180498     28
 ```
 
 ```r
@@ -1720,64 +1690,72 @@ results_lite %>% head %>% as.data.frame
 ```
 
 ```
-##   success_variable cohort_variable cohort disaggregation           group      n
-## 1             Math     Cohort_Math 2017.0      Ethnicity           Asian 281200
-## 2             Math     Cohort_Math 2017.0      Ethnicity           Black  84200
-## 3             Math     Cohort_Math 2017.0      Ethnicity        Hispanic 163000
-## 4             Math     Cohort_Math 2017.0      Ethnicity Multi-Ethnicity  42200
-## 5             Math     Cohort_Math 2017.0      Ethnicity Native American   9000
-## 6             Math     Cohort_Math 2017.0      Ethnicity           White 300000
-##   success       pct ppg_reference ppg_reference_group  moe    pct_lo    pct_hi
-## 1  252200 0.8968706     0.8462938             overall 0.03 0.8668706 0.9268706
-## 2   66200 0.7862233     0.8462938             overall 0.03 0.7562233 0.8162233
-## 3  119400 0.7325153     0.8462938             overall 0.03 0.7025153 0.7625153
-## 4   35000 0.8293839     0.8462938             overall 0.03 0.7993839 0.8593839
-## 5    8400 0.9333333     0.8462938             overall 0.03 0.9033333 0.9633333
-## 6  263200 0.8773333     0.8462938             overall 0.03 0.8473333 0.9073333
-##   di_indicator_ppg success_needed_not_di_ppg success_needed_full_parity_ppg
-## 1                0                         0                              0
-## 2                1                      2532                           5058
-## 3                1                     13656                          18546
-## 4                0                         0                            714
-## 5                0                         0                              0
-## 6                0                         0                              0
-##   di_prop_index di_indicator_prop_index success_needed_not_di_prop_index
-## 1     1.0597627                       0                                0
-## 2     0.9290193                       0                                0
-## 3     0.8655568                       0                                0
-## 4     0.9800189                       0                                0
-## 5     1.1028479                       0                                0
-## 6     1.0366771                       0                                0
+##   college Ed_Goal College_Status success_variable cohort_variable cohort
+## 1   - All   - All          - All          English  Cohort_English 2017.0
+## 2   - All   - All          - All          English  Cohort_English 2017.0
+## 3   - All   - All          - All          English  Cohort_English 2017.0
+## 4   - All   - All          - All          English  Cohort_English 2017.0
+## 5   - All   - All          - All          English  Cohort_English 2017.0
+## 6   - All   - All          - All          English  Cohort_English 2017.0
+##   disaggregation           group       n success       pct ppg_reference
+## 1         - None           - All 1104000  836600 0.7577899     0.7577899
+## 2      Ethnicity           Asian  337800  286000 0.8466548     0.7577899
+## 3      Ethnicity           Black  111800   72200 0.6457961     0.7577899
+## 4      Ethnicity        Hispanic  211200  124200 0.5880682     0.7577899
+## 5      Ethnicity Multi-Ethnicity   56400   41400 0.7340426     0.7577899
+## 6      Ethnicity Native American   10800    7000 0.6481481     0.7577899
+##   ppg_reference_group  moe    pct_lo    pct_hi di_indicator_ppg
+## 1             overall 0.03 0.7277899 0.7877899                0
+## 2             overall 0.03 0.8166548 0.8766548                0
+## 3             overall 0.03 0.6157961 0.6757961                1
+## 4             overall 0.03 0.5580682 0.6180682                1
+## 5             overall 0.03 0.7040426 0.7640426                0
+## 6             overall 0.03 0.6181481 0.6781481                1
+##   success_needed_not_di_ppg success_needed_full_parity_ppg di_prop_index
+## 1                         0                              0     1.0000000
+## 2                         0                              0     1.1172686
+## 3                      9167                          12521     0.8522100
+## 4                     29510                          35846     0.7760307
+## 5                         0                           1340     0.9686624
+## 6                       861                           1185     0.8553138
+##   di_indicator_prop_index success_needed_not_di_prop_index
+## 1                       0                                0
+## 2                       0                                0
+## 3                       0                                0
+## 4                       1                             4530
+## 5                       0                                0
+## 6                       0                                0
 ##   success_needed_full_parity_prop_index di_80_index_reference_group di_80_index
-## 1                                     0             Native American   0.9609327
-## 2                                  5594             Native American   0.8423821
-## 3                                 22765             Native American   0.7848379
-## 4                                   750             Native American   0.8886256
-## 5                                     0             Native American   1.0000000
-## 6                                     0             Native American   0.9400000
+## 1                                     0                       - All   1.0000000
+## 2                                     0                       Asian   1.0000000
+## 3                                 13932                       Asian   0.7627619
+## 4                                 44325                       Asian   0.6945784
+## 5                                  1412                       Asian   0.8669915
+## 6                                  1196                       Asian   0.7655400
 ##   di_indicator_80_index success_needed_not_di_80_index
 ## 1                     0                              0
 ## 2                     0                              0
-## 3                     1                           2307
-## 4                     0                              0
+## 3                     1                           3525
+## 4                     1                          18851
 ## 5                     0                              0
-## 6                     0                              0
+## 6                     1                            316
 ##   success_needed_full_parity_80_index
-## 1                               10254
-## 2                               12387
-## 3                               32734
-## 4                                4387
-## 5                                   0
-## 6                               16801
+## 1                                   0
+## 2                                   0
+## 3                               22457
+## 4                               54614
+## 5                                6352
+## 6                                2144
 ```
 
 ```r
-# Generate a list of queries for user to run on own
+# Or, we could generate a list of queries for the user to run on own
 list_queries <- di_iterate_sql(db_conn=lite_db
                              , db_table_name='student_equity_big'
                              , success_vars=c('Math', 'English', 'Transfer')
                              , group_vars=c('Ethnicity', 'Gender')
                              , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                             , scenario_repeat_by_vars=c('college', 'Ed_Goal', 'College_Status')
                              , mssql_flag=FALSE # Not MS SQL Server
                              , return_what='SQL' # Changed from 'data' to 'SQL'
                                )
@@ -1785,17 +1763,17 @@ length(list_queries)
 ```
 
 ```
-## [1] 10
+## [1] 16282
 ```
 
 ```r
-cat(list_queries[[1]]) # print
+cat(list_queries[[1]]) # print 1st query: create pre-summary table first
 ```
 
 ```
 ## create temp table student_equity_big_summ_ as
 ## select
-## Ethnicity, Gender, Cohort_Math, Cohort_English, Cohort
+## college, Ed_Goal, College_Status, Ethnicity, Gender, Cohort_Math, Cohort_English, Cohort
 ## , "- None"
 ## , Math_NA_FLAG
 ## , English_NA_FLAG
@@ -1808,7 +1786,7 @@ cat(list_queries[[1]]) # print
 ## from
 ## (
 ##   select
-##   Ethnicity, Gender, Cohort_Math, Cohort_English, Cohort
+##   college, Ed_Goal, College_Status, Ethnicity, Gender, Cohort_Math, Cohort_English, Cohort
 ##   , '- All' as "- None"
 ##   , case when Math is null then 1 else 0 end as Math_NA_FLAG
 ## , case when English is null then 1 else 0 end as English_NA_FLAG
@@ -1821,7 +1799,7 @@ cat(list_queries[[1]]) # print
 ##   student_equity_big
 ## ) as a
 ## group by
-## Ethnicity, Gender, Cohort_Math, Cohort_English, Cohort
+## college, Ed_Goal, College_Status, Ethnicity, Gender, Cohort_Math, Cohort_English, Cohort
 ## , "- None"
 ## , Math_NA_FLAG
 ## , English_NA_FLAG
@@ -1830,12 +1808,12 @@ cat(list_queries[[1]]) # print
 ```
 
 ```r
-cat(list_queries[[2]]) # print
+cat(list_queries[[2]]) # print 2nd query: create results table, calculate, and insert data
 ```
 
 ```
 ## -- create table foo as -- create table for sqlite, duckdb (parquet), postgres, MySQL; not SQL Server
-## create table DisImpact_Staging_11788 as
+## create table DisImpact_Staging_41112 as
 ## with
 ## tb_summ as
 ## (
@@ -1853,7 +1831,7 @@ cat(list_queries[[2]]) # print
 ##     end as pct_ppg
 ##   from
 ##   student_equity_big_summ_
-##   
+##   where college = 'College 1' and Ed_Goal = 'Deg/Transfer' and College_Status = 'First-time College' and Math is not null
 ##   group by
 ##   Cohort_Math
 ##   , Ethnicity
@@ -2003,8 +1981,8 @@ cat(list_queries[[2]]) # print
 ##     , a.pct + a.moe as pct_hi
 ##     -- , 'overall' as ppg_reference_group
 ##     , case
-##       -- when 'overall' = 'hpg' then c.hpg_subgroup
-##       when 'overall' = 'hpg' then 'overall' -- like di_iterate
+##       when 'overall' = 'hpg' then c.hpg_subgroup
+##       -- when 'overall' = 'hpg' then 'overall' -- like di_iterate ver. 0.0.19
 ##       when 'overall' in ('overall', 'all but current') then 'overall'
 ##       else e.ppg_reference_group
 ##       end as ppg_reference_group
@@ -2017,7 +1995,7 @@ cat(list_queries[[2]]) # print
 ##     -- , 'hpg' as di_80_index_reference_group
 ##     , case
 ##       when 'hpg' = 'hpg' then c.hpg_subgroup -- like di_iterate ver. 0.0.19
-##       when 'hpg' in ('overall', 'all but current') then 'overall'
+##       when 'hpg' in ('overall', 'all but current') then 'hpg'
 ##       else f.di_80_index_reference_group
 ##       end as di_80_index_reference_group
 ##     , case
@@ -2068,11 +2046,309 @@ cat(list_queries[[2]]) # print
 ## -- insert into foo -- for append
 ## 
 ## select
-## 
+## cast('College 1' as varchar(255)) as college, cast('Deg/Transfer' as varchar(255)) as Ed_Goal, cast('First-time College' as varchar(255)) as College_Status, 
 ## cast('Math' as varchar(255)) as success_variable
-## , cast('Cohort_Math' as varchar(255)) as cohort_variable
 ## -- , cast('Cohort_Math' as varchar(255)) as cohort_variable
+## , cast('Cohort_Math' as varchar(255)) as cohort_variable
 ## , cast(a.cohort as varchar(255)) as cohort
+## -- , cast('Ethnicity' as varchar(255)) as disaggregation
+## , cast('Ethnicity' as varchar(255)) as disaggregation
+## , cast(a.subgroup as varchar(255)) as "group"
+## , a.weight as n
+## , a.success
+## , a.pct
+## -- ppg
+## , f.ppg_reference
+## , f.ppg_reference_group
+## , f.moe
+## , f.pct_lo
+## , f.pct_hi
+## , f.di_indicator_ppg
+## , f.success_needed_not_di_ppg
+## , f.success_needed_full_parity_ppg
+## -- proportionality index
+## , e.pct_success / e.pct_group as di_prop_index
+## , case when e.pct_success / e.pct_group < 0.8 then 1 else 0 end as di_indicator_prop_index
+## , case
+##   when e.pct_success / e.pct_group < 0.8 then ceil((e.cohort_success_total * e.pct_group * 0.8 - a.success) / (1 - e.pct_group * 0.8))
+##   else 0
+##   end as success_needed_not_di_prop_index
+## , case
+##   when e.pct_success / e.pct_group < 1 then ceil((e.cohort_success_total * e.pct_group * 1 - a.success) / (1 - e.pct_group * 1))
+##   else 0
+##   end as success_needed_full_parity_prop_index
+## -- 80% index
+## , f.di_80_index_reference_group
+## , f.di_80_index
+## , f.di_indicator_80_index
+## , f.success_needed_not_di_80_index
+## , f.success_needed_full_parity_80_index
+## -- into foo -- create table for MS SQL Server
+## 
+## from
+## tb_summ as a
+## left join
+## tb_group_prop as e
+## on
+## e.cohort = a.cohort
+## and
+## e.subgroup = a.subgroup
+## left join
+## tb_calc as f
+## on
+## f.cohort = a.cohort
+## and
+## f.subgroup = a.subgroup
+## where
+## a.success is not null
+## ;
+```
+
+```r
+cat(list_queries[[3]]) # print 3rd query: calculat, and insert data
+```
+
+```
+## -- create table foo as -- create table for sqlite, duckdb (parquet), postgres, MySQL; not SQL Server
+## 
+## with
+## tb_summ as
+## (
+##   select
+##   Cohort_Math as cohort
+##   , Ethnicity as subgroup
+##   , 1.0 * sum(Math) / sum(weight) as pct
+##   , 1.0 * sum(Math) as success
+##   , 1.0 * sum(weight) as weight
+##   , case 
+##     when 'FALSE' != 'TRUE' then 0.5
+##     when 1.0 * sum(Math) / sum(weight) = 0 then 0.5
+##     when 1.0 * sum(Math) / sum(weight) = 1 then 0.5
+##     else 1.0 * sum(Math) / sum(weight)
+##     end as pct_ppg
+##   from
+##   student_equity_big_summ_
+##   where college = 'College 2' and Ed_Goal = 'Deg/Transfer' and College_Status = 'First-time College' and Math is not null
+##   group by
+##   Cohort_Math
+##   , Ethnicity
+## )
+## ,
+## tb_ppg_specific_group as
+## (
+##   select
+##   cohort
+##   , subgroup as ppg_reference_group
+##   , pct as ppg_specific_group_rate
+##   from
+##   tb_summ
+##   where
+##   subgroup = 'overall'
+## )
+## ,
+## tb_di_80_index_specific_group as
+## (
+##   select
+##   cohort
+##   , subgroup as di_80_index_reference_group
+##   , pct as di_80_index_specific_group_rate
+##   from
+##   tb_summ
+##   where
+##   subgroup = 'hpg'
+## )
+## ,
+## tb_overall as
+## (
+##   select
+##   cohort
+##   , 1.0 * sum(success) / sum(weight) as overall_rate
+##   from
+##   tb_summ
+##   group by
+##   cohort
+## )
+## ,
+## tb_hpg as
+## (
+##   select
+##   cohort
+##   , subgroup as hpg_subgroup
+##   , pct as hpg_rate
+##   from
+##   (
+##     select
+##     *
+##     , row_number() over (partition by cohort order by pct desc, subgroup) as rn
+##     from
+##     tb_summ
+##   ) as a
+##   where
+##   a.rn=1
+## )
+## ,
+## tb_all_but_current as
+## (
+##   select
+##   c.cohort
+##   , c.subgroup
+##   , 1.0 * sum(success) / sum(weight) as all_but_current_rate
+##   from
+##   (
+##     select
+##     a.cohort
+##     , a.subgroup
+##     , b.success
+##     , b.weight
+##     from
+##     tb_summ as a
+##     left join
+##     tb_summ as b
+##     on
+##     b.cohort = a.cohort
+##     and
+##     b.subgroup != a.subgroup
+##   ) as c
+##   group by
+##   c.cohort
+##   , c.subgroup
+## )
+## ,
+## tb_group_prop as
+## (
+##   select
+##   a.cohort
+##   , a.subgroup
+##   , b.cohort_size
+##   , b.cohort_success_total
+##   , 1.0 * a.weight / b.cohort_size as pct_group
+##   , 1.0 * a.success / b.cohort_success_total as pct_success
+##   from
+##   tb_summ as a
+##   left join
+##   (
+##     select
+##     cohort
+##     , sum(weight) as cohort_size
+##     , sum(success) as cohort_success_total
+##     from
+##     tb_summ
+##     group by
+##     cohort
+##   ) as b
+##   on
+##   b.cohort = a.cohort
+## )
+## ,
+## tb_calc as
+## (
+##   select
+##   a.*
+##   -- ppg
+##   , case
+##     when a.pct_hi <= a.ppg_reference then 1
+##     else 0
+##     end as di_indicator_ppg
+##   , case
+##     when a.pct_hi <= a.ppg_reference then ceil((a.ppg_reference - (a.pct + a.moe)) * a.n)
+##     else 0
+##     end as success_needed_not_di_ppg
+##   , case when a.pct < a.ppg_reference then ceil((a.ppg_reference - a.pct) * a.n)
+##     else 0
+##     end as success_needed_full_parity_ppg
+##   , a.pct / a.di_80_index_reference as di_80_index
+##   , case when a.pct / a.di_80_index_reference < 0.8 then 1 else 0 end as di_indicator_80_index
+##   , case
+##     when a.pct / a.di_80_index_reference < 0.8 then ceil((0.8 * a.di_80_index_reference - a.pct) * a.n)
+##     else 0
+##     end as success_needed_not_di_80_index
+##   , case
+##     when a.pct < a.di_80_index_reference then ceil((a.di_80_index_reference - a.pct) * a.n)
+##     else 0
+##     end as success_needed_full_parity_80_index
+##   from
+##   (
+##     select
+##     a.cohort
+##     , a.subgroup
+##     , a.pct
+##     , a.n
+##     , a.moe
+##     , a.pct - a.moe as pct_lo
+##     , a.pct + a.moe as pct_hi
+##     -- , 'overall' as ppg_reference_group
+##     , case
+##       when 'overall' = 'hpg' then c.hpg_subgroup
+##       -- when 'overall' = 'hpg' then 'overall' -- like di_iterate ver. 0.0.19
+##       when 'overall' in ('overall', 'all but current') then 'overall'
+##       else e.ppg_reference_group
+##       end as ppg_reference_group
+##     , case
+##       when 'overall' = 'overall' then b.overall_rate
+##       when 'overall' = 'hpg' then c.hpg_rate
+##       when 'overall' = 'all but current' then d.all_but_current_rate
+##       else e.ppg_specific_group_rate
+##       end as ppg_reference
+##     -- , 'hpg' as di_80_index_reference_group
+##     , case
+##       when 'hpg' = 'hpg' then c.hpg_subgroup -- like di_iterate ver. 0.0.19
+##       when 'hpg' in ('overall', 'all but current') then 'hpg'
+##       else f.di_80_index_reference_group
+##       end as di_80_index_reference_group
+##     , case
+##       when 'hpg' = 'overall' then b.overall_rate
+##       when 'hpg' = 'hpg' then c.hpg_rate
+##       when 'hpg' = 'all but current' then d.all_but_current_rate
+##       else f.di_80_index_specific_group_rate
+##       end as di_80_index_reference
+##     from
+##     (
+##       select
+##       cohort
+##       , subgroup
+##       , pct
+##       , weight as n
+##       , case
+##         when (1.96 * sqrt(pct_ppg*(1-pct_ppg)/weight)) < 0.03 then 0.03
+##         else (1.96 * sqrt(pct_ppg*(1-pct_ppg)/weight))
+##         end as moe
+##       from
+##       tb_summ
+##     ) as a
+##     left join
+##     tb_overall as b
+##     on
+##     b.cohort = a.cohort
+##     left join
+##     tb_hpg as c
+##     on
+##     c.cohort = a.cohort
+##     left join
+##     tb_all_but_current as d
+##     on
+##     d.cohort = a.cohort
+##     and
+##     d.subgroup = a.subgroup
+##     left join
+##     tb_ppg_specific_group as e
+##     on
+##     e.cohort = a.cohort
+##     left join
+##     tb_di_80_index_specific_group as f
+##     on
+##     f.cohort = a.cohort
+##   ) as a
+##   
+## )
+## -- insert into foo -- for append
+## insert into DisImpact_Staging_41112
+## select
+## cast('College 2' as varchar(255)) as college, cast('Deg/Transfer' as varchar(255)) as Ed_Goal, cast('First-time College' as varchar(255)) as College_Status, 
+## cast('Math' as varchar(255)) as success_variable
+## -- , cast('Cohort_Math' as varchar(255)) as cohort_variable
+## , cast('Cohort_Math' as varchar(255)) as cohort_variable
+## , cast(a.cohort as varchar(255)) as cohort
+## -- , cast('Ethnicity' as varchar(255)) as disaggregation
 ## , cast('Ethnicity' as varchar(255)) as disaggregation
 ## , cast(a.subgroup as varchar(255)) as "group"
 ## , a.weight as n
@@ -2136,8 +2412,32 @@ For `di_iterate_sql` to be fast, one should leverage [duckdb](https://CRAN.R-pro
 
 ```r
 library(duckdb) # Fast columnar-based database system that supports parquet files as tables
-library(arrow) # To create parquet files using write_parquet
+```
 
+```
+## Warning: package 'duckdb' was built under R version 4.2.1
+```
+
+```r
+library(arrow) # To create parquet files using write_parquet
+```
+
+```
+## The tzdb package is not installed. Timezones will not be available to Arrow compute functions.
+```
+
+```
+## 
+## Attaching package: 'arrow'
+```
+
+```
+## The following object is masked from 'package:utils':
+## 
+##     timestamp
+```
+
+```r
 # DuckDB connection (in memory)
 duck_db <- dbConnect(duckdb(), dbdir=':memory:')
 
@@ -2145,12 +2445,12 @@ duck_db <- dbConnect(duckdb(), dbdir=':memory:')
 student_equity_big_parquet_path <- tempfile(pattern='student_equity_big_', fileext='.parquet') # temporary disk file
 write_parquet(x=student_equity_big, sink=student_equity_big_parquet_path)
 
-# Calculate
+# Path to parquet file
 student_equity_big_parquet_path
 ```
 
 ```
-## [1] "C:\\Users\\VNGUYE~1\\AppData\\Local\\Temp\\RtmpE92FFC\\student_equity_big_1ddf460d07cbf.parquet"
+## [1] "C:\\Users\\VNGUYE~1\\AppData\\Local\\Temp\\RtmpIPpudK\\student_equity_big_22b1c6d5b77bb.parquet"
 ```
 
 ```r
@@ -2159,10 +2459,11 @@ student_equity_big_parquet_path_quote # Path to parquet file, that needs to be s
 ```
 
 ```
-## [1] "'C:\\Users\\VNGUYE~1\\AppData\\Local\\Temp\\RtmpE92FFC\\student_equity_big_1ddf460d07cbf.parquet'"
+## [1] "'C:\\Users\\VNGUYE~1\\AppData\\Local\\Temp\\RtmpIPpudK\\student_equity_big_22b1c6d5b77bb.parquet'"
 ```
 
 ```r
+# Calculate
 system.time({
   results_duck <- di_iterate_sql(db_conn=duck_db
                                , db_table_name=student_equity_big_parquet_path_quote
@@ -2176,7 +2477,7 @@ system.time({
 
 ```
 ##    user  system elapsed 
-## 1148.91    8.94  270.06
+## 1160.00   12.05  282.80
 ```
 
 ```r
@@ -2204,7 +2505,7 @@ system.time({
 
 ```
 ##    user  system elapsed 
-##   24.82    4.70  177.28
+##   27.97    4.75  175.69
 ```
 
 ```r
@@ -2220,62 +2521,82 @@ results_duck %>% head %>% as.data.frame
 ```
 
 ```
-##     college      Ed_Goal     College_Status success_variable cohort_variable
-## 1 College 1 Deg/Transfer First-time College             Math     Cohort_Math
-## 2 College 1 Deg/Transfer First-time College             Math     Cohort_Math
-## 3 College 1 Deg/Transfer First-time College             Math     Cohort_Math
-## 4 College 1 Deg/Transfer First-time College             Math     Cohort_Math
-## 5 College 1 Deg/Transfer First-time College             Math     Cohort_Math
-## 6 College 1 Deg/Transfer First-time College             Math     Cohort_Math
-##   cohort disaggregation           group   n success       pct ppg_reference
-## 1 2017.0      Ethnicity Native American  30      28 0.9333333     0.8427699
-## 2 2017.0      Ethnicity Multi-Ethnicity 117      99 0.8461538     0.8427699
-## 3 2018.0      Ethnicity Multi-Ethnicity 204     158 0.7745098     0.8410306
-## 4 2018.0      Ethnicity           Black 374     269 0.7192513     0.8410306
-## 5 2017.0      Ethnicity           Black 235     185 0.7872340     0.8427699
-## 6 2018.0      Ethnicity Native American  32      23 0.7187500     0.8410306
-##   ppg_reference_group        moe    pct_lo    pct_hi di_indicator_ppg
-## 1             overall 0.17892270 0.7544106 1.1122560                0
-## 2             overall 0.09060103 0.7555528 0.9367549                0
-## 3             overall 0.06861372 0.7058961 0.8431235                0
-## 4             overall 0.05067459 0.6685767 0.7699259                1
-## 5             overall 0.06392815 0.7233059 0.8511622                0
-## 6             overall 0.17324116 0.5455088 0.8919912                0
+##   college Ed_Goal College_Status success_variable cohort_variable cohort
+## 1   - All   - All          - All          English  Cohort_English 2017.0
+## 2   - All   - All          - All          English  Cohort_English 2017.0
+## 3   - All   - All          - All          English  Cohort_English 2017.0
+## 4   - All   - All          - All          English  Cohort_English 2017.0
+## 5   - All   - All          - All          English  Cohort_English 2017.0
+## 6   - All   - All          - All          English  Cohort_English 2017.0
+##   disaggregation           group       n success       pct ppg_reference
+## 1         - None           - All 1104000  836600 0.7577899     0.7577899
+## 2      Ethnicity           Asian  337800  286000 0.8466548     0.7577899
+## 3      Ethnicity           Black  111800   72200 0.6457961     0.7577899
+## 4      Ethnicity        Hispanic  211200  124200 0.5880682     0.7577899
+## 5      Ethnicity Multi-Ethnicity   56400   41400 0.7340426     0.7577899
+## 6      Ethnicity Native American   10800    7000 0.6481481     0.7577899
+##   ppg_reference_group  moe    pct_lo    pct_hi di_indicator_ppg
+## 1             overall 0.03 0.7277899 0.7877899                0
+## 2             overall 0.03 0.8166548 0.8766548                0
+## 3             overall 0.03 0.6157961 0.6757961                1
+## 4             overall 0.03 0.5580682 0.6180682                1
+## 5             overall 0.03 0.7040426 0.7640426                0
+## 6             overall 0.03 0.6181481 0.6781481                1
 ##   success_needed_not_di_ppg success_needed_full_parity_ppg di_prop_index
-## 1                         0                              0     1.1074593
-## 2                         0                              0     1.0040153
-## 3                         0                             14     0.9209056
-## 4                        27                             46     0.8552023
-## 5                         0                             14     0.9341032
-## 6                         0                              4     0.8546062
+## 1                         0                              0     1.0000000
+## 2                         0                              0     1.1172686
+## 3                      9167                          12521     0.8522100
+## 4                     29510                          35846     0.7760307
+## 5                         0                           1340     0.9686624
+## 6                       861                           1185     0.8553138
 ##   di_indicator_prop_index success_needed_not_di_prop_index
 ## 1                       0                                0
 ## 2                       0                                0
 ## 3                       0                                0
-## 4                       0                                0
+## 4                       1                             4530
 ## 5                       0                                0
 ## 6                       0                                0
 ##   success_needed_full_parity_prop_index di_80_index_reference_group di_80_index
-## 1                                     0             Native American   1.0000000
-## 2                                     0             Native American   0.9065934
-## 3                                    15                       Asian   0.8442492
-## 4                                    51                       Asian   0.7840151
-## 5                                    15             Native American   0.8434650
-## 6                                     4                       Asian   0.7834686
+## 1                                     0                       - All   1.0000000
+## 2                                     0                       Asian   1.0000000
+## 3                                 13932                       Asian   0.7627619
+## 4                                 44325                       Asian   0.6945784
+## 5                                  1412                       Asian   0.8669915
+## 6                                  1196                       Asian   0.7655400
 ##   di_indicator_80_index success_needed_not_di_80_index
 ## 1                     0                              0
 ## 2                     0                              0
-## 3                     0                              0
-## 4                     1                              6
+## 3                     1                           3525
+## 4                     1                          18851
 ## 5                     0                              0
-## 6                     1                              1
+## 6                     1                            316
 ##   success_needed_full_parity_80_index
 ## 1                                   0
-## 2                                  11
-## 3                                  30
-## 4                                  75
-## 5                                  35
-## 6                                   7
+## 2                                   0
+## 3                               22457
+## 4                               54614
+## 5                                6352
+## 6                                2144
+```
+
+```r
+# Disconnect from database
+dbDisconnect(duck_db, shutdown=TRUE)
+```
+
+As can be seen, `di_iterate_sql` is very fast when the database engine is `duckdb`.
+
+Please note that for student-level data stored as a single table in a traditional database platform (e.g., MS SQL Server, MySQL, PostgreSQL, etc.), the user could leverage the [odbc](https://CRAN.R-project.org/package=odbc) package in conjunction with the [DBI](https://CRAN.R-project.org/package=DBI) package to connect to these databases.  Here are some sample code that illustrates the steps needed:
+
+
+```r
+library(DBI)
+library(odbc) # connect to databases using odbc
+
+# DB connection using DBI package
+db_conn <- dbConnect(odbc(), dsn='Name of my Data Source Name', uid='my_username', pwd='my_password')
+
+results <- di_iterate_sql(db_conn=db_conn, db_table_name='table_of_student_data', ...)
 ```
 
 # Appendix: R and R Package Versions
@@ -2305,27 +2626,28 @@ sessionInfo()
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] data.table_1.14.3    fstcore_0.9.12       scales_1.1.1        
-##  [4] forcats_0.5.0        ggplot2_3.3.2        knitr_1.39          
-##  [7] arrow_8.0.0          duckdb_0.5.0         RSQLite_2.2.12      
-## [10] DBI_1.1.0            dplyr_1.0.8          DisImpact_0.0.9000  
-## [13] RevoUtils_11.0.2     RevoUtilsMath_11.0.0
+##  [1] arrow_8.0.0          duckdb_0.5.0         RSQLite_2.2.12      
+##  [4] DBI_1.1.0            data.table_1.14.3    fstcore_0.9.12      
+##  [7] scales_1.1.1         forcats_0.5.0        ggplot2_3.3.2       
+## [10] knitr_1.39           dplyr_1.0.8          DisImpact_0.0.9000  
+## [13] roxygen2_7.1.2       devtools_2.4.3       usethis_2.1.5       
+## [16] RevoUtils_11.0.2     RevoUtilsMath_11.0.0
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] Rcpp_1.0.8.3      tidyr_1.2.0       prettyunits_1.1.1 ps_1.6.0         
-##  [5] assertthat_0.2.1  rprojroot_1.3-2   digest_0.6.25     utf8_1.2.2       
+##  [5] digest_0.6.25     assertthat_0.2.1  rprojroot_1.3-2   utf8_1.2.2       
 ##  [9] R6_2.3.0          backports_1.1.7   evaluate_0.15     highr_0.9        
 ## [13] pillar_1.7.0      rlang_1.0.1       rstudioapi_0.13   callr_3.7.0      
-## [17] blob_1.2.1        collapse_1.8.8    desc_1.4.1        labeling_0.3     
-## [21] devtools_2.4.3    sets_1.0-21       stringr_1.4.0     bit_1.1-15.2     
-## [25] munsell_0.5.0     compiler_4.0.2    xfun_0.30         pkgconfig_2.0.3  
-## [29] pkgbuild_1.3.1    tidyselect_1.1.2  tibble_3.1.6      fansi_1.0.2      
-## [33] crayon_1.5.0      withr_2.5.0       brio_1.1.3        grid_4.0.2       
-## [37] gtable_0.3.0      lifecycle_1.0.1   magrittr_2.0.2    cli_3.2.0        
-## [41] stringi_1.4.6     cachem_1.0.6      farver_2.0.3      remotes_2.4.2    
-## [45] fs_1.5.2          testthat_3.1.3    ellipsis_0.3.2    generics_0.1.2   
+## [17] blob_1.2.1        collapse_1.8.8    labeling_0.3      desc_1.4.1       
+## [21] sets_1.0-21       stringr_1.4.0     bit_1.1-15.2      munsell_0.5.0    
+## [25] compiler_4.0.2    xfun_0.30         pkgconfig_2.0.3   pkgbuild_1.3.1   
+## [29] tidyselect_1.1.2  tibble_3.1.6      fansi_1.0.2       crayon_1.5.0     
+## [33] withr_2.5.0       brio_1.1.3        grid_4.0.2        gtable_0.3.0     
+## [37] lifecycle_1.0.1   magrittr_2.0.2    cli_3.2.0         stringi_1.4.6    
+## [41] cachem_1.0.6      farver_2.0.3      fs_1.5.2          remotes_2.4.2    
+## [45] testthat_3.1.3    xml2_1.3.3        ellipsis_0.3.2    generics_0.1.2   
 ## [49] vctrs_0.3.8       fst_0.9.8         tools_4.0.2       bit64_0.9-7      
 ## [53] glue_1.6.1        purrr_0.3.4       processx_3.5.3    pkgload_1.2.4    
 ## [57] parallel_4.0.2    fastmap_1.1.0     colorspace_1.4-1  sessioninfo_1.2.2
-## [61] memoise_2.0.1     usethis_2.1.5
+## [61] memoise_2.0.1
 ```
