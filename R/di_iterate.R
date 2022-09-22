@@ -341,6 +341,9 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
 
   # Iterate for all scenarios
   if (is.null(scenario_repeat_by_vars)) {
+    # CRAN: no visible binding for global variable
+    success_variable <- cohort_variable <- cohort <- disaggregation <- group <- NULL
+    
     subset_idx <- 1:nrow(data)
     pmap(dScenarios %>% mutate(subset_idx=list(subset_idx), parallel_split_to_disk=FALSE, split_filename='NOT_USED'), iterate) %>%
       bind_rows %>%
@@ -407,7 +410,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
     
     # CRAN: no visible binding for global variable
     df_results <- split_filename <- NULL
-    
+
     dRepeatScenarios %>%
       select(-want_indices, -parallel_split_to_disk, -split_filename) %>%
       unnest(df_results) %>%
