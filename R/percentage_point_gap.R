@@ -9,6 +9,7 @@
 ## devtools::build(vignettes=FALSE)
 ## setwd('..')
 ## install('DisImpact')
+## tinytest::build_install_test('./DisImpact') # from outside
 
 ##' Calculate the margin of error (MOE) for the percentage point gap (PPG) method.
 ##'
