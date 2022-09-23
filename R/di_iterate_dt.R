@@ -24,7 +24,7 @@ di_calc_dt <- function(dt, success_var, group_var, cohort_var='', weight_var=NUL
   # Need data.table >= 1.14.3
   if(requireNamespace("data.table", quietly=TRUE) &&
     utils::packageVersion("data.table") < "1.14.3") {
-    stop("`di_calc_dt` requires data.table version 1.14.3 or higher.  Please execute the following to update data.table to the current development version:\n\ndata.table::update_dev_pkg()")
+    stop("`di_calc_dt` requires data.table version 1.14.3 or higher.  Please execute the following to update data.table to the current development version:\n\ndata.table::update.dev.pkg()")
   }
   
   # Following for CRAN: no visible binding for global variable
@@ -295,7 +295,7 @@ di_iterate_dt <- function(dt, success_vars, group_vars, cohort_vars=NULL, scenar
   # Need data.table >= 1.14.3
   if(requireNamespace("data.table", quietly=TRUE) &&
     utils::packageVersion("data.table") < "1.14.3") {
-    stop("`di_calc_dt` requires data.table version 1.14.3 or higher.  Please execute the following to update data.table to the current development version:\n\ndata.table::update_dev_pkg()")
+    stop("`di_calc_dt` requires data.table version 1.14.3 or higher.  Please execute the following to update data.table to the current development version:\n\ndata.table::update.dev.pkg()")
   }
 
   # Following for CRAN: no visible binding for global variable
