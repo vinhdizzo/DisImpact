@@ -98,7 +98,7 @@ di_80_index <- function(success, group, cohort, weight, data, di_80_index_cutoff
                     (sum(success) - success) / (sum(n) - n)
                   }
                 } else {
-                  pct[group == reference_group & !is.na(group)]
+                  c(pct[group == reference_group & !is.na(group)], NA)[1]
                 }
          , reference_group=if (is.na(reference_group)) { # NA
                   group[pct==max(pct)][1] # can be more than 1 groups
