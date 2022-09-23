@@ -118,7 +118,7 @@ di_calc_dt <- function(dt, success_var, group_var, cohort_var='', weight_var=NUL
     , hpg_rate = max(pct)
     , hpg_subgroup = group_var[pct == max(pct)][1]
     , all_but_current_rate = (sum(success) - success) / (sum(weight) - weight)
-    , ppg_specific_group_rate = pct[group_var == ppg_reference_group]
+    , ppg_specific_group_rate = c(pct[group_var == ppg_reference_group], NA)[1]
     , moe = fcase(
         (1.96 * sqrt(pct_ppg*(1-pct_ppg)/weight)) < min_moe, min_moe
         , rep(TRUE, .N), (1.96 * sqrt(pct_ppg*(1-pct_ppg)/weight))
@@ -134,7 +134,7 @@ di_calc_dt <- function(dt, success_var, group_var, cohort_var='', weight_var=NUL
         rep(ppg_reference_group, .N)=='overall', sum(success) / sum(weight)
       , rep(ppg_reference_group, .N)=='hpg', max(pct)
       , rep(ppg_reference_group, .N)=='all but current', (sum(success) - success) / (sum(weight) - weight)
-      , rep(TRUE, .N), pct[group_var == ppg_reference_group]
+      , rep(TRUE, .N), c(pct[group_var == ppg_reference_group], NA)[1]
       , default=NA
       )
     # PI
@@ -148,7 +148,7 @@ di_calc_dt <- function(dt, success_var, group_var, cohort_var='', weight_var=NUL
         , default=0
       )
     # 80% index
-    , di_80_index_specific_group_rate = pct[group_var == di_80_index_reference_group]
+    , di_80_index_specific_group_rate = c(pct[group_var == di_80_index_reference_group], NA)[1]
     )
   # , by=.(cohort_var)
   , by=.(cohort)
