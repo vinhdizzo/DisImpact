@@ -216,9 +216,8 @@ di_ppg <- function(success, group, cohort, weight, reference=c('overall', 'hpg',
       moe=if (use_prop_in_moe) { ppg_moe(n=n, proportion=pct, min_moe=min_moe, prop_sub_0=prop_sub_0, prop_sub_1=prop_sub_1) } else { ppg_moe(n=n, min_moe=min_moe) }
          , pct_lo=pct - moe
          , pct_hi=pct + moe
-         , di_indicator=ifelse(pct_hi <= reference, 1, 0)
+         , di_indicator=ifelse(pct_hi <= reference, 1, 0) %>% coalesce(0)
            ) %>%
-    mutate(di_indicator=ifelse(reference_group=='all but current' & is.na(di_indicator), 0, di_indicator)) %>% # When 'all but current' is used and there is only a single group, there is no comparison group, so di_indicator is NA; set this to 0
     mutate(success_needed_not_di=ifelse(di_indicator==1, ceiling((reference - (pct+moe)) * n), 0)
            , success_needed_full_parity=ifelse(pct < reference, ceiling((reference - pct) * n), 0) %>% coalesce(0)
            ) %>% 
