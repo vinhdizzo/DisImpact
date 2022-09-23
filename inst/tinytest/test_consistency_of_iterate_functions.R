@@ -75,6 +75,123 @@ from
 ) as a
 "))
 
+# Data: 2017-Asian missing, to test reference
+student_equity_no_2017_asian <- student_equity %>%
+  filter(!(Cohort==2017 & Ethnicity=='Asian'))
+dim(student_equity)
+dim(student_equity_no_2017_asian)
+
+student_equity_dt_no_2017_asian <- student_equity_dt[!(Cohort==2017 & Ethnicity=='Asian')]
+dim(student_equity_dt_no_2017_asian)
+
+dbExecute(conn=duck_db, statement=glue("
+create table student_equity_no_2017_asian as
+select
+*
+from
+{student_equity_parquet}
+where
+not
+(Cohort = 2017 and Ethnicity = 'Asian')
+;
+"))
+
+# Data: 2017 all non-success on Transfer, for testing the behavior of proportionality index
+student_equity_2017_all_non_success <- student_equity %>%
+  mutate(Transfer=ifelse(!is.na(Cohort) & Cohort==2017 & !is.na(Transfer), 0, Transfer))
+student_equity_2017_all_non_success %>%
+  group_by(Cohort, Transfer) %>%
+  tally
+
+student_equity_dt_2017_all_non_success <- copy(student_equity_dt)
+student_equity_dt_2017_all_non_success[!is.na(Cohort) & Cohort==2017 & !is.na(Transfer), Transfer := 0]
+student_equity_dt_2017_all_non_success[, .N, by=.(Cohort, Transfer)]
+
+dbExecute(conn=duck_db, statement=glue("
+create table student_equity_2017_all_non_success as
+select
+*
+from
+{student_equity_parquet}
+;
+
+update
+student_equity_2017_all_non_success
+set
+Transfer=0
+where
+Cohort=2017
+and
+Transfer is not null
+;
+"))
+
+# Data: 2017 1 group for gender to test all but current
+student_equity_2017_gender_1_group <- student_equity %>%
+  mutate(Gender=ifelse(!is.na(Cohort) & Cohort==2017, 'Male', Gender))
+student_equity_2017_gender_1_group %>%
+  group_by(Cohort, Gender) %>%
+  tally
+
+student_equity_dt_2017_gender_1_group <- copy(student_equity_dt)
+student_equity_dt_2017_gender_1_group[!is.na(Cohort) & Cohort==2017, Gender := 'Male']
+student_equity_dt_2017_gender_1_group[, .N, by=.(Cohort, Gender)]
+
+dbExecute(conn=duck_db, statement=glue("
+create table student_equity_2017_gender_1_group as
+select
+*
+from
+{student_equity_parquet}
+;
+
+update
+student_equity_2017_gender_1_group
+set
+Gender='Male'
+where
+Cohort=2017
+;
+"))
+
+# Data: 2017 has missing values for Math and English outcomes
+student_equity_2017_has_missing_outcomes <- student_equity %>%
+  mutate(Cohort_Math=ifelse(is.na(Cohort_Math), 2017, Cohort_Math), Cohort_English=ifelse(is.na(Cohort_English), 2017, Cohort_English))
+student_equity_2017_has_missing_outcomes %>%
+  group_by(Cohort_Math, Math) %>%
+  tally
+
+student_equity_dt_2017_has_missing_outcomes <- copy(student_equity_dt)
+student_equity_dt_2017_has_missing_outcomes[is.na(Cohort_Math), Cohort_Math := 2017]
+student_equity_dt_2017_has_missing_outcomes[is.na(Cohort_English), Cohort_English := 2017]
+student_equity_dt_2017_has_missing_outcomes[, .N, by=.(Cohort_Math, Math)]
+student_equity_dt_2017_has_missing_outcomes[, .N, by=.(Cohort_English, English)]
+
+dbExecute(conn=duck_db, statement=glue("
+create table student_equity_2017_has_missing_outcomes as
+select
+*
+from
+{student_equity_parquet}
+;
+
+update
+student_equity_2017_has_missing_outcomes
+set
+Cohort_Math=2017
+where
+Cohort_Math is null
+;
+update
+student_equity_2017_has_missing_outcomes
+set
+Cohort_English=2017
+where
+Cohort_English is null
+;
+"))
+
+
 # Scenario: single variables
 results_tb <- di_iterate(data=student_equity
                        , success_vars=c('Math')
@@ -1680,3 +1797,561 @@ results_sql <- di_iterate_sql(db_conn=duck_db
 expect_equivalent(results_tb0, results_tb, info='weight_var for summarized data: unsummarized vs. summarized')
 expect_equivalent(results_tb0, results_dt, info='weight_var for summarized data: tb vs. dt')
 expect_equivalent(results_tb, results_sql %>% mutate(cohort=as.numeric(cohort)), info='weight_var for summarized data: tb vs. dt')
+
+# Scenario: multiple variables, ppg reference custom (Asian), but 2017 has no Asian students for comparison
+results_tb <- di_iterate(data=student_equity_no_2017_asian
+                       , success_vars=c('Math', 'English', 'Transfer')
+                       , group_vars=c('Ethnicity', 'Gender')
+                       , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                       # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                       , include_non_disagg_results=TRUE
+                       , ppg_reference_groups=c('Asian', 'Male')
+                       , min_moe=0.03
+                       , use_prop_in_moe=FALSE
+                       , prop_sub_0=0.5
+                       , prop_sub_1=0.5
+                       , di_prop_index_cutoff=0.8
+                       , di_80_index_cutoff=0.8
+                       , di_80_index_reference_groups='hpg'
+                       , check_valid_reference=TRUE
+                       , parallel=FALSE
+                       # , parallel_n_cores=4
+                         )
+
+results_dt <- di_iterate_dt(dt=student_equity_dt_no_2017_asian
+                          , success_vars=c('Math', 'English', 'Transfer')
+                          , group_vars=c('Ethnicity', 'Gender')
+                          , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                          # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                          , include_non_disagg_results=TRUE
+                          , ppg_reference_groups=c('Asian', 'Male')
+                          , min_moe=0.03
+                          , use_prop_in_moe=FALSE
+                          , prop_sub_0=0.5
+                          , prop_sub_1=0.5
+                          , di_prop_index_cutoff=0.8
+                          , di_80_index_cutoff=0.8
+                          , di_80_index_reference_groups='hpg'
+                          , check_valid_reference=TRUE
+                          , parallel=FALSE
+                          # , parallel_n_cores=4
+                            )
+
+results_sql <- di_iterate_sql(db_conn=duck_db
+                            , db_table_name='student_equity_no_2017_asian'
+                            , success_vars=c('Math', 'English', 'Transfer')
+                            , group_vars=c('Ethnicity', 'Gender')
+                            , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                            # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                            , include_non_disagg_results=TRUE
+                            , ppg_reference_groups=c('Asian', 'Male')
+                            , min_moe=0.03
+                            , use_prop_in_moe=FALSE
+                            , prop_sub_0=0.5
+                            , prop_sub_1=0.5
+                            , di_prop_index_cutoff=0.8
+                            , di_80_index_cutoff=0.8
+                            , di_80_index_reference_groups='hpg'
+                            , check_valid_reference=TRUE
+                            , parallel=FALSE
+                            # , parallel_n_cores=4
+                              )
+
+expect_equivalent(results_tb, results_dt, info='multiple variables, ppg reference custom (Asian), but 2017 has no Asian students for comparison: tb vs. dt')
+expect_equivalent(results_tb, results_sql %>% mutate(cohort=as.numeric(cohort)), info='multiple variables, ppg reference custom (Asian), but 2017 has no Asian students for comparison: tb vs. SQL')
+
+# Scenario: multiple variables, 80 index reference custom (Asian), but 2017 has no Asian students for comparison
+results_tb <- di_iterate(data=student_equity_no_2017_asian
+                       , success_vars=c('Math', 'English', 'Transfer')
+                       , group_vars=c('Ethnicity', 'Gender')
+                       , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                       # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                       , include_non_disagg_results=TRUE
+                       , ppg_reference_groups='overall'
+                       , min_moe=0.03
+                       , use_prop_in_moe=FALSE
+                       , prop_sub_0=0.5
+                       , prop_sub_1=0.5
+                       , di_prop_index_cutoff=0.8
+                       , di_80_index_cutoff=0.8
+                       , di_80_index_reference_groups=c('Asian', 'Male')
+                       , check_valid_reference=TRUE
+                       , parallel=FALSE
+                       # , parallel_n_cores=4
+                         )
+
+results_dt <- di_iterate_dt(dt=student_equity_dt_no_2017_asian
+                          , success_vars=c('Math', 'English', 'Transfer')
+                          , group_vars=c('Ethnicity', 'Gender')
+                          , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                          # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                          , include_non_disagg_results=TRUE
+                          , ppg_reference_groups='overall'
+                          , min_moe=0.03
+                          , use_prop_in_moe=FALSE
+                          , prop_sub_0=0.5
+                          , prop_sub_1=0.5
+                          , di_prop_index_cutoff=0.8
+                          , di_80_index_cutoff=0.8
+                          , di_80_index_reference_groups=c('Asian', 'Male')
+                          , check_valid_reference=TRUE
+                          , parallel=FALSE
+                          # , parallel_n_cores=4
+                            )
+
+results_sql <- di_iterate_sql(db_conn=duck_db
+                            , db_table_name='student_equity_no_2017_asian'
+                            , success_vars=c('Math', 'English', 'Transfer')
+                            , group_vars=c('Ethnicity', 'Gender')
+                            , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                            # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                            , include_non_disagg_results=TRUE
+                            , ppg_reference_groups='overall'
+                            , min_moe=0.03
+                            , use_prop_in_moe=FALSE
+                            , prop_sub_0=0.5
+                            , prop_sub_1=0.5
+                            , di_prop_index_cutoff=0.8
+                            , di_80_index_cutoff=0.8
+                            , di_80_index_reference_groups=c('Asian', 'Male')
+                            , check_valid_reference=TRUE
+                            , parallel=FALSE
+                            # , parallel_n_cores=4
+                              )
+
+expect_equivalent(results_tb, results_dt, info='multiple variables, 80 index reference custom (Asian), but 2017 has no Asian students for comparison: tb vs. dt')
+expect_equivalent(results_tb, results_sql %>% mutate(cohort=as.numeric(cohort)), info='multiple variables, 80 index reference custom (Asian), but 2017 has no Asian students for comparison: tb vs. SQL')
+
+# Scenario: multiple variables, when one cohort has 0 success (impact to PI, PPG, and 80 index)
+results_tb <- di_iterate(data=student_equity_2017_all_non_success
+                       , success_vars=c('Math', 'English', 'Transfer')
+                       , group_vars=c('Ethnicity', 'Gender')
+                       , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                       # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                       , include_non_disagg_results=TRUE
+                       , ppg_reference_groups='overall'
+                       , min_moe=0.03
+                       , use_prop_in_moe=FALSE
+                       , prop_sub_0=0.5
+                       , prop_sub_1=0.5
+                       , di_prop_index_cutoff=0.8
+                       , di_80_index_cutoff=0.8
+                       , di_80_index_reference_groups='hpg'
+                       , check_valid_reference=TRUE
+                       , parallel=FALSE
+                       # , parallel_n_cores=4
+                         )
+
+results_dt <- di_iterate_dt(dt=student_equity_dt_2017_all_non_success
+                          , success_vars=c('Math', 'English', 'Transfer')
+                          , group_vars=c('Ethnicity', 'Gender')
+                          , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                          # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                          , include_non_disagg_results=TRUE
+                          , ppg_reference_groups='overall'
+                          , min_moe=0.03
+                          , use_prop_in_moe=FALSE
+                          , prop_sub_0=0.5
+                          , prop_sub_1=0.5
+                          , di_prop_index_cutoff=0.8
+                          , di_80_index_cutoff=0.8
+                          , di_80_index_reference_groups='hpg'
+                          , check_valid_reference=TRUE
+                          , parallel=FALSE
+                          # , parallel_n_cores=4
+                            )
+
+results_sql <- di_iterate_sql(db_conn=duck_db
+                            , db_table_name='student_equity_2017_all_non_success'
+                            , success_vars=c('Math', 'English', 'Transfer')
+                            , group_vars=c('Ethnicity', 'Gender')
+                            , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                            # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                            , include_non_disagg_results=TRUE
+                            , ppg_reference_groups='overall'
+                            , min_moe=0.03
+                            , use_prop_in_moe=FALSE
+                            , prop_sub_0=0.5
+                            , prop_sub_1=0.5
+                            , di_prop_index_cutoff=0.8
+                            , di_80_index_cutoff=0.8
+                            , di_80_index_reference_groups='hpg'
+                            , check_valid_reference=TRUE
+                            , parallel=FALSE
+                            # , parallel_n_cores=4
+                              )
+
+expect_equivalent(results_tb, results_dt, info='multiple variables, when one cohort has 0 success (impact to PI, PPG, and 80 index): tb vs. dt')
+expect_equivalent(results_tb, results_sql %>% mutate(cohort=as.numeric(cohort)), info='multiple variables, when one cohort has 0 success (impact to PI, PPG, and 80 index): tb vs. SQL')
+
+# Scenario: multiple variables, when 1 cohort has just 1 group in Gender, overall reference
+results_tb <- di_iterate(data=student_equity_2017_gender_1_group
+                       , success_vars=c('Math', 'English', 'Transfer')
+                       , group_vars=c('Ethnicity', 'Gender')
+                       , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                       # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                       , include_non_disagg_results=TRUE
+                       , ppg_reference_groups='overall'
+                       , min_moe=0.03
+                       , use_prop_in_moe=FALSE
+                       , prop_sub_0=0.5
+                       , prop_sub_1=0.5
+                       , di_prop_index_cutoff=0.8
+                       , di_80_index_cutoff=0.8
+                       , di_80_index_reference_groups='overall'
+                       , check_valid_reference=TRUE
+                       , parallel=FALSE
+                       # , parallel_n_cores=4
+                         )
+
+results_dt <- di_iterate_dt(dt=student_equity_dt_2017_gender_1_group
+                          , success_vars=c('Math', 'English', 'Transfer')
+                          , group_vars=c('Ethnicity', 'Gender')
+                          , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                          # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                          , include_non_disagg_results=TRUE
+                          , ppg_reference_groups='overall'
+                          , min_moe=0.03
+                          , use_prop_in_moe=FALSE
+                          , prop_sub_0=0.5
+                          , prop_sub_1=0.5
+                          , di_prop_index_cutoff=0.8
+                          , di_80_index_cutoff=0.8
+                          , di_80_index_reference_groups='overall'
+                          , check_valid_reference=TRUE
+                          , parallel=FALSE
+                          # , parallel_n_cores=4
+                            )
+
+results_sql <- di_iterate_sql(db_conn=duck_db
+                            , db_table_name='student_equity_2017_gender_1_group'
+                            , success_vars=c('Math', 'English', 'Transfer')
+                            , group_vars=c('Ethnicity', 'Gender')
+                            , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                            # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                            , include_non_disagg_results=TRUE
+                            , ppg_reference_groups='overall'
+                            , min_moe=0.03
+                            , use_prop_in_moe=FALSE
+                            , prop_sub_0=0.5
+                            , prop_sub_1=0.5
+                            , di_prop_index_cutoff=0.8
+                            , di_80_index_cutoff=0.8
+                            , di_80_index_reference_groups='overall'
+                            , check_valid_reference=TRUE
+                            , parallel=FALSE
+                            # , parallel_n_cores=4
+                              )
+
+expect_equivalent(results_tb, results_dt, info='multiple variables, when 1 cohort has just 1 group in Gender, overall reference: tb vs. dt')
+expect_equivalent(results_tb, results_sql %>% mutate(cohort=as.numeric(cohort)), info='multiple variables, when 1 cohort has just 1 group in Gender, overall reference: tb vs. SQL')
+
+# Scenario: multiple variables, when 1 cohort has just 1 group in Gender, hpg reference
+results_tb <- di_iterate(data=student_equity_2017_gender_1_group
+                       , success_vars=c('Math', 'English', 'Transfer')
+                       , group_vars=c('Ethnicity', 'Gender')
+                       , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                       # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                       , include_non_disagg_results=TRUE
+                       , ppg_reference_groups='hpg'
+                       , min_moe=0.03
+                       , use_prop_in_moe=FALSE
+                       , prop_sub_0=0.5
+                       , prop_sub_1=0.5
+                       , di_prop_index_cutoff=0.8
+                       , di_80_index_cutoff=0.8
+                       , di_80_index_reference_groups='hpg'
+                       , check_valid_reference=TRUE
+                       , parallel=FALSE
+                       # , parallel_n_cores=4
+                         )
+
+results_dt <- di_iterate_dt(dt=student_equity_dt_2017_gender_1_group
+                          , success_vars=c('Math', 'English', 'Transfer')
+                          , group_vars=c('Ethnicity', 'Gender')
+                          , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                          # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                          , include_non_disagg_results=TRUE
+                          , ppg_reference_groups='hpg'
+                          , min_moe=0.03
+                          , use_prop_in_moe=FALSE
+                          , prop_sub_0=0.5
+                          , prop_sub_1=0.5
+                          , di_prop_index_cutoff=0.8
+                          , di_80_index_cutoff=0.8
+                          , di_80_index_reference_groups='hpg'
+                          , check_valid_reference=TRUE
+                          , parallel=FALSE
+                          # , parallel_n_cores=4
+                            )
+
+results_sql <- di_iterate_sql(db_conn=duck_db
+                            , db_table_name='student_equity_2017_gender_1_group'
+                            , success_vars=c('Math', 'English', 'Transfer')
+                            , group_vars=c('Ethnicity', 'Gender')
+                            , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                            # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                            , include_non_disagg_results=TRUE
+                            , ppg_reference_groups='hpg'
+                            , min_moe=0.03
+                            , use_prop_in_moe=FALSE
+                            , prop_sub_0=0.5
+                            , prop_sub_1=0.5
+                            , di_prop_index_cutoff=0.8
+                            , di_80_index_cutoff=0.8
+                            , di_80_index_reference_groups='hpg'
+                            , check_valid_reference=TRUE
+                            , parallel=FALSE
+                            # , parallel_n_cores=4
+                              )
+
+expect_equivalent(results_tb, results_dt, info='multiple variables, when 1 cohort has just 1 group in Gender, hpg reference: tb vs. dt')
+expect_equivalent(results_tb, results_sql %>% mutate(cohort=as.numeric(cohort)), info='multiple variables, when 1 cohort has just 1 group in Gender, hpg reference: tb vs. SQL')
+
+# Scenario: multiple variables, when 1 cohort has just 1 group in Gender, all but current reference
+results_tb <- di_iterate(data=student_equity_2017_gender_1_group
+                       , success_vars=c('Math', 'English', 'Transfer')
+                       , group_vars=c('Ethnicity', 'Gender')
+                       , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                       # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                       , include_non_disagg_results=TRUE
+                       , ppg_reference_groups='all but current'
+                       , min_moe=0.03
+                       , use_prop_in_moe=FALSE
+                       , prop_sub_0=0.5
+                       , prop_sub_1=0.5
+                       , di_prop_index_cutoff=0.8
+                       , di_80_index_cutoff=0.8
+                       , di_80_index_reference_groups='all but current'
+                       , check_valid_reference=TRUE
+                       , parallel=FALSE
+                       # , parallel_n_cores=4
+                         )
+
+results_dt <- di_iterate_dt(dt=student_equity_dt_2017_gender_1_group
+                          , success_vars=c('Math', 'English', 'Transfer')
+                          , group_vars=c('Ethnicity', 'Gender')
+                          , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                          # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                          , include_non_disagg_results=TRUE
+                          , ppg_reference_groups='all but current'
+                          , min_moe=0.03
+                          , use_prop_in_moe=FALSE
+                          , prop_sub_0=0.5
+                          , prop_sub_1=0.5
+                          , di_prop_index_cutoff=0.8
+                          , di_80_index_cutoff=0.8
+                          , di_80_index_reference_groups='all but current'
+                          , check_valid_reference=TRUE
+                          , parallel=FALSE
+                          # , parallel_n_cores=4
+                            )
+
+results_sql <- di_iterate_sql(db_conn=duck_db
+                            , db_table_name='student_equity_2017_gender_1_group'
+                            , success_vars=c('Math', 'English', 'Transfer')
+                            , group_vars=c('Ethnicity', 'Gender')
+                            , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                            # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                            , include_non_disagg_results=TRUE
+                            , ppg_reference_groups='all but current'
+                            , min_moe=0.03
+                            , use_prop_in_moe=FALSE
+                            , prop_sub_0=0.5
+                            , prop_sub_1=0.5
+                            , di_prop_index_cutoff=0.8
+                            , di_80_index_cutoff=0.8
+                            , di_80_index_reference_groups='all but current'
+                            , check_valid_reference=TRUE
+                            , parallel=FALSE
+                            # , parallel_n_cores=4
+                              )
+
+expect_equivalent(results_tb, results_dt, info='multiple variables, when 1 cohort has just 1 group in Gender, all but current reference: tb vs. dt')
+expect_equivalent(results_tb, results_sql %>% mutate(cohort=as.numeric(cohort)), info='multiple variables, when 1 cohort has just 1 group in Gender, all but current reference: tb vs. SQL')
+
+# Scenario: single success var, outcome has NA
+results_manually_removed <- di_iterate(data=student_equity_2017_has_missing_outcomes %>% filter(!is.na(Math))
+                       , success_vars=c('Math')
+                       , group_vars=c('Ethnicity', 'Gender')
+                       , cohort_vars=c('Cohort_Math')
+                       # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                       , include_non_disagg_results=TRUE
+                       , ppg_reference_groups='all but current'
+                       , min_moe=0.03
+                       , use_prop_in_moe=FALSE
+                       , prop_sub_0=0.5
+                       , prop_sub_1=0.5
+                       , di_prop_index_cutoff=0.8
+                       , di_80_index_cutoff=0.8
+                       , di_80_index_reference_groups='all but current'
+                       , check_valid_reference=TRUE
+                       , parallel=FALSE
+                       # , parallel_n_cores=4
+                         )
+
+results_tb <- di_iterate(data=student_equity_2017_has_missing_outcomes
+                       , success_vars=c('Math')
+                       , group_vars=c('Ethnicity', 'Gender')
+                       , cohort_vars=c('Cohort_Math')
+                       # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                       , include_non_disagg_results=TRUE
+                       , ppg_reference_groups='all but current'
+                       , min_moe=0.03
+                       , use_prop_in_moe=FALSE
+                       , prop_sub_0=0.5
+                       , prop_sub_1=0.5
+                       , di_prop_index_cutoff=0.8
+                       , di_80_index_cutoff=0.8
+                       , di_80_index_reference_groups='all but current'
+                       , check_valid_reference=TRUE
+                       , parallel=FALSE
+                       # , parallel_n_cores=4
+                         )
+
+results_dt <- di_iterate_dt(dt=student_equity_dt_2017_has_missing_outcomes
+                          , success_vars=c('Math')
+                          , group_vars=c('Ethnicity', 'Gender')
+                          , cohort_vars=c('Cohort_Math')
+                          # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                          , include_non_disagg_results=TRUE
+                          , ppg_reference_groups='all but current'
+                          , min_moe=0.03
+                          , use_prop_in_moe=FALSE
+                          , prop_sub_0=0.5
+                          , prop_sub_1=0.5
+                          , di_prop_index_cutoff=0.8
+                          , di_80_index_cutoff=0.8
+                          , di_80_index_reference_groups='all but current'
+                          , check_valid_reference=TRUE
+                          , parallel=FALSE
+                          # , parallel_n_cores=4
+                            )
+
+results_sql <- di_iterate_sql(db_conn=duck_db
+                            , db_table_name='student_equity_2017_has_missing_outcomes'
+                            , success_vars=c('Math')
+                            , group_vars=c('Ethnicity', 'Gender')
+                            , cohort_vars=c('Cohort_Math')
+                            # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                            , include_non_disagg_results=TRUE
+                            , ppg_reference_groups='all but current'
+                            , min_moe=0.03
+                            , use_prop_in_moe=FALSE
+                            , prop_sub_0=0.5
+                            , prop_sub_1=0.5
+                            , di_prop_index_cutoff=0.8
+                            , di_80_index_cutoff=0.8
+                            , di_80_index_reference_groups='all but current'
+                            , check_valid_reference=TRUE
+                            , parallel=FALSE
+                            # , parallel_n_cores=4
+                              )
+
+expect_equivalent(results_tb, results_manually_removed, info='single success var, outcome has NA: tb vs. manually removed')
+expect_equivalent(results_tb, results_dt, info='single success var, outcome has NA: tb vs. dt')
+expect_equivalent(results_tb, results_sql %>% mutate(cohort=as.numeric(cohort)), info='single success var, outcome has NA: tb vs. SQL')
+
+# Scenario: multiple success var, outcome has NA
+results_manually_removed <- bind_rows(
+  di_iterate(data=student_equity_2017_has_missing_outcomes %>% filter(!is.na(English))
+                       , success_vars=c('English')
+                       , group_vars=c('Ethnicity', 'Gender')
+                       , cohort_vars=c('Cohort_English')
+                       # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                       , include_non_disagg_results=TRUE
+                       , ppg_reference_groups='all but current'
+                       , min_moe=0.03
+                       , use_prop_in_moe=FALSE
+                       , prop_sub_0=0.5
+                       , prop_sub_1=0.5
+                       , di_prop_index_cutoff=0.8
+                       , di_80_index_cutoff=0.8
+                       , di_80_index_reference_groups='all but current'
+                       , check_valid_reference=TRUE
+                       , parallel=FALSE
+                       # , parallel_n_cores=4
+                         )
+  , 
+  di_iterate(data=student_equity_2017_has_missing_outcomes %>% filter(!is.na(Math))
+                       , success_vars=c('Math')
+                       , group_vars=c('Ethnicity', 'Gender')
+                       , cohort_vars=c('Cohort_Math')
+                       # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                       , include_non_disagg_results=TRUE
+                       , ppg_reference_groups='all but current'
+                       , min_moe=0.03
+                       , use_prop_in_moe=FALSE
+                       , prop_sub_0=0.5
+                       , prop_sub_1=0.5
+                       , di_prop_index_cutoff=0.8
+                       , di_80_index_cutoff=0.8
+                       , di_80_index_reference_groups='all but current'
+                       , check_valid_reference=TRUE
+                       , parallel=FALSE
+                       # , parallel_n_cores=4
+                         )
+)
+
+results_tb <- di_iterate(data=student_equity_2017_has_missing_outcomes
+                       , success_vars=c('Math', 'English')
+                       , group_vars=c('Ethnicity', 'Gender')
+                       , cohort_vars=c('Cohort_Math', 'Cohort_English')
+                       # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                       , include_non_disagg_results=TRUE
+                       , ppg_reference_groups='all but current'
+                       , min_moe=0.03
+                       , use_prop_in_moe=FALSE
+                       , prop_sub_0=0.5
+                       , prop_sub_1=0.5
+                       , di_prop_index_cutoff=0.8
+                       , di_80_index_cutoff=0.8
+                       , di_80_index_reference_groups='all but current'
+                       , check_valid_reference=TRUE
+                       , parallel=FALSE
+                       # , parallel_n_cores=4
+                         )
+
+results_dt <- di_iterate_dt(dt=student_equity_dt_2017_has_missing_outcomes
+                          , success_vars=c('Math', 'English')
+                          , group_vars=c('Ethnicity', 'Gender')
+                          , cohort_vars=c('Cohort_Math', 'Cohort_English')
+                          # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                          , include_non_disagg_results=TRUE
+                          , ppg_reference_groups='all but current'
+                          , min_moe=0.03
+                          , use_prop_in_moe=FALSE
+                          , prop_sub_0=0.5
+                          , prop_sub_1=0.5
+                          , di_prop_index_cutoff=0.8
+                          , di_80_index_cutoff=0.8
+                          , di_80_index_reference_groups='all but current'
+                          , check_valid_reference=TRUE
+                          , parallel=FALSE
+                          # , parallel_n_cores=4
+                            )
+
+results_sql <- di_iterate_sql(db_conn=duck_db
+                            , db_table_name='student_equity_2017_has_missing_outcomes'
+                            , success_vars=c('Math', 'English')
+                            , group_vars=c('Ethnicity', 'Gender')
+                            , cohort_vars=c('Cohort_Math', 'Cohort_English')
+                            # , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                            , include_non_disagg_results=TRUE
+                            , ppg_reference_groups='all but current'
+                            , min_moe=0.03
+                            , use_prop_in_moe=FALSE
+                            , prop_sub_0=0.5
+                            , prop_sub_1=0.5
+                            , di_prop_index_cutoff=0.8
+                            , di_80_index_cutoff=0.8
+                            , di_80_index_reference_groups='all but current'
+                            , check_valid_reference=TRUE
+                            , parallel=FALSE
+                            # , parallel_n_cores=4
+                              )
+
+expect_equivalent(results_tb, results_manually_removed, info='multiple success var, outcome has NA: tb vs. manually removed')
+expect_equivalent(results_tb, results_dt, info='multiple success var, outcome has NA: tb vs. dt')
+expect_equivalent(results_tb, results_sql %>% mutate(cohort=as.numeric(cohort)), info='multiple success var, outcome has NA: tb vs. SQL')
+
