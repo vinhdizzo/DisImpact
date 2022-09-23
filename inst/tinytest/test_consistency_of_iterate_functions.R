@@ -2355,3 +2355,6 @@ expect_equivalent(results_tb, results_manually_removed, info='multiple success v
 expect_equivalent(results_tb, results_dt, info='multiple success var, outcome has NA: tb vs. dt')
 expect_equivalent(results_tb, results_sql %>% mutate(cohort=as.numeric(cohort)), info='multiple success var, outcome has NA: tb vs. SQL')
 
+
+# Disconnect
+dbDisconnect(conn=duck_db, shutdown=TRUE)
