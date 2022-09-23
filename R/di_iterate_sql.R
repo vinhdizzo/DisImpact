@@ -667,10 +667,7 @@ group by
     on.exit(stopCluster(cl), add=TRUE)   
     clusterEvalQ(cl, library(dplyr))
     clusterEvalQ(cl, library(DBI))
-    clusterEvalQ(cl, library(odbc))
-    clusterEvalQ(cl, library(RSQLite))
     clusterEvalQ(cl, library(duckdb))
-    clusterEvalQ(cl, library(pool))
     clusterEvalQ(cl, library(glue))
     clusterExport(cl, varlist=c('list_queries', 'query_create_summ', 'temp_summ_tn', 'staging_table'), envir=environment())
     
