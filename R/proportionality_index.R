@@ -79,8 +79,8 @@ di_prop_index <- function(success, group, cohort, weight, data, di_prop_index_cu
          , di_indicator=ifelse(di_prop_index < di_prop_index_cutoff, 1, 0) %>% coalesce(0)
            ) %>%
     # Following derived using the formula: (need + group_success) / (need + all_group_success) / pct_group = di_prop_index_cutoff, solve for need
-    mutate(success_needed_not_di=ifelse(di_indicator==1, ceiling((sum(success) * pct_group * di_prop_index_cutoff - success) / (1 - pct_group * di_prop_index_cutoff)), 0)
-           , success_needed_full_parity=ifelse(di_prop_index < 1, ceiling((sum(success) * pct_group * 1 - success) / (1 - pct_group * 1)), 0)
+    mutate(success_needed_not_di=ifelse(di_indicator==1, ceiling((sum(success) * pct_group * di_prop_index_cutoff - success) / (1 - pct_group * di_prop_index_cutoff)), 0) %>% coalesce(0)
+           , success_needed_full_parity=ifelse(di_prop_index < 1, ceiling((sum(success) * pct_group * 1 - success) / (1 - pct_group * 1)), 0) %>% coalesce(0)
     ) %>% 
     ungroup %>%
     arrange(cohort, group)
