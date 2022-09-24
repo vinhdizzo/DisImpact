@@ -294,13 +294,11 @@ dim(student_equity)
 
 ## Example summarized data set
 student_equity_summ <- student_equity %>%
-  group_by(Ethnicity, Gender, Cohort, Cohort_Math, Cohort_English, Ed_Goal, College_Status) %>%
+  group_by(Ethnicity, Gender, Cohort, Cohort_Math, Cohort_English, Ed_Goal, College_Status, Math, English, Transfer) %>% # Math, English, Transfer can take on values 0, 1, NA
   summarize(N=n() %>% as.numeric # not needed, for all.equal()
-            , Math=sum(Math, na.rm=TRUE)
-            , English=sum(English, na.rm=TRUE)
-            , Transfer=sum(Transfer, na.rm=TRUE)
             ) %>%
-  ungroup
+  ungroup %>%
+  mutate(Math=Math*N, English=English*N, Transfer=Transfer*N) # So that Math, English, and Transfer represent counts
 
 dim(student_equity_summ) # same number of columns, less number of rows
 
@@ -315,18 +313,11 @@ df_di_summary_2 <- di_iterate(data=student_equity_summ
                           , weight_var='N' # SET THIS
                             )
 dim(df_di_summary)  ## original results
-dim(df_di_summary_2) # more rows?  because of NA cohort from Cohort_English and Cohort_Math
-dim(df_di_summary_2 %>% filter(!is.na(cohort)))
-
-## ## if user wants to see the extra rows
-## extra_rows <- df_di_summary_2 %>%
-##   anti_join(df_di_summary %>% select(Ed_Goal, College_Status, success_variable, cohort_variable, cohort, disaggregation, group))
-## difference %>% head %>% as.data.frame  
+dim(df_di_summary_2)
 
 all.equal(df_di_summary
         , df_di_summary_2 %>% filter(!is.na(cohort))
           ) # returned results are the same
-
 ```
 
 ## Suppress non-disaggregated results using `include_non_disagg_results`
