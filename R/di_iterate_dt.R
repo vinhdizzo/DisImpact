@@ -69,7 +69,13 @@ di_calc_dt <- function(dt, success_var, group_var, cohort_var='', weight_var=NUL
   ][
     !is.na(success_var)
   , env=substitute_list
-  ][ # Following is using collapse package for aggregation
+  ]
+  
+  if (nrow(dt) == 0) {
+    return(NULL)
+  }
+  
+  dt <- dt[ # Following is using collapse package for aggregation
     , weight__:=1
   ] %>% 
     fgroup_by(group_by_list) %>%
