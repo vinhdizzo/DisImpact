@@ -10,6 +10,7 @@
 ## setwd('..')
 ## install('DisImpact')
 ## tinytest::build_install_test('./DisImpact') # from outside
+## install.packages("../DisImpact_0.0.9000.tar.gz", repos = NULL, type = "source") # install
 
 ##' Calculate the margin of error (MOE) for the percentage point gap (PPG) method.
 ##'
