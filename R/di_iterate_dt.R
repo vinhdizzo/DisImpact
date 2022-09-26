@@ -499,6 +499,6 @@ di_iterate_dt <- function(dt, success_vars, group_vars, cohort_vars=NULL, scenar
   d_results[
     , filter_subset:=NULL
     ][]
-  setorderv(d_results, c(scenario_repeat_by_vars, 'success_variable', 'cohort_variable', 'cohort', 'disaggregation', 'group')) # reorder
+  setorderv(d_results, c(scenario_repeat_by_vars, 'success_variable', 'cohort_variable', 'cohort', 'disaggregation', 'group'), na.last=TRUE) # reorder
   return(d_results)  
 }
