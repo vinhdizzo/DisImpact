@@ -1,3 +1,13 @@
+##' Function used internally by \link[DisImpact]{di_calc_sql} and \link[DisImpact]{di_iterate_sql} to surround variable names by double quotes in SQL queries in order to support non-alphanumeric characters in variable names.
+##'
+##' @title Helper function: Surround character values with double quotes if not present.
+##' @param value A character vector.
+##' @return A character vector with double quotes surrounding \code{value} if the first and last characters of \code{value} aren't yet double quotes.  For \code{value} that is already surrounded by double quotes, nothing is changed.
+##' @export
+surround_quote_if_needed <- function(value) {
+  ifelse(substring(value, 1, 1) == '"' & substring(value, nchar(value), nchar(value)) == '"', value, paste0('"', value, '"'))
+}
+
 ##' Generate SQL code that calculates disproportionate impact via the percentage point gap (PPG), proportionality index, and 80\% index methods for a specified table name, success variable, group variable, and cohort variable.  This is the workhorse function leveraged by the \link[DisImpact]{di_iterate_sql} function.
 ##'
 ##' @title Generate SQL code that calculates disproportionate impact using multiple methods for a specified table.
@@ -25,11 +35,21 @@
 ##' @export
 di_calc_sql <- function(db_table_name, success_var, group_var, cohort_var='', weight_var=1, ppg_reference_group='overall', min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5, di_prop_index_cutoff=0.8, di_80_index_cutoff=0.8, di_80_index_reference_group='hpg', before_with_statement='', after_with_statement='', end_of_select_statement='', where_statement='', select_statement_add='') {
 
+  success_var <- surround_quote_if_needed(success_var)
+  success_var_no_quote <- str_replace_all(success_var, fixed('"'), "")
+  group_var <- surround_quote_if_needed(group_var)
   if (cohort_var == '') {
     cohort_var <- "''"
+  } else {
+    cohort_var <- surround_quote_if_needed(cohort_var)
   }
-  cohort_var_no_quote <- str_replace_all(cohort_var, fixed("'"), "")  
+  cohort_var_no_quote <- str_replace_all(cohort_var, fixed("'"), "") %>% str_replace_all(fixed('"'), "")
   group_var_no_quote <- str_replace_all(group_var, fixed('"'), '') # '"- None"' for non-disagg results
+  if (weight_var == 1) {
+    weight_var <- 1
+  } else {
+    weight_var <- surround_quote_if_needed(weight_var)
+  }
 
   # Remove missing
   if (where_statement == '') {
@@ -274,7 +294,8 @@ di_calc_sql <- function(db_table_name, success_var, group_var, cohort_var='', we
   {after_with_statement}
   select
   {select_statement_add}
-  cast('{success_var}' as varchar(255)) as success_variable
+  -- cast('{success_var}' as varchar(255)) as success_variable
+  cast('{success_var_no_quote}' as varchar(255)) as success_variable
   -- , cast('{cohort_var}' as varchar(255)) as cohort_variable
   , cast('{cohort_var_no_quote}' as varchar(255)) as cohort_variable
   , cast(a.cohort as varchar(255)) as cohort
@@ -415,11 +436,11 @@ di_iterate_sql <- function(db_conn, db_table_name, success_vars, group_vars, coh
     mssql <- FALSE
   }
 
-  # Check for valid variable names for custom query construction
-  if(any(str_detect(c(scenario_repeat_by_vars, group_vars, cohort_vars, success_vars), '[^a-zA-Z0-9_]'))) {
-    x <- c(scenario_repeat_by_vars, group_vars, cohort_vars, success_vars)
-    stop(paste0("Variable names should only contain alphanumeric characters and underscores: ", paste0(x[str_detect(x, '[^a-zA-Z0-9_]')], collapse='; ')))
-  }
+  ## # Check for valid variable names for custom query construction
+  ## if(any(str_detect(c(scenario_repeat_by_vars, group_vars, cohort_vars, success_vars), '[^a-zA-Z0-9_]'))) {
+  ##   x <- c(scenario_repeat_by_vars, group_vars, cohort_vars, success_vars)
+  ##   stop(paste0("Variable names should only contain alphanumeric characters and underscores: ", paste0(x[str_detect(x, '[^a-zA-Z0-9_]')], collapse='; ')))
+  ## }
 
   # Check if variables are in table
   vars_to_check <- c(success_vars, group_vars, cohort_vars, scenario_repeat_by_vars, weight_var)
@@ -427,7 +448,7 @@ di_iterate_sql <- function(db_conn, db_table_name, success_vars, group_vars, coh
     query_check_var <- "
 select
 top 1
-{var_to_check}
+\"{var_to_check}\"
 from
 {db_table_name}
 ;
@@ -435,7 +456,7 @@ from
   } else {
     query_check_var <- "
 select
-{var_to_check}
+\"{var_to_check}\"
 from
 {db_table_name}
 limit 1
@@ -455,7 +476,7 @@ limit 1
     query_distinct_group <- "
 select
 distinct
-{group_var} as subgroup
+\"{group_var}\" as subgroup
 from
 {db_table_name}
 ;
@@ -475,6 +496,8 @@ from
   # Check for weight variable
   if(is.null(weight_var)) {
     weight_var <- 1
+  } else {
+    weight_var <- surround_quote_if_needed(weight_var)
   }
 
   # Cohort
@@ -486,11 +509,11 @@ from
   }
   
   # Create summary table first
-  s_group_by_vars <- paste0(c(scenario_repeat_by_vars, group_vars, if (length(cohort_vars)==1 && cohort_vars =='') NULL else cohort_vars), collapse=', ')
-  s_calc_missing_flags <- paste0(', case when ', success_vars, ' is null then 1 else 0 end as ', success_vars, '_NA_FLAG', collapse='\n')
-  s_missing_flag_vars <- paste0(', ', success_vars, '_NA_FLAG', collapse='\n')
-  s_success_vars <- paste0(', ', success_vars, collapse='\n')
-  s_calc_success_vars <- paste0(', sum(', success_vars, ') ', 'as ', success_vars, collapse='\n')
+  s_group_by_vars <- paste0(c(scenario_repeat_by_vars, group_vars, if (length(cohort_vars)==1 && cohort_vars =='') NULL else cohort_vars) %>% surround_quote_if_needed, collapse=', ')
+  s_calc_missing_flags <- paste0(', case when ', success_vars %>% surround_quote_if_needed, ' is null then 1 else 0 end as ', paste0(success_vars, '_NA_FLAG') %>% surround_quote_if_needed, collapse='\n')
+  s_missing_flag_vars <- paste0(', ', paste0(success_vars, '_NA_FLAG') %>% surround_quote_if_needed, collapse='\n')
+  s_success_vars <- paste0(', ', success_vars %>% surround_quote_if_needed, collapse='\n')
+  s_calc_success_vars <- paste0(', sum(', success_vars %>% surround_quote_if_needed, ') ', 'as ', success_vars %>% surround_quote_if_needed, collapse='\n')
   if(mssql) {
     temp_summ_tn <- glue('##', db_table_name, '_summ_')
     before_select_statement <- ''
@@ -576,12 +599,12 @@ group by
 
   if (!is.null(scenario_repeat_by_vars)) {
     dRepeatScenarios0 <- lapply(scenario_repeat_by_vars
-                              , function(cur_var) c(dbGetQuery(conn=db_conn, statement=glue('select distinct {cur_var} from {db_table_name} ; ')) %>% unlist, '- All')
+                              , function(cur_var) c(dbGetQuery(conn=db_conn, statement=glue('select distinct "{cur_var}" from {db_table_name} ; ')) %>% unlist, '- All')
                                 ) %>%
       expand.grid(stringsAsFactors=FALSE)
     names(dRepeatScenarios0) <- scenario_repeat_by_vars
     dRepeatScenarios0$where_statement <- do.call("paste"
-                                               , c(lapply(1:ncol(dRepeatScenarios0), function(i) paste0(names(dRepeatScenarios0)[i], " = ", "'", dRepeatScenarios0[[i]], "'")), sep=" and ")
+                                               , c(lapply(1:ncol(dRepeatScenarios0), function(i) paste0(names(dRepeatScenarios0)[i] %>% surround_quote_if_needed, " = ", "'", dRepeatScenarios0[[i]], "'")), sep=" and ")
                                                  ) %>%
       str_replace_all(" and(?:(?!and).)*'- All'", '') %>% # every "and to '- All'" that is not first
       str_replace_all("^.*'- All'", '') %>% # first "and to '- All'"
@@ -589,7 +612,7 @@ group by
     dRepeatScenarios0$where_statement <- ifelse(dRepeatScenarios0$where_statement=='', '', paste0('where ', dRepeatScenarios0$where_statement))
     
     dRepeatScenarios0$select_statement_add <- do.call("paste"
-                                                    , c(lapply(1:(ncol(dRepeatScenarios0)-1), function(i) paste0("cast('", dRepeatScenarios0[[i]], "' as varchar(255)) as ", names(dRepeatScenarios0)[i])), sep=", ")
+                                                    , c(lapply(1:(ncol(dRepeatScenarios0)-1), function(i) paste0("cast('", dRepeatScenarios0[[i]], "' as varchar(255)) as ", names(dRepeatScenarios0)[i] %>% surround_quote_if_needed)), sep=", ")
                                                       )
     dRepeatScenarios0$select_statement_add <- paste0(dRepeatScenarios0$select_statement_add, ', ')
 
