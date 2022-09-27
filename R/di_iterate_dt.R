@@ -446,7 +446,7 @@ di_iterate_dt <- function(dt, success_vars, group_vars, cohort_vars=NULL, scenar
       expand.grid(stringsAsFactors=FALSE)
     # names(dRepeatScenarios0) <- scenario_repeat_by_vars
     dRepeatScenarios0$filter_subset <- do.call("paste"
-                                               , c(lapply(1:ncol(dRepeatScenarios0), function(i) paste0(names(dRepeatScenarios0)[i], " == ", "'", dRepeatScenarios0[[i]], "'")), sep=" & ")
+                                               , c(lapply(1:ncol(dRepeatScenarios0), function(i) paste0(paste0('`', names(dRepeatScenarios0)[i], '`'), " == ", "'", dRepeatScenarios0[[i]], "'")), sep=" & ")
                                                  ) %>%
       str_replace_all(" &(?:(?!&).)*'- All'", '') %>% # every "& to '- All'" that is not first
       str_replace_all("^.*'- All'", '') %>% # first "& to '- All'"
