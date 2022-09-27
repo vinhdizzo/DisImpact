@@ -936,6 +936,74 @@ results_sql <- di_iterate_sql(db_conn=duck_db
 expect_equivalent(results_tb, results_dt, info='multiple variables, scenario_repeat_by_vars, 80% index custom: tb vs. dt')
 expect_equivalent(results_tb, results_sql %>% mutate(cohort=as.numeric(cohort)), info='multiple variables, scenario_repeat_by_vars, 80% index custom: tb vs. SQL')
 
+# Scenario: multiple variables, scenario_repeat_by_vars, exclude_scenario_df
+exclude_df <- data.frame(Ed_Goal=c('Other', 'Other'), College_Status=c('First-time College', 'Other'))
+
+results_tb <- di_iterate(data=student_equity
+                       , success_vars=c('Math', 'English', 'Transfer')
+                       , group_vars=c('Ethnicity', 'Gender')
+                       , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                       , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                       , exclude_scenario_df=exclude_df
+                       , include_non_disagg_results=TRUE
+                       , ppg_reference_groups='overall'
+                       , min_moe=0.03
+                       , use_prop_in_moe=FALSE
+                       , prop_sub_0=0.5
+                       , prop_sub_1=0.5
+                       , di_prop_index_cutoff=0.8
+                       , di_80_index_cutoff=0.8
+                       , di_80_index_reference_groups='hpg'
+                       , check_valid_reference=TRUE
+                       , parallel=FALSE
+                       # , parallel_n_cores=4
+                         )
+
+results_dt <- di_iterate_dt(dt=student_equity_dt
+                          , success_vars=c('Math', 'English', 'Transfer')
+                          , group_vars=c('Ethnicity', 'Gender')
+                          , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                          , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                          , exclude_scenario_df=exclude_df
+                          , include_non_disagg_results=TRUE
+                          , ppg_reference_groups='overall'
+                          , min_moe=0.03
+                          , use_prop_in_moe=FALSE
+                          , prop_sub_0=0.5
+                          , prop_sub_1=0.5
+                          , di_prop_index_cutoff=0.8
+                          , di_80_index_cutoff=0.8
+                          , di_80_index_reference_groups='hpg'
+                          , check_valid_reference=TRUE
+                          , parallel=FALSE
+                          # , parallel_n_cores=4
+                            )
+
+results_sql <- di_iterate_sql(db_conn=duck_db
+                            , db_table_name=student_equity_parquet
+                            , success_vars=c('Math', 'English', 'Transfer')
+                            , group_vars=c('Ethnicity', 'Gender')
+                            , cohort_vars=c('Cohort_Math', 'Cohort_English', 'Cohort')
+                            , scenario_repeat_by_vars=c('Ed_Goal', 'College_Status')
+                            , exclude_scenario_df=exclude_df
+                            , include_non_disagg_results=TRUE
+                            , ppg_reference_groups='overall'
+                            , min_moe=0.03
+                            , use_prop_in_moe=FALSE
+                            , prop_sub_0=0.5
+                            , prop_sub_1=0.5
+                            , di_prop_index_cutoff=0.8
+                            , di_80_index_cutoff=0.8
+                            , di_80_index_reference_groups='hpg'
+                            , check_valid_reference=TRUE
+                            , parallel=FALSE
+                            # , parallel_n_cores=4
+                              )
+
+expect_equivalent(results_tb %>% left_join(exclude_df %>% mutate(in_exclude_df=1)) %>% filter(in_exclude_df==1) %>% nrow, 0, info='multiple variables, scenario_repeat_by_vars, exclude_scenario_df: tb contain exclude scenarios')
+expect_equivalent(results_tb, results_dt, info='multiple variables, scenario_repeat_by_vars, exclude_scenario_df: tb vs. dt')
+expect_equivalent(results_tb, results_sql %>% mutate(cohort=as.numeric(cohort)), info='multiple variables, scenario_repeat_by_vars, exclude_scenario_df: tb vs. SQL')
+
 # Scenario: multiple variables, use_prop_in_moe TRUE
 results_tb <- di_iterate(data=student_equity
                        , success_vars=c('Math', 'English', 'Transfer')
