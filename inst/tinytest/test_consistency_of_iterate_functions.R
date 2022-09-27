@@ -75,6 +75,62 @@ from
 ) as a
 "))
 
+# Summarized Data with spaces in variable names
+student_equity_summ_space <- student_equity %>%
+  group_by(Math, English, Transfer, Cohort_Math, Cohort_English, Cohort, Ethnicity, Gender, Ed_Goal, College_Status) %>%
+  summarize(N=n()) %>%
+  ungroup %>%
+  mutate(Math=Math*N, English=English*N, Transfer=Transfer*N) %>%
+  rename(`Cohort_Math 1`=Cohort_Math, `Math 1`=Math, `Ethnicity 1`=Ethnicity, `Ed_Goal 1`=Ed_Goal, `N 1`=N)
+dim(student_equity_summ_space)
+tail(student_equity_summ_space) %>% as.data.frame
+
+student_equity_summ_space_dt <- as.data.table(student_equity_summ_space)
+
+dbExecute(conn=duck_db, statement=glue("
+create table student_equity_summ_space as
+select
+Math * N as \"Math 1\"
+, English * N as English
+, Transfer * N as Transfer
+, Cohort_Math as \"Cohort_Math 1\"
+, Cohort_English
+, Cohort
+, Ethnicity as \"Ethnicity 1\"
+, Gender
+, Ed_Goal as \"Ed_Goal 1\"
+, College_Status
+, N as \"N 1\"
+from
+(
+  select
+  Math
+  , English
+  , Transfer
+  , Cohort_Math
+  , Cohort_English
+  , Cohort
+  , Ethnicity
+  , Gender
+  , Ed_Goal
+  , College_Status
+  , count(1) as N
+  from
+  {student_equity_parquet}
+  group by
+  Math
+  , English
+  , Transfer
+  , Cohort_Math
+  , Cohort_English
+  , Cohort
+  , Ethnicity
+  , Gender
+  , Ed_Goal
+  , College_Status
+) as a
+"))
+
 # Data: 2017-Asian missing, to test reference
 student_equity_no_2017_asian <- student_equity %>%
   filter(!(Cohort==2017 & Ethnicity=='Asian'))
@@ -2422,6 +2478,93 @@ results_sql <- di_iterate_sql(db_conn=duck_db
 expect_equivalent(results_tb, results_manually_removed, info='multiple success var, outcome has NA: tb vs. manually removed')
 expect_equivalent(results_tb, results_dt, info='multiple success var, outcome has NA: tb vs. dt')
 expect_equivalent(results_tb, results_sql %>% mutate(cohort=as.numeric(cohort)), info='multiple success var, outcome has NA: tb vs. SQL')
+
+# Scenario: space in variable names
+results_tb0 <- di_iterate(data=student_equity %>%
+                            rename(`Cohort_Math 1`=Cohort_Math, `Math 1`=Math, `Ethnicity 1`=Ethnicity, `Ed_Goal 1`=Ed_Goal)
+                       , success_vars=c('Math 1', 'English', 'Transfer')
+                       , group_vars=c('Ethnicity 1', 'Gender')
+                       , cohort_vars=c('Cohort_Math 1', 'Cohort_English', 'Cohort')
+                       , scenario_repeat_by_vars=c('Ed_Goal 1', 'College_Status')
+                       , include_non_disagg_results=TRUE
+                       , ppg_reference_groups='overall'
+                       , min_moe=0.03
+                       , use_prop_in_moe=FALSE
+                       , prop_sub_0=0.5
+                       , prop_sub_1=0.5
+                       , di_prop_index_cutoff=0.8
+                       , di_80_index_cutoff=0.8
+                       , di_80_index_reference_groups='hpg'
+                       , check_valid_reference=TRUE
+                       , parallel=FALSE
+                       # , parallel_n_cores=4
+                         )
+
+results_tb <- di_iterate(data=student_equity_summ_space
+                       , success_vars=c('Math 1', 'English', 'Transfer')
+                       , group_vars=c('Ethnicity 1', 'Gender')
+                       , cohort_vars=c('Cohort_Math 1', 'Cohort_English', 'Cohort')
+                       , scenario_repeat_by_vars=c('Ed_Goal 1', 'College_Status')
+                       , weight_var='N 1'
+                       , include_non_disagg_results=TRUE
+                       , ppg_reference_groups='overall'
+                       , min_moe=0.03
+                       , use_prop_in_moe=FALSE
+                       , prop_sub_0=0.5
+                       , prop_sub_1=0.5
+                       , di_prop_index_cutoff=0.8
+                       , di_80_index_cutoff=0.8
+                       , di_80_index_reference_groups='hpg'
+                       , check_valid_reference=TRUE
+                       , parallel=FALSE
+                       # , parallel_n_cores=4
+                         )
+
+results_dt <- di_iterate_dt(dt=student_equity_summ_space_dt
+                          , success_vars=c('Math 1', 'English', 'Transfer')
+                          , group_vars=c('Ethnicity 1', 'Gender')
+                          , cohort_vars=c('Cohort_Math 1', 'Cohort_English', 'Cohort')
+                          , scenario_repeat_by_vars=c('Ed_Goal 1', 'College_Status')
+                          , include_non_disagg_results=TRUE
+                          , weight_var='N 1'
+                          , ppg_reference_groups='overall'
+                          , min_moe=0.03
+                          , use_prop_in_moe=FALSE
+                          , prop_sub_0=0.5
+                          , prop_sub_1=0.5
+                          , di_prop_index_cutoff=0.8
+                          , di_80_index_cutoff=0.8
+                          , di_80_index_reference_groups='hpg'
+                          , check_valid_reference=TRUE
+                          , parallel=FALSE
+                          # , parallel_n_cores=4
+                            )
+
+results_sql <- di_iterate_sql(db_conn=duck_db
+                            , db_table_name='student_equity_summ_space'
+                            , success_vars=c('Math 1', 'English', 'Transfer')
+                            , group_vars=c('Ethnicity 1', 'Gender')
+                            , cohort_vars=c('Cohort_Math 1', 'Cohort_English', 'Cohort')
+                            , scenario_repeat_by_vars=c('Ed_Goal 1', 'College_Status')
+                            , weight_var='N 1'
+                            , include_non_disagg_results=TRUE
+                            , ppg_reference_groups='overall'
+                            , min_moe=0.03
+                            , use_prop_in_moe=FALSE
+                            , prop_sub_0=0.5
+                            , prop_sub_1=0.5
+                            , di_prop_index_cutoff=0.8
+                            , di_80_index_cutoff=0.8
+                            , di_80_index_reference_groups='hpg'
+                            , check_valid_reference=TRUE
+                            , parallel=FALSE
+                            # , parallel_n_cores=4
+                              )
+
+
+expect_equivalent(results_tb0, results_tb, info='space in variable names: unsummarized vs. summarized')
+expect_equivalent(results_tb0, results_dt, info='space in variable names: tb vs. dt')
+expect_equivalent(results_tb, results_sql %>% mutate(cohort=as.numeric(cohort)), info='space in variable names: tb vs. dt')
 
 
 # Disconnect
