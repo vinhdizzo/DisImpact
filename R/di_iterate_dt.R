@@ -17,7 +17,7 @@
 ##' @param filter_subset A character value such as \code{"Ethnicity == 'White' & Gender == 'M'"} used in the \code{i} argument (filtering rows via \code{dt[i, j, by]}) to filter data in \code{dt}.  The character value is parsed using \code{eval(parse(text=filter_subset))}.  Defaults to \code{''} for no filtering.
 ##' @return A \link[data.table]{data.table} object with summarized results.
 ##' @importFrom data.table is.data.table as.data.table setnames setkeyv .N `:=` fcase
-##' @importFrom collapse fgroup_by get_vars fsum qDT
+##' @importFrom collapse fgroup_by get_vars fsum qDT collapv
 ##' @export
 di_calc_dt <- function(dt, success_var, group_var, cohort_var='', weight_var=NULL, ppg_reference_group='overall', min_moe=0.03, use_prop_in_moe=FALSE, prop_sub_0=0.5, prop_sub_1=0.5, di_prop_index_cutoff=0.8, di_80_index_cutoff=0.8, di_80_index_reference_group='hpg', filter_subset='') {
 
@@ -78,9 +78,10 @@ di_calc_dt <- function(dt, success_var, group_var, cohort_var='', weight_var=NUL
   dt <- dt[ # Following is using collapse package for aggregation
     , weight__:=1
   ] %>% 
-    fgroup_by(group_by_list) %>%
-    get_vars(c(success_var, weight_var)) %>% 
-    fsum %>%
+    ## fgroup_by(group_by_list) %>% # bug in collapse 1.8.8 https://github.com/SebKrantz/collapse/issues/320#issuecomment-1259065656
+    ## get_vars(c(success_var, weight_var)) %>% 
+    ## fsum %>%
+    collapv(by=c(group_by_list), FUN=fsum, cols=c(success_var, weight_var)) %>% 
     qDT # to not have data.table warning without having to use suppressWarnings https://github.com/SebKrantz/collapse/issues/319#issuecomment-1249527808
   setnames(x=dt, old=c(success_var, weight_var), new=c('success', 'weight'))
   dt[
