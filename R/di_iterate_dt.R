@@ -81,7 +81,7 @@ di_calc_dt <- function(dt, success_var, group_var, cohort_var='', weight_var=NUL
     ## fgroup_by(group_by_list) %>% # bug in collapse 1.8.8 https://github.com/SebKrantz/collapse/issues/320#issuecomment-1259065656
     ## get_vars(c(success_var, weight_var)) %>% 
     ## fsum %>%
-    collapv(by=c(group_by_list), FUN=fsum, cols=c(success_var, weight_var)) %>% 
+    collapv(by=c(group_by_list), custom=list(fsum=c(success_var, weight_var))) %>% 
     qDT # to not have data.table warning without having to use suppressWarnings https://github.com/SebKrantz/collapse/issues/319#issuecomment-1249527808
   setnames(x=dt, old=c(success_var, weight_var), new=c('success', 'weight'))
   dt[
@@ -302,7 +302,7 @@ di_iterate_dt <- function(dt, success_vars, group_vars, cohort_vars=NULL, scenar
   # Need data.table >= 1.14.3
   if(requireNamespace("data.table", quietly=TRUE) &&
     utils::packageVersion("data.table") < "1.14.3") {
-    stop("`di_calc_dt` requires data.table version 1.14.3 or higher.  Please execute the following to update data.table to the current development version:\n\n    data.table::update.dev.pkg()\n\nIf this doesn't work, try:\n\n    install.packages('data.table', repo = 'https://Rdatatable.gitlab.io/data.table') # Select 'Yes' if asked to install from source.\n\nIf the previous doesn't work, you can manually download the package (.tar.gz, .zip, or .tgz) at https://rdatatable.gitlab.io/data.table/web/packages/data.table/index.html and install it yourself.")
+    stop("`di_iterate_dt` requires data.table version 1.14.3 or higher.  Please execute the following to update data.table to the current development version:\n\n    data.table::update.dev.pkg()\n\nIf this doesn't work, try:\n\n    install.packages('data.table', repo = 'https://Rdatatable.gitlab.io/data.table') # Select 'Yes' if asked to install from source.\n\nIf the previous doesn't work, you can manually download the package (.tar.gz, .zip, or .tgz) at https://rdatatable.gitlab.io/data.table/web/packages/data.table/index.html and install it yourself.")
   }
 
   # Following for CRAN: no visible binding for global variable

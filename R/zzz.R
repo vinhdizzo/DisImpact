@@ -19,7 +19,7 @@
   # Need data.table >= 1.14.3
   if(requireNamespace("data.table", quietly=TRUE) &&
     utils::packageVersion("data.table") < "1.14.3") {
-    packageStartupMessage("`di_calc_dt` requires data.table version 1.14.3 or higher.  Please execute the following to update data.table to the current development version:\n\n    data.table::update.dev.pkg()\n\nIf this doesn't work, try:\n\n    install.packages('data.table', repo = 'https://Rdatatable.gitlab.io/data.table') # Select 'Yes' if asked to install from source.\n\nIf the previous doesn't work, you can manually download the package (.tar.gz, .zip, or .tgz) at https://rdatatable.gitlab.io/data.table/web/packages/data.table/index.html and install it yourself.")
+    packageStartupMessage("`di_iterate_dt` requires data.table version 1.14.3 or higher.  Please execute the following to update data.table to the current development version:\n\n    data.table::update.dev.pkg()\n\nIf this doesn't work, try:\n\n    install.packages('data.table', repo = 'https://Rdatatable.gitlab.io/data.table') # Select 'Yes' if asked to install from source.\n\nIf the previous doesn't work, you can manually download the package (.tar.gz, .zip, or .tgz) at https://rdatatable.gitlab.io/data.table/web/packages/data.table/index.html and install it yourself.")
   }
 
   invisible()
