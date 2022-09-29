@@ -407,7 +407,7 @@ di_iterate_sql <- function(db_conn, db_table_name, success_vars, group_vars, coh
   stopifnot(length(group_vars) == length(di_80_index_reference_groups) | length(di_80_index_reference_groups) == 1)
 
   if (isTRUE(parallel)) {
-    if (class(db_conn) == 'duckdb_connection') {
+    if (inherits(db_conn, 'duckdb_connection')) {
       db_type <- 'duckdb'
       if (!(db_table_name %>% tolower %>% str_detect("\\.parquet'$"))) {
         stop("`parallel=TRUE` is only supported for DB connections (`db_conn` argument) from the duckdb package and when `db_table_name` is a path to a parquet file surrounded by single quotes ('/path/to/data.parquet').")
@@ -427,7 +427,7 @@ di_iterate_sql <- function(db_conn, db_table_name, success_vars, group_vars, coh
   }
   
   check_mssql <- try(db_conn@info$dbms.name == 'Microsoft SQL Server', silent=TRUE)
-  if (class(check_mssql) == 'try-error') {
+  if (inherits(check_mssql, 'try-error')) {
     check_mssql <- FALSE
   }
   if (check_mssql | mssql_flag) {
@@ -466,7 +466,7 @@ limit 1
 
   for (var_to_check in vars_to_check) {
     check_result <- try(dbGetQuery(conn=db_conn, statement=glue(query_check_var)), silent=TRUE)
-    if (class(check_result) == 'try-error') {
+    if (inherits(check_result, 'try-error')) {
       stop(glue("Variable not found in table {db_table_name}: {var_to_check}."))
     }
   }
