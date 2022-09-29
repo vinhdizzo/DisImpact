@@ -349,7 +349,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
       bind_rows %>%
       mutate(cohort_variable=ifelse(cohort_variable=='_cohort_', '', cohort_variable)) %>% 
       arrange(success_variable, cohort_variable, cohort, disaggregation, group) %>%
-      return
+      return()
   } else {
     if (!parallel) {
       dRepeatScenarios$df_results <- lapply(1:nrow(dRepeatScenarios)
@@ -416,7 +416,7 @@ di_iterate <- function(data, success_vars, group_vars, cohort_vars=NULL, scenari
       unnest(df_results) %>%
       mutate(cohort_variable=ifelse(cohort_variable=='_cohort_', '', cohort_variable)) %>% 
       arrange(across(one_of(c(scenario_repeat_by_vars, 'success_variable', 'cohort_variable', 'cohort', 'disaggregation', 'group')))) %>%
-      return
+      return()
   }
 }
 
