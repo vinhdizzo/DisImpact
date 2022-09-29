@@ -644,7 +644,7 @@ For users not familiar with `data.table`, the recommended workflow for using `di
 1. it allows the user to operate on tables that are too large to be ingested into R; and
 2. it off-loads the computations onto the database engine (so calculations are not leveraging the user's system's resources or R).
 
-Let's illustrate `di_iterate_sql` with a [SQLite](https://www.sqlite.org/) database:
+Let's illustrate `di_iterate_sql` with a [SQLite](https://www.sqlite.org/index.html) database:
 
 ```{r}
 library(DBI) # Connect and query databases
