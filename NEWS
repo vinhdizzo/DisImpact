@@ -1,3 +1,6 @@
+* 0.0.21
+  - Swictched to check on `env` argument/support in data.table instead of version numbering (https://github.com/Rdatatable/data.table/issues/5466#issuecomment-1272700196)
+
 * 0.0.20
   - `di_ppg` (and hence, `di_iterate`) change:
     + When `reference='hpg'`, the returned `reference_group` column (`di_ppg`) and `ppg_reference_group` column (`di_iterate`) will now show the reference group name (highest performing group) instead of 'hpg'

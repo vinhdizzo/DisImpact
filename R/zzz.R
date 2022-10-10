@@ -18,8 +18,8 @@
   
   # Need data.table >= 1.14.3
   if(requireNamespace("data.table", quietly=TRUE) &&
-    utils::packageVersion("data.table") < "1.14.3") {
-    packageStartupMessage("`di_iterate_dt` requires data.table version 1.14.3 or higher.  Please execute the following to update data.table to the current development version:\n\n    detach('package:DisImpact', unload=TRUE) # unload package\n\n    data.table::update.dev.pkg()\n\nIf this doesn't work, try:\n\n    install.packages('data.table', repo = 'https://Rdatatable.gitlab.io/data.table') # Select 'Yes' if asked to install from source.\n\nIf the previous doesn't work, you can manually download the package (.tar.gz, .zip, or .tgz) at https://rdatatable.gitlab.io/data.table/web/packages/data.table/index.html and install it yourself.")
+    !("env" %in% names(as.list(args(utils::getFromNamespace("[.data.table", "data.table")))))) {
+    packageStartupMessage("`di_iterate_dt` requires a new version of data.table.  Please execute the following to update data.table to the current development version:\n\n    detach('package:DisImpact', unload=TRUE) # unload package\n\n    data.table::update.dev.pkg()\n\nIf this doesn't work, try:\n\n    install.packages('data.table', repo = 'https://Rdatatable.gitlab.io/data.table') # Select 'Yes' if asked to install from source.\n\nIf the previous doesn't work, you can manually download the package (.tar.gz, .zip, or .tgz) at https://rdatatable.gitlab.io/data.table/web/packages/data.table/index.html and install it yourself.")
   }
 
   invisible()
