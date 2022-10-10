@@ -5,7 +5,7 @@
 ## setwd('vignettes')
 ## knitr::knit("Scaling-DI-Calculations.Rmd.orig", output = "Scaling-DI-Calculations.Rmd") # Manually build one of the vignettes here in order to pass CRAN https://ropensci.org/blog/2019/12/08/precompute-vignettes/
 ## setwd('..') # back to DisImpact
-## devtools::check(cran=TRUE)
+## devtools::check(cran=TRUE) # ignore parallel error
 ## devtools::build()
 ## devtools::build(vignettes=FALSE)
 ## setwd('..')
